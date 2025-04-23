@@ -433,3 +433,102 @@ body.hider-vault:not(.is-mobile) .workspace-split.mod-left-split .workspace-side
 .hider-file-nav-header .workspace-leaf-content[data-type=file-explorer] .nav-header {
   display: none;
 }
+
+/* ------------------------------------------------------------------
+   Dataview / Mini-Table column-width tuning
+------------------------------------------------------------------ */
+/* ① Title ─ 왼쪽 정렬·넉넉한 폭 */
+.dv-table-wrapper table thead th:nth-child(1),
+.dv-table-wrapper table tbody  td:nth-child(1) {
+  width: 28%;          /* 또는 min-width: 280px; */
+  text-align: left;    /* 제목은 왼쪽 정렬이 가독성 ↑ */
+  white-space: normal; /* 줄바꿈 허용 */
+}
+
+/* ② Created Date, ③ Published Date ─ 날짜는 좁게 */
+.dv-table-wrapper table thead th:nth-child(2),
+.dv-table-wrapper table tbody  td:nth-child(2),
+.dv-table-wrapper table thead th:nth-child(3),
+.dv-table-wrapper table tbody  td:nth-child(3) {
+  width: 11%;
+  min-width: 95px;     /* 작은 화면 대비 */
+  white-space: nowrap; /* 2025-04-21 처럼 한 줄 유지 */
+}
+
+/* ④ Status */
+.dv-table-wrapper table thead th:nth-child(4),
+.dv-table-wrapper table tbody  td:nth-child(4) {
+  width: 8%;
+  min-width: 70px;
+}
+
+/* ⑤ Importance */
+.dv-table-wrapper table thead th:nth-child(5),
+.dv-table-wrapper table tbody  td:nth-child(5) {
+  width: 10%;
+  min-width: 80px;
+}
+
+/* ⑥ Tags ─ 가장 길어질 수 있으므로 넉넉하게 */
+.dv-table-wrapper table thead th:nth-child(6),
+.dv-table-wrapper table tbody  td:nth-child(6) {
+  width: 32%;
+  white-space: normal;     /* 태그 여러 줄 허용 */
+  text-align: center;
+}
+
+/* 선택 – 세로 스크롤 대신 셀 내부 줄바꿈을 허용하고 싶다면 */
+.dv-table-wrapper table td {
+  overflow-wrap: anywhere; /* 긴 링크·태그 자동 줄바꿈 */
+}
+
+/* ------------------------------------------------------------------
+   Center-fixed layout (prevent left/right drifting)
+------------------------------------------------------------------ */
+/* ① 페이지 전체를 감쌀 래퍼 */
+.dvit-page-wrapper{
+  max-width: 1180px;   /* 원하는 최대 폭 — 필요 없으면 지워도 OK */
+  width: 100%;
+  margin: 0 auto;      /* 좌우 중앙 고정 */
+  padding: 0 16px;     /* 모바일 사이드 여백 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;           /* 위·아래 블록 간 여백 */
+}
+
+/* ② 상단(필터·검색) 행을 3-컬럼 Grid 로 정렬 — 좌·중·우 균형 */
+.dvit-top-row{
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr; /* 왼쪽·오른쪽은 가변, 가운데는 실제 컨텐츠 */
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+.dvit-left-area   { justify-self: start; }
+.dvit-center-area { justify-self: center; }
+.dvit-right-area  { justify-self: end;   }
+
+/* ③ 검색창 묶음(우측)도 깔끔하게 */
+.dvit-search-wrapper{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ④ 테이블·페이지네이션도 래퍼 폭에 맞춰 100 % */
+.dv-table-wrapper,
+.pagination-block{
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 선택: 화면이 아주 넓을 때도 테이블 셀 줄바꿈이 자연스럽도록 */
+.dv-table-wrapper table td{
+  overflow-wrap: anywhere;
+}
+
+/* 선택: 배너와 본문 사이 여백이 부족하면 */
+.dvit-page-wrapper{
+  margin-top: 2rem;   /* 히어로 배너 → 본문 간 공백 */
+}
