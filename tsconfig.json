@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",                           // 소스 디렉토리 지정
+    "outDir": "dist",                           // 빌드 산출물 경로
+    "baseUrl": ".",                             // 절대 경로 기준
+    "module": "ESNext",                         // 번들러가 처리할 모듈 형식
+    "target": "ES2020",                         // 출력 코드 타겟
+    "lib": ["DOM", "ES2020"],                   // 사용할 라이브러리
+    "strict": true,                             // 모든 엄격 검사 활성화
+    "noImplicitAny": true,                      // 암시적 any 금지
+    "strictNullChecks": true,                   // null 검사
+    "esModuleInterop": true,                    // CommonJS 호환
+    "allowSyntheticDefaultImports": true,       // 디폴트 import 허용
+    "moduleResolution": "node",                 // Node 방식 해석
+    "resolveJsonModule": true,                  // JSON import 지원
+    "importHelpers": true,                      // tslib import 사용
+    "isolatedModules": true,                    // 개별 트랜스파일 모드
+    "skipLibCheck": true,                       // 라이브러리 .d.ts 검사 생략
+    "forceConsistentCasingInFileNames": true,   // 파일명 대소문자 일관성
+    "inlineSourceMap": false,                   // 개발용만 true 권장
+    "inlineSources": false                       // 개발용만 true 권장
+  },
+  "include": ["src"],                           // 컴파일 대상
+  "exclude": ["node_modules", "dist"]           // 제외할 폴더
+}
+

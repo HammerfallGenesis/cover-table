@@ -1,0 +1,27 @@
+{
+	"name": "obsidian-cover-table-plugin",
+	"version": "1.0.0",
+	"description": "Navigator that displays your vault files as a table on the cover screen, with Dataview filtering & sorting, optimized for mobile.",
+	"main": "dist/main.js",
+	"scripts": {
+	  "dev": "node esbuild.config.mjs",
+	  "build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs --production",
+	  "version": "node version-bump.mjs && git add manifest.json versions.json"
+	},
+	"keywords": [
+	  "obsidian-plugin",
+	  "cover-screen",
+	  "table",
+	  "dataview",
+	  "mobile"
+	],
+	"author": "HammerfallGenesis <you@example.com>",
+	"license": "MIT",
+	"devDependencies": {
+	  "@types/node": "^16.11.6",
+	  "builtin-modules": "^3.3.0",
+	  "esbuild": "^0.17.11",
+	  "typescript": "^4.7.4"
+	}
+  }
+  
