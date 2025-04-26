@@ -1,5 +1,4 @@
 import { App } from "obsidian";
-import { InteractiveTable } from "./interactive_table";
 
 /***********************************************************************
  * gantt_table.ts (최종 수정안)
@@ -21,15 +20,13 @@ export class GanttTable {
   private legendData: Record<string, string>;
 
   private isDarkMode: boolean;
-  private interactiveTable: InteractiveTable | null;
 
-  constructor() {
+  constructor(private app: App) {
     this.noteColorMap = {};
     this.colorIndex = 0;
     this.legendData = {};
 
     this.isDarkMode = document.body.classList.contains("theme-dark");
-    this.interactiveTable = null;
   }
 
   /**
@@ -38,13 +35,14 @@ export class GanttTable {
    *    - parentEl: 실제 DOM 컨테이너(예: dv.container)
    */
   private createResponsiveHR(parentEl: HTMLElement) {
-    let hr = parentEl.createEl("hr");
-    if (document.body.classList.contains("theme-dark")) {
+    const hr = document.createElement("hr");
+    if (this.isDarkMode) {
       hr.style.border = "1px solid #fff";
     } else {
       hr.style.border = "1px solid #000";
     }
     hr.style.margin = "10px 0";
+    parentEl.appendChild(hr);
     return hr;
   }
 
@@ -301,15 +299,13 @@ export class GanttTable {
     }
 
     // (5) renderInteractiveBelow
-    if (settings.renderInteractiveBelow === true) {
-      // 간트 아래 구분선 → dv.container (DOM 요소)에 hr 추가
+    if (settings.renderInteractiveBelow) {
       this.createResponsiveHR(dv.container);
 
       // 아래쪽 InteractiveTable
-      const engine = (globalThis as any).miniTableGlobal?.engine;
-      if (engine && typeof engine.renderAutoView === "function") {
-        let itSettings = settings.interactiveOptions || {};
-        await engine.renderAutoView(dv, itSettings);
+      const engine = (globalThis as any).coverTable.engine as any;
+      if (engine?.renderAutoView) {
+        await engine.renderAutoView(dv, settings.interactiveOptions ?? {});
       }
     }
   }
