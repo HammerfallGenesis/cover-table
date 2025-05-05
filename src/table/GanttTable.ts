@@ -20,22 +20,23 @@ export interface GanttSettings {
   /* 상태 필터 */
   statusField?: string;
   statusDoneValue?: string;
-  excludeDone?: boolean;          // 기본값: true
+  excludeDone?: boolean;            // 기본값: true
 
   /* 날짜 필드 */
-  startField?: string;            // 기본값: "created"
-  endField?: string;              // 기본값: "end"
+  startField?: string;              // 기본값: "created"
+  endField?: string;                // 기본값: "end"
 
   /* 팔레트 */
-  colorPalette?: string[];        // 일반
-  colorPaletteDark?: string[];    // 다크 우선
-  colorPaletteLight?: string[];   // 라이트 우선
+  colorPalette?:       string[];
+  colorPaletteDark?:   string[];
+  colorPaletteLight?:  string[];
 
   /* 표시 옵션 */
-  showLegend?: boolean;           // 기본값: true
+  showLegend?:            boolean; // 기본값: true
   renderInteractiveBelow?: boolean; // 기본값: true
-  interactiveOptions?: any;       // InteractiveTable 전달
-  debugLegend?: boolean;          // JSON 범례 출력
+  forceInteractiveBelow?:  boolean; // 🆕 작업이 없어도 InteractiveTable 강제 렌더
+  interactiveOptions?:     any;
+  debugLegend?:            boolean;
 }
 
 /* 기본 색상군 */
@@ -221,80 +222,92 @@ export class GanttTable {
   }
 
   /*──────────────────────────────────────────────────────────────
-    H. renderView (DataviewJS / 코드펜스)
-  ─────────────────────────────────────────────────────────────*/
+      H. renderView (DataviewJS / 코드펜스)
+  ──────────────────────────────────────────────────────────────*/
   public async renderView(
-    dv:any,
-    settings:GanttSettings={},
-    ctx?:MarkdownPostProcessorContext,
-    hostPre?:HTMLElement             // 코드펜스 <pre>
+    dv: any,
+    settings: GanttSettings = {},
+    ctx?: MarkdownPostProcessorContext,
+    hostPre?: HTMLElement            // 코드펜스 <pre>
   ){
-    /* 기본값 */
+    /* 0) 기본값 확정 */
     settings.renderInteractiveBelow ??= true;
-    settings.showLegend ??= true;
+    settings.showLegend             ??= true;
+    settings.forceInteractiveBelow  ??= false;
+
+    /* forceInteractive 가 켜져 있으면 InteractiveTable 렌더 플래그를 무조건 ON */
+    if (settings.forceInteractiveBelow)
+      settings.renderInteractiveBelow = true;
 
     /* 1) current page 확보 */
     let cur = dv.current?.();
-    if((!cur||!cur.file)&&ctx?.sourcePath) cur=dv.page(ctx.sourcePath);
-    if(!cur?.file){ console.warn("[Gantt] current page not found – abort"); return; }
-
-    /* dv.current 임시 패치 (canvas 호출 지원) */
-    const origCurrent=dv.current;
-    (dv as any).current=()=>cur;
-
-    /* 2) 렌더 컨테이너 */
-    let container:HTMLElement;
-    if(hostPre){
-      container=document.createElement("div");
-      container.classList.add("gantt-view");
-      hostPre.insertAdjacentElement("beforebegin",container);
-    }else{
-      container=dv.container;
-    }
-
-    /* 3) 헤더(년·월) */
-    const now=new Date();
-    const monthName=new Intl.DateTimeFormat("en",{month:"long"}).format(now);
-    const header=container.createEl("p");
-    header.innerHTML=`<span class="gantt-month-year">${monthName} ${now.getFullYear()}</span>`;
-
-    /* 상태 초기화 */
-    this.noteColorMap={};this.colorPtr=0;this.legendMap={};
-
-    /* 4) 데이터 수집 */
-    const data=this.gatherData(dv,settings);
-    (dv as any).current=origCurrent;   // 원복
-
-    if(data.all.length===0){
-      container.createEl("p",{text:"*No tasks*"});
+    if ((!cur || !cur.file) && ctx?.sourcePath) cur = dv.page(ctx.sourcePath);
+    if (!cur?.file) {
+      console.warn("[Gantt] current page not found – abort");
       return;
     }
 
-    /* 5) 테이블 + 범례 */
-    const wrap=container.createDiv("gantt-container");
-    wrap.innerHTML = this.buildTable(data)+
-      (settings.showLegend!==false ? this.buildLegendHTML(data) : "");
+    /* dv.current 임시 패치 (canvas 지원) */
+    const origCurrent = dv.current;
+    (dv as any).current = () => cur;
 
-    this.paintCells(wrap,data);
-    this.legendMap=this.makeLegendMap(data);
-
-    if(settings.debugLegend){
-      const pre=container.createEl("pre",{cls:"gantt-debug"});
-      pre.innerText=JSON.stringify(this.legendMap,null,2);
+    /* 2) 렌더 컨테이너 */
+    let container: HTMLElement;
+    if (hostPre) {
+      container = document.createElement("div");
+      container.classList.add("gantt-view");
+      hostPre.insertAdjacentElement("beforebegin", container);
+    } else {
+      container = dv.container;
     }
 
-    /* 6) InteractiveTable 연동 */
-    if(settings.renderInteractiveBelow){
+    /* 3) 헤더(년·월) */
+    const now       = new Date();
+    const monthName = new Intl.DateTimeFormat("en",{month:"long"}).format(now);
+    const header    = container.createEl("p");
+    header.innerHTML = `<span class="gantt-month-year">${monthName} ${now.getFullYear()}</span>`;
+
+    /* 상태 초기화 */
+    this.noteColorMap = {};
+    this.colorPtr     = 0;
+    this.legendMap    = {};
+
+    /* 4) 데이터 수집 */
+    const data = this.gatherData(dv, settings);
+    (dv as any).current = origCurrent;   // 원복
+
+    /* 5) Gantt 본체 ------------------------------------------------*/
+    if (data.all.length > 0) {
+      const wrap = container.createDiv("gantt-container");
+      wrap.innerHTML =
+        this.buildTable(data) +
+        (settings.showLegend !== false ? this.buildLegendHTML(data) : "");
+
+      this.paintCells(wrap, data);
+      this.legendMap = this.makeLegendMap(data);
+
+      if (settings.debugLegend) {
+        const pre = container.createEl("pre", { cls: "gantt-debug" });
+        pre.innerText = JSON.stringify(this.legendMap, null, 2);
+      }
+    } else {
+      /* 작업이 없으면 안내 문구만 출력 */
+      container.createEl("p", { text: "*No tasks*" });
+    }
+
+    /* 6) InteractiveTable 연동 -------------------------------------*/
+    if (settings.renderInteractiveBelow) {
       this.hr(container);
-      const engine=(window as any).coverTable?.engine;
+      const engine = (window as any).coverTable?.engine;
       await engine?.renderAutoView(
         dv,
-        settings.interactiveOptions??{},
+        settings.interactiveOptions ?? {},
         ctx,
         container
       );
     }
   }
+
 
   /*──────────────────────────────────────────────────────────────
     I. 범례 외부 제공

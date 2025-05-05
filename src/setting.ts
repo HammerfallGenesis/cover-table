@@ -178,7 +178,7 @@ export const DEFAULT_BASE_VARS: BaseThemeVars = {
 };
 
 /*───────────────────────────────────────────────────────────────
-  1-B.  DEFAULT GLOBAL TOKEN COLOURS  ← NEW
+  1-B. DEFAULT GLOBAL TOKEN COLOURS
 ───────────────────────────────────────────────────────────────*/
 const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
   gHeaderBg     : "#2d2d2d",
@@ -191,8 +191,8 @@ const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
 
   itHeaderBg    : "#7a481d",
   itHeaderFg    : "#fff0e6",
-  itRowOdd      : "rgba(160,85,40,0.25)",
-  itRowEven     : "rgba(135,70,30,0.25)",
+  itRowOdd      : "#171717",
+  itRowEven     : "#171717",
   itRowHover    : "rgba(200,120,50,0.28)",
   itBorder      : "rgba(200,145,80,0.45)",
   itBorderV     : "rgba(200,145,80,0.45)",
@@ -205,27 +205,33 @@ const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
   hdrBarBg      : "#7a481d",
   sepColor      : "#7a481d",
 };
+
 const DEFAULT_GLOBAL_TOKENS_LIGHT: GlobalTokenColorConfig = {
-  ...DEFAULT_GLOBAL_TOKENS_DARK,                    // 전체 복사 후 필요한 값만 덮어씀
   gHeaderBg     : "#eeeeee",
   gHeaderFg     : "#202020",
+  gLine         : "#444444",
   gRowOdd       : "#f7f7f7",
   gRowEven      : "#f1f1f1",
   gRowHover     : "#eaeaea",
+  gTodayOutline : "#ffffff",
 
-  itHeaderBg    : "#c6934b",
-  itHeaderFg    : "#382409",
-  itRowOdd      : "rgba(230,210,190,0.45)",
-  itRowEven     : "rgba(220,200,180,0.45)",
-  itRowHover    : "rgba(255,225,185,0.55)",
-  itBorder      : "rgba(150,115,70,0.45)",
-  itBorderV     : "rgba(150,115,70,0.45)",
+  itHeaderBg    : "#0644fe",
+  itHeaderFg    : "#ffffff",
+  itRowOdd      : "#171717",
+  itRowEven     : "#171717",
+  itRowHover    : "#616161",
+  itBorder      : "#0076f5",
+  itBorderV     : "#171717",
 
-  btnBg         : "#c6934b",
-  btnBgHover    : "#dba663",
-  hdrBarBg      : "#c6934b",
-  sepColor      : "#c6934b",
+  btnBg         : "#171717",
+  btnBgHover    : "#171717",
+  btnFg         : "#ffffff",
+  btnGradTop    : "#3d4aff",
+  btnGradBottom : "#030099",
+  hdrBarBg      : "#338bff",
+  sepColor      : "#5c9aff",
 };
+
 
 /*───────────────────────────────────────────────────────────────
   1-C.  DEFAULT_SETTINGS  ← GLOBAL TOKEN 필드 추가
@@ -236,13 +242,15 @@ export const DEFAULT_SETTINGS: CoverTableSettings = {
   hideZeroFolders      : false,
   design       : { dark: { ...DEFAULT_IT_COLOR },
                    light: { ...DEFAULT_IT_COLOR,
-                            buttonColor:"#c6934b", buttonHoverColor:"#dba663",
-                            itHeaderBg:"#c6934b", itHeaderFg:"#382409",
-                            itRowOdd:"rgba(230,210,190,.45)",
-                            itRowEven:"rgba(220,200,180,.45)",
-                            itRowHover:"rgba(255,225,185,.55)",
-                            itBorder:"rgba(150,115,70,.45)",
-                            itBorderV : "rgba(150,115,70,0.45)" } },
+                    buttonColor     : "#c6934b",
+                    buttonHoverColor: "#dba663",
+                    itHeaderBg      : "#c6934b",
+                    itHeaderFg      : "#382409",
+                    itRowOdd        : "rgba(230,210,190,.45)",
+                    itRowEven       : "rgba(220,200,180,.45)",
+                    itRowHover      : "rgba(255,225,185,.55)",
+                    itBorder        : "rgba(150,115,70,.45)",
+                    itBorderV       : "rgba(150,115,70,0.45)",} },
   globalTokens : { dark : { ...DEFAULT_GLOBAL_TOKENS_DARK },
                    light: { ...DEFAULT_GLOBAL_TOKENS_LIGHT } },   /* ← NEW */
   baseVars     : { ...DEFAULT_BASE_VARS },
