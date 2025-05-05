@@ -29,13 +29,13 @@
   --g-legend-size   : 12px;
 
   /* ── INTERACTIVE TABLE ─────────────────────────────────── */
-  --it-header-bg    : #0f3a79;
-  --it-header-fg    : #ffffff;
-  --it-row-odd      : #1e1e1e;
-  --it-row-even     : #1e1e1e;
-  --it-row-hover    : #363636;
-  --it-border       : #0f3a79;
-  --it-border-v     : #0f3a79;        /* ★ NEW : 세로선(V) */
+  --ct-it-header-bg    : #0f3a79;
+  --ct-it-header-fg    : #ffffff;
+  --ct-it-row-odd      : #1e1e1e;
+  --ct-it-row-even     : #1e1e1e;
+  --ct-it-row-hover    : #363636;
+  --ct-it-border       : #0f3a79;
+  --ct-it-border-v     : #0f3a79;        /* ★ NEW : 세로선(V) */
 
   /* ── BUTTONS ────────────────────────────────────────────── */
   --btn-bg          : #1e1e1e;

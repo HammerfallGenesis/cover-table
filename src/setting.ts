@@ -96,12 +96,12 @@ export const CSS_VAR_MAP_GLOBAL: Record<keyof GlobalTokenColorConfig, string> = 
   gRowHover     : "--g-row-hover",
   gTodayOutline : "--g-today-outline",
 
-  itHeaderBg    : "--it-header-bg",
-  itHeaderFg    : "--it-header-fg",
-  itRowOdd      : "--it-row-odd",
-  itRowEven     : "--it-row-even",
-  itRowHover    : "--it-row-hover",
-  itBorder      : "--it-border",
+  itHeaderBg    : "--ct-it-header-bg",
+  itHeaderFg    : "--ct-it-header-fg",
+  itRowOdd      : "--ct-it-row-odd",
+  itRowEven     : "--ct-it-row-even",
+  itRowHover    : "--ct-it-row-hover",
+  itBorder      : "--ct-it-border",
 
   btnBg         : "--btn-bg",
   btnBgHover    : "--btn-bg-hover",
