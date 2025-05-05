@@ -27,6 +27,7 @@ export interface ModeColorConfig {
   itRowEven        : string;
   itRowHover       : string;
   itBorder         : string;
+  itBorderV         : string;
 }
 export interface DesignOptions { dark: ModeColorConfig; light: ModeColorConfig; }
 export type   BaseThemeVars   = Record<string, string>;
@@ -71,6 +72,7 @@ export interface GlobalTokenColorConfig {
   itRowEven      : string;   /* --it-row-even       */
   itRowHover     : string;   /* --it-row-hover      */
   itBorder       : string;   /* --it-border         */
+  itBorderV       : string;   /* --it-border-v         */
 
   /* BUTTONS / HEADER BAR / SEPARATORS */
   btnBg          : string;   /* --btn-bg            */
@@ -96,12 +98,13 @@ export const CSS_VAR_MAP_GLOBAL: Record<keyof GlobalTokenColorConfig, string> = 
   gRowHover     : "--g-row-hover",
   gTodayOutline : "--g-today-outline",
 
-  itHeaderBg    : "--ct-it-header-bg",
-  itHeaderFg    : "--ct-it-header-fg",
-  itRowOdd      : "--ct-it-row-odd",
-  itRowEven     : "--ct-it-row-even",
-  itRowHover    : "--ct-it-row-hover",
-  itBorder      : "--ct-it-border",
+  itHeaderBg    : "--it-header-bg",
+  itHeaderFg    : "--it-header-fg",
+  itRowOdd      : "--it-row-odd",
+  itRowEven     : "--it-row-even",
+  itRowHover    : "--it-row-hover",
+  itBorder      : "--it-border",
+  itBorderV     : "--it-border-v", 
 
   btnBg         : "--btn-bg",
   btnBgHover    : "--btn-bg-hover",
@@ -125,6 +128,7 @@ export const DEFAULT_IT_COLOR: ModeColorConfig = {
   itRowEven        : "rgba(135,70,30,0.25)",
   itRowHover       : "rgba(200,120,50,0.28)",
   itBorder         : "rgba(200,145,80,0.45)",
+  itBorderV        : "rgba(150,115,70,0.45)",
 };
 
 /* (Light/Dark Base Vars 전체 – 동일) */
@@ -191,6 +195,7 @@ const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
   itRowEven     : "rgba(135,70,30,0.25)",
   itRowHover    : "rgba(200,120,50,0.28)",
   itBorder      : "rgba(200,145,80,0.45)",
+  itBorderV     : "rgba(200,145,80,0.45)",
 
   btnBg         : "#7a481d",
   btnBgHover    : "rgba(140,70,30,0.9)",
@@ -214,6 +219,7 @@ const DEFAULT_GLOBAL_TOKENS_LIGHT: GlobalTokenColorConfig = {
   itRowEven     : "rgba(220,200,180,0.45)",
   itRowHover    : "rgba(255,225,185,0.55)",
   itBorder      : "rgba(150,115,70,0.45)",
+  itBorderV     : "rgba(150,115,70,0.45)",
 
   btnBg         : "#c6934b",
   btnBgHover    : "#dba663",
@@ -235,7 +241,8 @@ export const DEFAULT_SETTINGS: CoverTableSettings = {
                             itRowOdd:"rgba(230,210,190,.45)",
                             itRowEven:"rgba(220,200,180,.45)",
                             itRowHover:"rgba(255,225,185,.55)",
-                            itBorder:"rgba(150,115,70,.45)" } },
+                            itBorder:"rgba(150,115,70,.45)",
+                            itBorderV : "rgba(150,115,70,0.45)" } },
   globalTokens : { dark : { ...DEFAULT_GLOBAL_TOKENS_DARK },
                    light: { ...DEFAULT_GLOBAL_TOKENS_LIGHT } },   /* ← NEW */
   baseVars     : { ...DEFAULT_BASE_VARS },
@@ -247,14 +254,15 @@ export const DEFAULT_SETTINGS: CoverTableSettings = {
   2.  CSS Token ↔ CSS Var Map (동일)
 ───────────────────────────────────────────────────────────────*/
 export const CSS_VAR_MAP: Record<keyof ModeColorConfig, string> = {
-  buttonColor      : "--ct-btn-bg",
-  buttonHoverColor : "--ct-btn-bg-hover",
-  itHeaderBg       : "--ct-it-header-bg",
-  itHeaderFg       : "--ct-it-header-fg",
-  itRowOdd         : "--ct-it-row-odd",
-  itRowEven        : "--ct-it-row-even",
-  itRowHover       : "--ct-it-row-hover",
-  itBorder         : "--ct-it-border",
+  buttonColor      : "--btn-bg",
+  buttonHoverColor : "--btn-bg-hover",
+  itHeaderBg       : "--it-header-bg",
+  itHeaderFg       : "--it-header-fg",
+  itRowOdd         : "--it-row-odd",
+  itRowEven        : "--it-row-even",
+  itRowHover       : "--it-row-hover",
+  itBorder         : "--it-border",
+  itBorderV        : "--it-border-v",
 };
 
 /*───────────────────────────────────────────────────────────────
@@ -306,9 +314,15 @@ private readonly DESC_BOLD_COLOR =
     return a!==255 ? hex + a.toString(16).padStart(2,"0") : hex;
   }
 
-  private static cssColorToHex(src: string): string {
+  /*───────────────────────────────────────────────────────────────
+      cssColorToHex()  –  any CSS → 6-digit HEX  (NULL SAFE)   🆕
+  ───────────────────────────────────────────────────────────────*/
+  private static cssColorToHex(src?: string): string {
+    /* ❶ undefined / null / 빈 문자 → 기본값 */
+    if (!src || typeof src !== "string") return "#000000";
+
     src = src.trim();
-  
+
     /* (#abc | #abcdef | #abcdef80) → 표준화 */
     if (/^#[0-9a-f]{3,8}$/i.test(src)) {
       const hex = src.replace("#", "");
@@ -319,8 +333,8 @@ private readonly DESC_BOLD_COLOR =
       );
       return "#" + hex.toLowerCase();                 /* 6 or 8 digits */
     }
-  
-    /* rgb/rgba → HEX(A) */
+
+    /* rgb / rgba → HEX(A) */
     const m = src.match(
       /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([0-9.]+))?\)$/i
     );
@@ -334,7 +348,7 @@ private readonly DESC_BOLD_COLOR =
       const hexRGB = [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
       return "#" + hexRGB + (a === 255 ? "" : a.toString(16).padStart(2, "0"));
     }
-  
+
     /* 기타(hsl 등) → 기본값 */
     return "#000000";
   }
@@ -525,7 +539,7 @@ private buildListCalloutsSection(container: HTMLElement){
 
 
 /*─────────────────────────────────────────────────────────────
-    🌟 Global Token Colour Section  (전체 교체)
+    🌟 Global Token Colour Section  (NULL SAFE)   🆕
 ─────────────────────────────────────────────────────────────*/
 private buildGlobalTokenColorSection(
   container: HTMLElement,
@@ -539,17 +553,21 @@ private buildGlobalTokenColorSection(
   container.createEl("p",{text:this.DESC_GLOBAL_TOKEN, cls:"ct-desc"});
 
   const NOTE: Partial<Record<keyof GlobalTokenColorConfig,string>> = {
-    gHeaderBg   :"Gantt 헤더 배경",
-    gHeaderFg   :"Gantt 헤더 글자색",
-    itHeaderBg  :"테이블 헤더 배경",
-    itRowOdd    :"테이블 홀수행 배경",
-    btnBg       :"일반 버튼 배경",
-    btnBgHover  :"버튼 Hover 배경",
-    hdrBarBg    :"설정창 헤더 바 배경",
+    gHeaderBg  :"Gantt 헤더 배경",
+    gHeaderFg  :"Gantt 헤더 글자색",
+    itHeaderBg :"테이블 헤더 배경",
+    itRowOdd   :"테이블 홀수행 배경",
+    btnBg      :"일반 버튼 배경",
+    btnBgHover :"버튼 Hover 배경",
+    hdrBarBg   :"설정창 헤더 바 배경",
   };
 
   (Object.keys(CSS_VAR_MAP_GLOBAL) as (keyof GlobalTokenColorConfig)[])
     .forEach(tok=>{
+      /* ❶ 값이 없으면 임시 기본값(#000000) 주입 */
+      if (this.plugin.settings.globalTokens[mode][tok] === undefined)
+        this.plugin.settings.globalTokens[mode][tok] = "#000000";
+
       const cur = this.plugin.settings.globalTokens[mode][tok];
       const row = new Setting(container)
         .setName(tok)
@@ -558,12 +576,13 @@ private buildGlobalTokenColorSection(
       row.addColorPicker(cp=>cp
         .setValue(CoverTableSettingTab.cssColorToHex(cur))
         .onChange(async v=>{
-          this.plugin.settings.globalTokens[mode][tok]=v;
+          this.plugin.settings.globalTokens[mode][tok] = v;
           await this.plugin.saveSettings();
           this.plugin.applyDesignSettings();
         }));
     });
 }
+
 
 
 /*─────────────────────────────────────────────────────────────
