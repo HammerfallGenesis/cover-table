@@ -5,7 +5,7 @@
  *   · HeaderLabeller(번호매기기) & BaseTheme 주입
  ***********************************************************************/
 
-import { CSS_VAR_MAP }              from "./setting";
+import { CSS_VAR_MAP, CSS_VAR_MAP_GLOBAL } from "./setting";
 import type { ModeColorConfig,
               CoverTableSettings }  from "./setting";
 import {
@@ -169,38 +169,45 @@ export default class CoverTablePlugin extends Plugin{
 
   /*───────── Design & Theme 주입 ─────────*/
   applyDesignSettings() {
-    /* ① Interactive-Table 색상 → CSS 변수 */
+    /* ① Interactive-Table 색상 → CSS 변수(:root) */
     const mode = this.app.getTheme() === "obsidian-dark" ? "dark" : "light";
-    const cfg  = this.settings.design[mode];
-    const root = document.documentElement;
-    (Object.keys(CSS_VAR_MAP) as (keyof ModeColorConfig)[]).forEach(tok =>
-      root.style.setProperty(CSS_VAR_MAP[tok], cfg[tok]),
-    );
+    const itCfg = this.settings.design[mode];
+    const gCfg  = this.settings.globalTokens[mode];
+    const root  = document.documentElement;
+
+    /* Interactive-Table 전용 변수 */
+    (Object.keys(CSS_VAR_MAP) as (keyof ModeColorConfig)[])
+      .forEach(tok => root.style.setProperty(CSS_VAR_MAP[tok], itCfg[tok]));
+
+    /* 🌟 Global Token 변수 */
+    (Object.keys(CSS_VAR_MAP_GLOBAL) as (keyof GlobalTokenColorConfig)[])
+      .forEach(tok => root.style.setProperty(CSS_VAR_MAP_GLOBAL[tok], gCfg[tok]));
 
     /* ② Base Theme CSS (전체 스타일 시트) */
     const idBase = "ct-base-theme";
-    let stBase = document.getElementById(idBase) as HTMLStyleElement | null;
+    let stBase   = document.getElementById(idBase) as HTMLStyleElement | null;
     if (!stBase && this.settings.enableBaseTheme) {
-      stBase = document.createElement("style");
+      stBase    = document.createElement("style");
       stBase.id = idBase;
       document.head.appendChild(stBase);
     }
-    if (stBase) stBase.textContent = this.settings.enableBaseTheme ? BASE_THEME_CSS : "";
+    if (stBase)
+      stBase.textContent = this.settings.enableBaseTheme ? BASE_THEME_CSS : "";
 
     /* ③ Base-Theme 변수 오버라이드 (:root / .theme-dark) */
     const idVars = "ct-base-vars";
-    let stVars = document.getElementById(idVars) as HTMLStyleElement | null;
+    let stVars   = document.getElementById(idVars) as HTMLStyleElement | null;
     if (!stVars) {
-      stVars = document.createElement("style");
+      stVars    = document.createElement("style");
       stVars.id = idVars;
       document.head.appendChild(stVars);
     }
-    const vars = this.settings.baseVars;
-    const rootBlock: string[] = [];
-    const darkBlock: string[] = [];
+    const vars      = this.settings.baseVars;
+    const rootBlock : string[] = [];
+    const darkBlock : string[] = [];
     Object.entries(vars).forEach(([k, v]) => {
       if (k.endsWith("-dark")) darkBlock.push(`${k}:${v};`);
-      else rootBlock.push(`${k}:${v};`);
+      else                     rootBlock.push(`${k}:${v};`);
     });
     stVars.textContent = `
       :root{${rootBlock.join("")}}
@@ -209,14 +216,20 @@ export default class CoverTablePlugin extends Plugin{
 
     /* ④ Custom CSS */
     const idCustom = "ct-custom-css";
-    let stCustom = document.getElementById(idCustom) as HTMLStyleElement | null;
+    let stCustom   = document.getElementById(idCustom) as HTMLStyleElement | null;
     if (!stCustom) {
-      stCustom = document.createElement("style");
+      stCustom    = document.createElement("style");
       stCustom.id = idCustom;
       document.head.appendChild(stCustom);
     }
     stCustom.textContent = this.settings.customCss || "";
+
+    /* ⚠️ ⑤ Interactive-Table 전용 CSS  블록 제거
+          ─ style.css 에 통합되므로 더 이상 주입하지 않습니다. */
   }
+
+
+
 
 /*───────── HeaderLabeller 적용/해제 ─────────*/
 reloadHeaderLabeller() {

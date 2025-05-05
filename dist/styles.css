@@ -15,50 +15,71 @@
 /*───────────────────────────────────────────────────────────────
   ① GLOBAL TOKENS & FONTS
 ───────────────────────────────────────────────────────────────*/
-@import url("https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbit&display=swap");
 
 :root{
   /* ── GANTT  ─────────────────────────────────────────────── */
   --g-h-bg          : #2d2d2d;
   --g-h-fg          : #fafafa;
   --g-line          : #444444;
-  --g-row-odd       : #3c2110;
-  --g-row-even      : #351e0d;
-  --g-row-hover     : #4b2c16;
-  --g-today-outline : #ff7675;
+  --g-row-odd       : #1e1e1e;
+  --g-row-even      : #1e1e1e;
+  --g-row-hover     : #1e1e1e;
+  --g-today-outline : #0b77a8;
   --g-legend-size   : 12px;
 
   /* ── INTERACTIVE TABLE ─────────────────────────────────── */
-  --it-header-bg    : #7a481d;
-  --it-header-fg    : #fff0e6;
-  --it-row-odd      : rgba(160,85,40,.25);
-  --it-row-even     : rgba(135,70,30,.25);
-  --it-row-hover    : rgba(200,120,50,.28);
-  --it-border       : rgba(200,145,80,.45);
+  --it-header-bg    : #0f3a79;
+  --it-header-fg    : #ffffff;
+  --it-row-odd      : #1e1e1e;
+  --it-row-even     : #1e1e1e;
+  --it-row-hover    : #363636;
+  --it-border       : #0f3a79;
+  --it-border-v     : #0f3a79;        /* ★ NEW : 세로선(V) */
 
   /* ── BUTTONS ────────────────────────────────────────────── */
-  --btn-bg          : #7a481d;
-  --btn-bg-hover    : rgba(140,70,30,.9);
+  --btn-bg          : #1e1e1e;
+  --btn-bg-hover    : #0b77a8;
   --btn-fg          : #ffffff;
   --btn-radius      : 0;
   --btn-pad         : .25rem .8rem;
   --btn-transition  : .15s ease-out;
-  --btn-grad-top    : #845127;
-  --btn-grad-bottom : #633818;
+  --btn-grad-top    : #0f3a79;
+  --btn-grad-bottom : #0f3a79;
 
   /* ── HEADER BAR (Interactive) ──────────────────────────── */
-  --hdr-bar-bg      : #7a481d;
+  --hdr-bar-bg      : #0f3a79;
   --hdr-row-h       : 32px;
   --hdr-pad-x       : 1rem;
 
   /* ── SEPARATORS ─────────────────────────────────────────── */
-  --sep-color       : #7a481d;
+  --sep-color       : #0f3a79;
   --sep-thick       : 4px;
 
   /* ── TYPOGRAPHY ─────────────────────────────────────────── */
-  --font-display    : "MedievalSharp", serif;
-  --font-body       : var(--font-text);
+  --font-display    : "Orbit", sans-serif;
+  --font-body       : "Orbit", sans-serif;
   --g-month-size    : 2rem;
+
+/*──────── Inline-Title CUSTOM ────────*/
+  --ct-inline-title-font : "Orbit", sans-serif; /* ← 폰트만 바꿔도 됨 */
+  --ct-inline-title-size : 1.8rem;              /* ← 숫자만 조절 */
+}
+
+/* 전체 Cover-Table(테이블·간트) 기본 폰트 */
+.interactive_table-view,
+.gantt-view,
+.gantt-table,
+.interactive_table-table--full{
+  font-family: var(--font-body) !important;
+}
+
+/* 헤더·디스플레이용 폰트도 동일하게 Orbit */
+.gantt-month-year,
+.interactive_table-table--full thead th,
+.interactive_table-filter__btn,
+.interactive_table-button{
+  font-family: var(--font-display) !important;
 }
 
 /*───────────────────────────────────────────────────────────────
@@ -208,9 +229,13 @@
 .interactive_table-table--full tbody td{
   padding:.6rem .9rem;
   border-bottom:1px solid var(--it-border);
+  border-right :1px solid var(--it-border-v);    /* ★ NEW 헤더 세로선 */
   overflow:hidden;
   white-space:nowrap;
   text-overflow:ellipsis;
+}
+.interactive_table-table--full tbody td:first-child{
+  border-left:1px solid var(--it-border-v);      /* ★ NEW 좌측 세로선 */
 }
 
 .interactive_table-table--full tbody tr:nth-child(odd)  td{ background:var(--it-row-odd); }
@@ -310,7 +335,14 @@ th[class^="interactive_table-table__header--"]{ text-align:center !important; }
 
 /* PAGINATION */
 .interactive_table-pagination{
-  display:flex; justify-content:center; gap:.5rem; margin:.8rem 0;
+  display:flex; justify-content:center; align-items:center; gap:.5rem; margin:.8rem 0;
+}
+/* 세로 중앙 + 버튼 높이와 동일하게 맞추기 */
+.interactive_table-pagination > span{
+  height:var(--hdr-row-h);     /* ★ NEW : 버튼 높이와 동일 */
+  line-height:var(--hdr-row-h);/* ★ NEW : 텍스트 수직 정렬 */
+  display:inline-flex;         /* ★ NEW : flex로 수직 중앙 */
+  align-items:center;          /* ★ NEW */
 }
 .interactive_table-pagination__btn--disabled{
   opacity:.35; cursor:not-allowed;
@@ -363,4 +395,11 @@ body.theme-light{
 .markdown-preview-view pre.language-ct,
 .markdown-preview-view pre.language-cover-table{
   display:none!important;
+}
+
+/* 인라인 제목*/
+.inline-title,            /* 미리보기(Preview) */
+.cm-inline-title{         /* 라이브 / 소스 편집 */
+  font-family: var(--ct-inline-title-font) !important;
+  font-size  : var(--ct-inline-title-size) !important;
 }
