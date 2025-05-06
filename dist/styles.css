@@ -18,6 +18,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbit&display=swap");
 
 :root{
+  --ct-tab-active-bg:#4c00ff;
+
   /* ── GANTT  ─────────────────────────────────────────────── */
   --g-h-fg          : #ff00f2;
   --g-line          : #4c00ff;
@@ -134,7 +136,7 @@
 .gantt-table tbody tr:nth-child(even) td:not(:first-child){
   background:var(--g-row-even);
 }
-.gantt-table tbody tr:hover           td{ background:var(--g-row-hover); }
+.gantt-table tbody tr:hover           td:not(:first-child){ background:var(--g-row-hover); }
 .gantt-today-col{ outline:2px solid var(--g-today-outline); }
 
 .gantt-legend{
@@ -406,3 +408,51 @@ body.theme-light{
   font-family: var(--ct-inline-title-font) !important;
   font-size  : var(--ct-inline-title-size) !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ▶  탭 재집중(플래시) 시 하이라이트 바/테두리 제거
+   ───────────────────────────────────────────────────────────── */
+
+/* 1) 플래시 타이밍에 붙는 클래스 — 배경만 살리고 나머지는 제거 */
+.workspace-tabs .workspace-tab-header.mod-flashing{
+  border: none !important;
+  box-shadow: none !important;   /* 코어 그림자 제거 */
+  outline: none !important;
+}
+
+/* 2) 플래시용 pseudo element(아랫쪽 바) 완전 제거 */
+.workspace-tabs .workspace-tab-header.mod-flashing::before,
+.workspace-tabs .workspace-tab-header.mod-flashing::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* 3) 혹시 테마에서 컨테이너 단위로 바를 그리는 경우 대비 */
+.workspace-tabs .workspace-tab-container.mod-flashing,
+.workspace-tabs .workspace-tab-container.mod-flashing::before,
+.workspace-tabs .workspace-tab-container.mod-flashing::after{
+  border: none !important;
+  box-shadow: none !important;
+  content: none !important;
+}
+
+/* 4) 비활성 탭 Hover – 이미 쓰시던 규칙 유지 (면 전체) */
+.workspace-tabs .workspace-tab-header:not(.is-active):hover{
+  background: var(--background-modifier-hover) !important;
+}
+
+/* 5) 기본‧활성 탭은 이전에 작성하신 reset 선언 그대로 두면 OK
+   (.workspace-tab-header, .workspace-tab-header-inner 의
+    border / box-shadow / outline 제거) */
+
+
+    .workspace-tab-header::before,
+    .workspace-tab-header::after,
+    .workspace-tab-header-inner::before,
+    .workspace-tab-header-inner::after{
+      background   : transparent !important; /* 배경색 투명           */
+      border-color : transparent !important; /* 선 색상 투명          */
+      box-shadow   : none        !important; /* 그림자 꺼짐           */
+      content      : ''          !important; /* 구조 유지 (필요 시)   */
+    }
