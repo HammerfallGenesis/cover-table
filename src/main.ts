@@ -7,6 +7,7 @@
 
 import { CSS_VAR_MAP, CSS_VAR_MAP_GLOBAL } from "./setting";
 import type { ModeColorConfig,
+              GlobalTokenColorConfig,
               CoverTableSettings }  from "./setting";
 import {
   App, MarkdownPostProcessorContext, Modal,
@@ -171,15 +172,19 @@ export default class CoverTablePlugin extends Plugin{
   applyDesignSettings() {
     /* ① Interactive-Table 색상 → CSS 변수(:root) */
     const mode = this.app.getTheme() === "obsidian-dark" ? "dark" : "light";
-    const itCfg = this.settings.design[mode];
-    const gCfg  = this.settings.globalTokens[mode];
     const root  = document.documentElement;
 
-    /* Interactive-Table 전용 변수 */
+    /* ───────────────────────────────────────────────
+    * ① Interactive-Table 색상  → CSS 변수
+    * ─────────────────────────────────────────────── */
+    const itCfg = this.settings.design[mode];
     (Object.keys(CSS_VAR_MAP) as (keyof ModeColorConfig)[])
       .forEach(tok => root.style.setProperty(CSS_VAR_MAP[tok], itCfg[tok]));
 
-    /* 🌟 Global Token 변수 */
+    /* ───────────────────────────────────────────────
+    * ② Global Token 색상 (gHeaderBg 등) → CSS 변수  ★ NEW
+    * ─────────────────────────────────────────────── */
+    const gCfg = this.settings.globalTokens[mode];
     (Object.keys(CSS_VAR_MAP_GLOBAL) as (keyof GlobalTokenColorConfig)[])
       .forEach(tok => root.style.setProperty(CSS_VAR_MAP_GLOBAL[tok], gCfg[tok]));
 
@@ -206,8 +211,7 @@ export default class CoverTablePlugin extends Plugin{
     const rootBlock : string[] = [];
     const darkBlock : string[] = [];
     Object.entries(vars).forEach(([k, v]) => {
-      if (k.endsWith("-dark")) darkBlock.push(`${k}:${v};`);
-      else                     rootBlock.push(`${k}:${v};`);
+      (k.endsWith("-dark") ? darkBlock : rootBlock).push(`${k}:${v};`);
     });
     stVars.textContent = `
       :root{${rootBlock.join("")}}

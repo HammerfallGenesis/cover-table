@@ -57,7 +57,6 @@ export interface CoverTableSettings {
 ───────────────────────────────────────────────────────────────*/
 export interface GlobalTokenColorConfig {
   /* GANTT */
-  gHeaderBg      : string;   /* --g-h-bg            */
   gHeaderFg      : string;   /* --g-h-fg            */
   gLine          : string;   /* --g-line            */
   gRowOdd        : string;   /* --g-row-odd         */
@@ -75,8 +74,6 @@ export interface GlobalTokenColorConfig {
   itBorderV       : string;   /* --it-border-v         */
 
   /* BUTTONS / HEADER BAR / SEPARATORS */
-  btnBg          : string;   /* --btn-bg            */
-  btnBgHover     : string;   /* --btn-bg-hover      */
   btnFg          : string;   /* --btn-fg            */
   btnGradTop     : string;   /* --btn-grad-top      */
   btnGradBottom  : string;   /* --btn-grad-bottom   */
@@ -90,7 +87,6 @@ export interface GlobalTokenDesign { dark: GlobalTokenColorConfig; light: Global
   0-C.  CSS Token ↔ CSS Var Map (Global Tokens)  ← NEW
 ───────────────────────────────────────────────────────────────*/
 export const CSS_VAR_MAP_GLOBAL: Record<keyof GlobalTokenColorConfig, string> = {
-  gHeaderBg     : "--g-h-bg",
   gHeaderFg     : "--g-h-fg",
   gLine         : "--g-line",
   gRowOdd       : "--g-row-odd",
@@ -106,8 +102,6 @@ export const CSS_VAR_MAP_GLOBAL: Record<keyof GlobalTokenColorConfig, string> = 
   itBorder      : "--it-border",
   itBorderV     : "--it-border-v", 
 
-  btnBg         : "--btn-bg",
-  btnBgHover    : "--btn-bg-hover",
   btnFg         : "--btn-fg",
   btnGradTop    : "--btn-grad-top",
   btnGradBottom : "--btn-grad-bottom",
@@ -181,7 +175,6 @@ export const DEFAULT_BASE_VARS: BaseThemeVars = {
   1-B. DEFAULT GLOBAL TOKEN COLOURS
 ───────────────────────────────────────────────────────────────*/
 const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
-  gHeaderBg     : "#2d2d2d",
   gHeaderFg     : "#fafafa",
   gLine         : "#444444",
   gRowOdd       : "#3c2110",
@@ -197,8 +190,6 @@ const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
   itBorder      : "rgba(200,145,80,0.45)",
   itBorderV     : "rgba(200,145,80,0.45)",
 
-  btnBg         : "#7a481d",
-  btnBgHover    : "rgba(140,70,30,0.9)",
   btnFg         : "#ffffff",
   btnGradTop    : "#845127",
   btnGradBottom : "#633818",
@@ -207,7 +198,6 @@ const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
 };
 
 const DEFAULT_GLOBAL_TOKENS_LIGHT: GlobalTokenColorConfig = {
-  gHeaderBg     : "#eeeeee",
   gHeaderFg     : "#202020",
   gLine         : "#444444",
   gRowOdd       : "#f7f7f7",
@@ -223,8 +213,6 @@ const DEFAULT_GLOBAL_TOKENS_LIGHT: GlobalTokenColorConfig = {
   itBorder      : "#0076f5",
   itBorderV     : "#171717",
 
-  btnBg         : "#171717",
-  btnBgHover    : "#171717",
   btnFg         : "#ffffff",
   btnGradTop    : "#3d4aff",
   btnGradBottom : "#030099",
@@ -262,8 +250,6 @@ export const DEFAULT_SETTINGS: CoverTableSettings = {
   2.  CSS Token ↔ CSS Var Map (동일)
 ───────────────────────────────────────────────────────────────*/
 export const CSS_VAR_MAP: Record<keyof ModeColorConfig, string> = {
-  buttonColor      : "--btn-bg",
-  buttonHoverColor : "--btn-bg-hover",
   itHeaderBg       : "--it-header-bg",
   itHeaderFg       : "--it-header-fg",
   itRowOdd         : "--it-row-odd",
@@ -561,12 +547,9 @@ private buildGlobalTokenColorSection(
   container.createEl("p",{text:this.DESC_GLOBAL_TOKEN, cls:"ct-desc"});
 
   const NOTE: Partial<Record<keyof GlobalTokenColorConfig,string>> = {
-    gHeaderBg  :"Gantt 헤더 배경",
     gHeaderFg  :"Gantt 헤더 글자색",
     itHeaderBg :"테이블 헤더 배경",
     itRowOdd   :"테이블 홀수행 배경",
-    btnBg      :"일반 버튼 배경",
-    btnBgHover :"버튼 Hover 배경",
     hdrBarBg   :"설정창 헤더 바 배경",
   };
 

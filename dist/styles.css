@@ -19,9 +19,8 @@
 
 :root{
   /* ── GANTT  ─────────────────────────────────────────────── */
-  --g-h-bg          : #2d2d2d;
-  --g-h-fg          : #fafafa;
-  --g-line          : #444444;
+  --g-h-fg          : #ff00f2;
+  --g-line          : #4c00ff;
   --g-row-odd       : #1e1e1e;
   --g-row-even      : #1e1e1e;
   --g-row-hover     : #1e1e1e;
@@ -38,8 +37,6 @@
   --it-border-v     : #0f3a79;        /* ★ NEW : 세로선(V) */
 
   /* ── BUTTONS ────────────────────────────────────────────── */
-  --btn-bg          : #1e1e1e;
-  --btn-bg-hover    : #0b77a8;
   --btn-fg          : #ffffff;
   --btn-radius      : 0;
   --btn-pad         : .25rem .8rem;
@@ -119,20 +116,24 @@
 .gantt-day-col,
 .gantt-note-col,
 .gantt-cell{
-  border:1px solid var(--g-line);
   font-size:.72rem;
   text-align:center;
   font-family:var(--font-body);
 }
 .gantt-day-col{
-  background:var(--g-h-bg);
-  color:var(--g-h-fg);
   font-family:var(--font-display);
 }
 .gantt-cell{ height:22px; }
 
-.gantt-table tbody tr:nth-child(odd)  td{ background:var(--g-row-odd); }
-.gantt-table tbody tr:nth-child(even) td{ background:var(--g-row-even); }
+/*─────────── Gantt Body Row 배경 – 첫 번째 열 제외 ───────────*/
+/* 홀수행 */
+.gantt-table tbody tr:nth-child(odd)  td:not(:first-child){
+  background:var(--g-row-odd);
+}
+/* 짝수행 */
+.gantt-table tbody tr:nth-child(even) td:not(:first-child){
+  background:var(--g-row-even);
+}
 .gantt-table tbody tr:hover           td{ background:var(--g-row-hover); }
 .gantt-today-col{ outline:2px solid var(--g-today-outline); }
 
@@ -159,19 +160,25 @@
   ④ GANTT TABLE  – CUSTOM OVERRIDES
 ───────────────────────────────────────────────────────────────*/
 .gantt-table th,
-.gantt-table td{ border:1px solid transparent!important; }
+.gantt-table td{ border:1px solid var(--g-line)!important; }
 
 .gantt-day-col{
   background:transparent!important;
-  color:var(--g-h-fg);
   text-align:center!important;
 }
 
-.gantt-corner-col{ text-align:left!important; }
+.gantt-corner-col{ 
+  text-align:left!important;
+  background:var(--g-h-bg)!important;
+
+}
 
 .gantt-day-col{ font-family:var(--font-text); }
 .gantt-table td,
-.gantt-note-col{ font-family:var(--font-text); }
+.gantt-note-col{ 
+  font-family:var(--font-text); 
+  color:var(--g-h-fg)!important;
+}
 
 .gantt-table thead tr{ font-family:var(--font-display)!important; }
 
@@ -378,14 +385,10 @@ th[class^="interactive_table-table__header--"]{ text-align:center !important; }
 ───────────────────────────────────────────────────────────────*/
 /*
 body.theme-light{
-  --g-h-bg          : #eeeeee;
   --g-row-odd       : #f7f7f7;
   --g-row-even      : #f1f1f1;
   --it-row-odd      : rgba(230,210,190,.45);
   --it-row-even     : rgba(220,200,180,.45);
-  --btn-bg          : #c6934b;
-  --btn-bg-hover    : #dba663;
-}
 */
 
 /*───────────────────────────────────────────────────────────────
