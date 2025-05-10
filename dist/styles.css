@@ -456,3 +456,67 @@ body.theme-light{
       box-shadow   : none        !important; /* 그림자 꺼짐           */
       content      : ''          !important; /* 구조 유지 (필요 시)   */
     }
+
+
+    /***********************************************************************
+ * Cover-Table ▶ Heading Colour Sync  · rev.2025-05-10
+ *   · **Preview mode** ─ 그대로 (배경색 유지)
+ *   · **편집 모드**   ─ 배경색 ⇒ 글자색, 배경 제거
+ *     ‣ Live-Preview (CM6) 및 Source 모드 모두 대응
+ *   · ① ─ Live-Preview < h1‥h6 >
+ *   · ② ─ CodeMirror token .class (.cm-header-X)
+ * --------------------------------------------------------------------
+ *  ※ 기본 변수는 src/theme/base.ts 의
+ *     --heading-bg-h[1‥6]-(light|dark)  을 그대로 사용합니다. :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
+ ***********************************************************************/
+
+/*═════════════════════════════════════════════════════════════════════
+  ① Live-Preview  (markdown-source-view.mod-cm6)
+═════════════════════════════════════════════════════════════════════*/
+/* ── LIGHT ──────────────────────────────────────────────────────────*/
+.theme-light .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h1){background:none!important;color:var(--heading-bg-h1-dark)!important;}
+.theme-light .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h2){background:none!important;color:var(--heading-bg-h2-dark)!important;}
+.theme-light .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h3){background:none!important;color:var(--heading-bg-h3-dark)!important;}
+.theme-light .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h4){background:none!important;color:var(--heading-bg-h4-dark)!important;}
+.theme-light .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h5){background:none!important;color:var(--heading-bg-h5-dark)!important;}
+.theme-light .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h6){background:none!important;color:var(--heading-bg-h6-dark)!important;}
+
+/* ── DARK ───────────────────────────────────────────────────────────*/
+.theme-dark .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h1){background:none!important;color:var(--heading-bg-h1-light)!important;}
+.theme-dark .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h2){background:none!important;color:var(--heading-bg-h2-light)!important;}
+.theme-dark .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h3){background:none!important;color:var(--heading-bg-h3-light)!important;}
+.theme-dark .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h4){background:none!important;color:var(--heading-bg-h4-light)!important;}
+.theme-dark .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h5){background:none!important;color:var(--heading-bg-h5-light)!important;}
+.theme-dark .markdown-source-view.mod-cm6:is(.is-live-preview, .is-readable)
+:is(h6){background:none!important;color:var(--heading-bg-h6-light)!important;}
+
+/*═════════════════════════════════════════════════════════════════════
+  ② Source 모드  (CodeMirror 토큰 .cm-header-X)
+  ─ 배경이 없으므로 글자색만 지정
+═════════════════════════════════════════════════════════════════════*/
+/* ── LIGHT ──────────────────────────────────────────────────────────*/
+.theme-light .cm-header-1{color:var(--heading-bg-h1-dark)!important;}
+.theme-light .cm-header-2{color:var(--heading-bg-h2-dark)!important;}
+.theme-light .cm-header-3{color:var(--heading-bg-h3-dark)!important;}
+.theme-light .cm-header-4{color:var(--heading-bg-h4-dark)!important;}
+.theme-light .cm-header-5{color:var(--heading-bg-h5-dark)!important;}
+.theme-light .cm-header-6{color:var(--heading-bg-h6-dark)!important;}
+
+/* ── DARK ───────────────────────────────────────────────────────────*/
+.theme-dark .cm-header-1{color:var(--heading-bg-h1-light)!important;}
+.theme-dark .cm-header-2{color:var(--heading-bg-h2-light)!important;}
+.theme-dark .cm-header-3{color:var(--heading-bg-h3-light)!important;}
+.theme-dark .cm-header-4{color:var(--heading-bg-h4-light)!important;}
+.theme-dark .cm-header-5{color:var(--heading-bg-h5-light)!important;}
+.theme-dark .cm-header-6{color:var(--heading-bg-h6-light)!important;}

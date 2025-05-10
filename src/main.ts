@@ -24,6 +24,7 @@ import {
 import { BASE_THEME_CSS }       from "./theme/base";
 import { HeaderLabeller }       from "./theme/headerLabeller";
 import { ListCalloutManager } from "./theme/list";
+import { EmbedFileHandler, DEFAULT_EMBED_SETTINGS } from "./theme/embed";
 
 /*──────────────────────────────────────────────────────────────
   0)  전역 네임스페이스(window.coverTable)
@@ -48,6 +49,7 @@ export default class CoverTablePlugin extends Plugin{
   private tabManager!        : TabManager;
   private headerLabeller     : HeaderLabeller|null = null;
   private listCallouts!: ListCalloutManager;
+  private embedHandler!: EmbedFileHandler;
   settings!                  : CoverTableSettings;
 
     /*───────────────────────────────────────────────────────────────
@@ -101,10 +103,17 @@ export default class CoverTablePlugin extends Plugin{
     this.addSettingTab(new CoverTableSettingTab(this.app,this));
     this.applyDesignSettings();
     this.applyZeroFolderVisibility(); 
+
+    /* (5) ▶▶ EmbedFileHandler 초기화 ◀◀ */
+    this.embedHandler = new EmbedFileHandler(this, () => this.settings.embed);
+    this.embedHandler.enable();
+
+    /* (6) 나머지 로직 (ListCallout, HeaderLabeller 등) */
     this.listCallouts = new ListCalloutManager(this);
     this.registerEditorExtension(this.listCallouts.editorExtensions());
     this.registerMarkdownPostProcessor(this.listCallouts.postProcessor(), 10_000);
     this.reloadHeaderLabeller();             // ← 헤더 라벨러 적용/해제
+
     this.applyZeroFolderVisibility();
 
     /* 테마 변경 이벤트 → CSS 재주입 */
@@ -153,20 +162,40 @@ export default class CoverTablePlugin extends Plugin{
     console.log("[Cover-Table] ▶ onload done");
   }
 
-  /* ─────────────── onunload ─────────────── */
-  onunload(){
+  /***********************************************************************
+   * onunload() – 전체 교체
+   ***********************************************************************/
+  onunload() {
     console.log("[Cover-Table] ▶ onunload");
     this.tabManager.destroy();
+    this.embedHandler.destroy();        // ← 리스너 해제
   }
 
+
   /*───────── Setting helpers ─────────*/
-  async loadSettings(){
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+
+  /***********************************************************************
+   * loadSettings() – 전체 교체
+   ***********************************************************************/
+  async loadSettings() {
+    const raw = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, raw);
+
+    /* Embed 기본값 병합 */
+    this.settings.embed = Object.assign(
+      {}, DEFAULT_EMBED_SETTINGS, this.settings.embed
+    );
   }
-  async saveSettings(){ 
+
+  /***********************************************************************
+   * saveSettings() – 전체 교체
+   ***********************************************************************/
+  async saveSettings() {
     await this.saveData(this.settings);
     this.applyZeroFolderVisibility();
+    this.embedHandler.reload();         // ← 설정 변경 즉시 반영
   }
+
 
   /*───────── Design & Theme 주입 ─────────*/
   applyDesignSettings() {

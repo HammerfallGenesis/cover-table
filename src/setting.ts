@@ -14,6 +14,7 @@ import {
   Notice,
 } from "obsidian";
 import type CoverTablePlugin from "./main";
+import type { EmbedFileHandlerSettings } from "./theme/embed";
 
 /*───────────────────────────────────────────────────────────────
   0.  Type Definitions
@@ -45,6 +46,7 @@ export interface CoverTableSettings {
   enableHeaderNumbering: boolean;
   /** ◀ NEW – “0_” 폴더 숨김 */
   hideZeroFolders      : boolean;
+  embed: EmbedFileHandlerSettings;
   design               : DesignOptions;
   globalTokens         : GlobalTokenDesign;       /* ← NEW */
   baseVars             : BaseThemeVars;
@@ -228,6 +230,10 @@ export const DEFAULT_SETTINGS: CoverTableSettings = {
   enableBaseTheme      : true,
   enableHeaderNumbering: true,
   hideZeroFolders      : false,
+  embed: {
+    enableEmbedNoPreview: true,
+    nonPreviewExtensions: [".pdf", ".exe", ".zip", ".rar"],
+    },
   design       : { dark: { ...DEFAULT_IT_COLOR },
                    light: { ...DEFAULT_IT_COLOR,
                     buttonColor     : "#c6934b",
@@ -368,6 +374,35 @@ display(): void {
   const el = this.containerEl;
   el.empty();
   el.createEl("h2", { text: "Cover-Table — Settings" });
+
+  /* ───────────────── Embed 옵션 ───────────────── */
+  el.createEl("h3", { text: "Drag / Paste Embed Override" });
+
+  new Setting(el)
+    .setName("Enable embed override")
+    .setDesc("ON → 지정 확장자는 [[링크]], 그 외는 ![[embed]] 로 삽입")
+    .addToggle(t => t
+      .setValue(this.plugin.settings.embed.enableEmbedNoPreview)
+      .onChange(async v => {
+        this.plugin.settings.embed.enableEmbedNoPreview = v;
+        await this.plugin.saveSettings();
+      }));
+
+  new Setting(el)
+    .setName("Non-preview extensions")
+    .setDesc("쉼표 구분, 반드시 점(.) 포함. 예) .pdf, .dwg")
+    .addTextArea(t => t
+      .setValue(this.plugin.settings.embed.nonPreviewExtensions.join(", "))
+      .onChange(async v => {
+        const arr = v.split(",")
+          .map(s => s.trim().toLowerCase())
+          .filter(s => s.length)
+          .map(s => (s.startsWith(".") ? s : `.${s}`));
+        this.plugin.settings.embed.nonPreviewExtensions = [...new Set(arr)];
+        await this.plugin.saveSettings();
+      }));
+
+
 
   /* (A) General Toggles */
   this.buildToggleSection(el);
