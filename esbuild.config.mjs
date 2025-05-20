@@ -13,7 +13,7 @@ const banner = `/*
 
 const prod = process.argv.includes("--production");
 
-const ctx = await esbuild.context({
+await esbuild.build({ 
   banner: { js: banner },
   entryPoints: ["src/core/Plugin.ts"],
   bundle: true,
@@ -29,8 +29,9 @@ const ctx = await esbuild.context({
   target: "es2018",
   sourcemap: prod ? false : "inline",
   treeShaking: true,
-  outfile: "dist/main.js",
+  outfile: "main.js",
   minify: prod,
+  loader: { ".css": "text" },
   plugins: [],
 });
 
@@ -46,8 +47,8 @@ async function buildStyle() {
     out += await readFile(file, "utf8") + "\n";
   }
   await mkdir("dist", { recursive: true });
-  await writeFile("dist/style.css", out);
-  console.log("✓ style.css built");
+  await writeFile("styles.css", out);
+  console.log("✓ styles.css built");
 }
 
 await buildStyle();

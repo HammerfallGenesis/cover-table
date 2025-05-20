@@ -7,8 +7,8 @@
 	"author": "HammerfallGenesis",
 	"authorUrl": "https://github.com/HammerfallGenesis",
 	"isDesktopOnly": false,
-	"main": "dist/main.js",
-	"css": "dist/style.css",
+	"main": "main.js",
+	"css": "styles.css",
 	"dependencies": ["dataview"]
   }
   
