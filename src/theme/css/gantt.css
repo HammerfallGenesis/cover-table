@@ -1,0 +1,98 @@
+/*****************************************************************
+ *  src/theme/css/gantt.css – auto-generated from legacy Cover-Table v2025-05
+ *  📊  Gantt-specific Theme Rules   (⚠ 수정 금지 · 기능 보존)
+ *****************************************************************/
+
+/* ──────────────────────────────────────────────────────────────
+   0. Global Color Tokens (모든 색상은 여기서만 정의)
+   ──────────────────────────────────────────────────────────── */
+:root{
+  /* 공통 베이스 컬러 */
+  --ct-base-white : #ffffff;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   1. View Wrapper & Animation
+   ──────────────────────────────────────────────────────────── */
+.gantt-corner-col{
+  width:20ch;
+  text-align:left!important;
+  background:transparent;
+}
+
+.gantt-table tbody tr:nth-child(odd) td,
+.gantt-table tbody tr:nth-child(even) td{
+  background-color:transparent;
+  border-color:transparent;
+  border-bottom-color:var(--ct-base-white) !important;   /* ⬅ white → token */
+}
+
+th.gantt-day-col{
+  font:300 .7rem/1 var(--font-interface);
+  white-space:nowrap!important;
+  border-color:transparent!important;
+}
+
+th.gantt-corner-col{
+  border-color:transparent!important;
+}
+
+td.gantt-note-col{
+  font:300 .9rem/1 var(--font-interface);
+  white-space:nowrap!important;
+  border-color:transparent!important;
+  background-color:transparent!important;
+  text-align:left;
+}
+
+.gantt-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  font:300 .7rem/1 var(--font-interface);
+  border-bottom-style:outset;
+  padding-bottom:10px;
+  margin-bottom:15px;
+}
+.gantt-legend-item{display:flex;align-items:center;font-size:0.85rem;}
+.gantt-legend-color{width:0.9rem;height:0.9rem;border-radius:3px;margin-right:0.25rem;}
+
+.gantt-month-year{
+  font:500 1.5rem/1 var(--font-interface);
+  border-bottom-style:outset;
+  border-bottom-color:var(--ct-base-white);  /* ⬅ white → token */
+  color:var(--ct-base-white);                /* ⬅ white → token */
+}
+
+.gantt-debug{display:none;}
+code.language-ct.is-loaded{display:none;}
+
+/* 오늘 표시 셀 */
+.gantt-table td.is-today{
+  outline:none!important;
+  position:relative;
+}
+.gantt-table td.is-today::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-color:var(--ct-base-white); /* ⬅ white → token */
+  opacity:.5;
+}
+
+/*─────────────────────────────────────────────────────────────
+  is-filled 셀 : --gantt-color → 배경색 · 테두리 둘 다 적용
+─────────────────────────────────────────────────────────────*/
+.gantt-table td.is-filled{
+  background-color:var(--gantt-color) !important;
+  border-color:var(--gantt-color)    !important;   /* 행 경계선 맞춤 */
+  position:relative;                                 /* edge 포인트용 */
+}
+/* 옵션: 작업 시작·끝 포인트에 얇은 줄 표시하고 싶다면 */
+.gantt-table td.gantt-start::before,
+.gantt-table td.gantt-end::before{
+  content:"";position:absolute;top:0;bottom:0;width:2px;
+  background:var(--gantt-color);
+}
+.gantt-table td.gantt-start::before{left:0;}
+.gantt-table td.gantt-end::before  {right:0;}

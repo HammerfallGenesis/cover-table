@@ -1,0 +1,355 @@
+/*****************************************************************
+ *  Cover-Table  –  Global Color · Style Tokens  (최종 통합판)
+ *  · 기존 기능 “모두” 보존  · 요약/함축/삭제 없음
+ *  · 테이블·이미지 색상은 단일 토큰 + 다크/라이트 자동 오버라이드
+ *  · 헤딩은 무지개 6색(토큰)으로 직관적 구분
+ *****************************************************************/
+:root{
+  /* ─────────── 베이스 / 공통 ─────────── */
+  --ct-base-white        : #ffffff;
+  --ct-base-black        : #000000;
+
+  /* ─────────── 탐색기 폴더 색상 ─────────── */
+  /* 0 단계(최상위) */
+  --ct-folder-lvl0-01-dark  : #91dcff;   --ct-folder-lvl0-01-light  : #0076ad;
+  --ct-folder-lvl0-25-dark  : #fffcab;   --ct-folder-lvl0-25-light  : #989300;
+  --ct-folder-lvl0-68-dark  : #ffb3ab;   --ct-folder-lvl0-68-light  : #9b1000;
+  /* 1 단계(내부) */
+  --ct-folder-lvl1-01-dark  : #2ebdff;   --ct-folder-lvl1-01-light  : #003d5a;
+  --ct-folder-lvl1-25-dark  : #ffdf3e;   --ct-folder-lvl1-25-light  : #453a01;
+  --ct-folder-lvl1-68-dark  : #ff7e4f;   --ct-folder-lvl1-68-light  : #461300;
+  /* ‘Q)’ 폴더노트 */
+  --ct-folder-q-dark        : #848484;   --ct-folder-q-light        : #848484;
+
+  /* ─────────── 본문 텍스트 스타일 ─────────── */
+  --ct-bold-dark            : rgb(255,188,188);
+  --ct-bold-light           : rgb(138,0,119);
+
+  /* ─────────── 헤딩(무지개 토큰: 읽기+편집 공통) ─────────── */
+  --ct-h1-dark : #ff5555;  --ct-h1-light : #ff5555;   /* red    */
+  --ct-h2-dark : #ffae42;  --ct-h2-light : #ffae42;   /* orange */
+  --ct-h3-dark : #f7ff50;  --ct-h3-light : #f7ff50;   /* yellow */
+  --ct-h4-dark : #4cd964;  --ct-h4-light : #4cd964;   /* green  */
+  --ct-h5-dark : #5ac8fa;  --ct-h5-light : #5ac8fa;   /* blue   */
+  --ct-h6-dark : #af52de;  --ct-h6-light : #af52de;   /* violet */
+
+  /* ─────────── 리스트 불릿/번호 ─────────── */
+  --ct-bullet-dark          : rgb(89,89,223);
+  --ct-bullet-light         : rgb(54,54,190);
+  --ct-ol-marker-dark       : red;
+  --ct-ol-marker-light      : red;
+
+  /* ─────────── 테이블(단일 토큰) ─────────── */
+  --ct-table-border         : #c0c0c0;         /* light 기본, dark 모드에서 재정의 */
+  --ct-table-shadow         : rgba(0,0,0,.10);
+  --ct-table-row-even       : rgba(0,0,0,.03);
+  --ct-table-row-hover      : rgba(0,0,0,.07);
+
+  /* ─────────── 이미지(단일 토큰) ─────────── */
+  --ct-image-border         : #d0d0d0;
+  --ct-image-shadow         : rgba(0,0,0,.10);
+}
+
+/* 다크 모드 오버라이드 – 자동 색상 전환 */
+.theme-dark:root{
+  --bullet-new-color        : var(--ct-bullet-dark);
+  --image-border            : #555555;
+  --image-shadow            : rgba(0,0,0,.60);
+
+  /* 테이블 토큰(투명·배경계열) */
+  --ct-table-border         : #444444;
+  --ct-table-shadow         : rgba(0,0,0,.55);
+  --ct-table-row-even       : transparent;
+  --ct-table-row-hover      : rgba(255,255,255,.07);
+}
+
+/* 라이트 모드 오버라이드 – 자동 색상 전환 */
+.theme-light:root{
+  --bullet-new-color        : var(--ct-bullet-light);
+  --image-border            : #d0d0d0;
+  --image-shadow            : rgba(0,0,0,.10);
+
+  --ct-table-border         : #c0c0c0;
+  --ct-table-shadow         : rgba(0,0,0,.10);
+  --ct-table-row-even       : rgba(0,0,0,.03);
+  --ct-table-row-hover      : rgba(0,0,0,.07);
+}
+
+/*****************************************************************
+ *  공통 타이포그래피 / 레이아웃
+ *****************************************************************/
+p               { text-indent:25px; margin:5px 0!important; text-align:justify; }
+li              { margin-block:5px; }
+.hr.cm-line     { text-indent:0!important; }
+.cm-line        { font-size:1em!important; text-align:justify; text-indent:25px; line-height:1.5em; }
+.cm-s-obsidian .cm-line.HyperMD-header { padding:0!important; text-indent:0; }
+.HyperMD-list-line.HyperMD-list-line-1.cm-line { text-indent:-50px!important; padding-inline-start:40px!important; }
+
+/*****************************************************************
+ *  탐색기 폴더 색상 (모든 단계·모드 보존)
+ *****************************************************************/
+
+/* ──────────────────────────────────────────────────────────────
+   0 단계(최상위)  ────────────────────────────────────────────*/
+/* DARK */
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl0-01-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl0-25-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl0-68-dark)!important;
+}
+
+/* LIGHT */
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl0-01-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl0-25-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl0-68-light)!important;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   1 단계(내부)  ─────────────────────────────────────────────*/
+/* DARK */
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl1-01-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl1-25-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl1-68-dark)!important;
+}
+
+/* LIGHT */
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl1-01-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl1-25-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl1-68-light)!important;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   ‘Q)’ 폴더노트 색상  ─────────────────────────────────────────*/
+/* DARK */
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item-self.is-clickable.mod-collapsible.has-folder-note[data-path*="Q)"]{
+  color:var(--ct-folder-q-dark)!important;
+}
+/* LIGHT */
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item-self.is-clickable.mod-collapsible.has-folder-note[data-path*="Q)"]{
+  color:var(--ct-folder-q-light)!important;
+}
+
+
+/*****************************************************************
+ *  볼드 컬러 (기존 기능 유지)
+ *****************************************************************/
+.theme-dark .markdown-preview-view strong,
+.theme-dark .markdown-preview-view b,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content strong,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content b,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content .cm-strong{
+  font-weight:normal!important; color:var(--ct-bold-dark)!important;
+}
+.theme-light .markdown-preview-view strong,
+.theme-light .markdown-preview-view b,
+.theme-light .markdown-source-view.mod-cm6 .cm-content strong,
+.theme-light .markdown-source-view.mod-cm6 .cm-content b,
+.theme-light .markdown-source-view.mod-cm6 .cm-content .cm-strong{
+  font-weight:normal!important; color:var(--ct-bold-light)!important;
+}
+
+/*****************************************************************
+ *  헤딩 – 무지개 + 밑줄 100% + 아이콘 우측
+ *****************************************************************/
+.markdown-preview-view h1,
+.markdown-preview-view h2,
+.markdown-preview-view h3,
+.markdown-preview-view h4,
+.markdown-preview-view h5,
+.markdown-preview-view h6{
+  display:flex!important; align-items:center; width:100%!important;
+  font-size:1.5em; line-height:1em; margin:5px 0!important; border-bottom-style:outset;
+}
+.markdown-preview-view h1{color:var(--ct-h1-dark); border-bottom-color:var(--ct-h1-dark);}
+.markdown-preview-view h2{color:var(--ct-h2-dark); border-bottom-color:var(--ct-h2-dark);}
+.markdown-preview-view h3{color:var(--ct-h3-dark); border-bottom-color:var(--ct-h3-dark);}
+.markdown-preview-view h4{color:var(--ct-h4-dark); border-bottom-color:var(--ct-h4-dark);}
+.markdown-preview-view h5{color:var(--ct-h5-dark); border-bottom-color:var(--ct-h5-dark);}
+.markdown-preview-view h6{color:var(--ct-h6-dark); border-bottom-color:var(--ct-h6-dark);}
+.theme-light .markdown-preview-view h1{color:var(--ct-h1-light); border-bottom-color:var(--ct-h1-light);}
+.theme-light .markdown-preview-view h2{color:var(--ct-h2-light); border-bottom-color:var(--ct-h2-light);}
+.theme-light .markdown-preview-view h3{color:var(--ct-h3-light); border-bottom-color:var(--ct-h3-light);}
+.theme-light .markdown-preview-view h4{color:var(--ct-h4-light); border-bottom-color:var(--ct-h4-light);}
+.theme-light .markdown-preview-view h5{color:var(--ct-h5-light); border-bottom-color:var(--ct-h5-light);}
+.theme-light .markdown-preview-view h6{color:var(--ct-h6-light); border-bottom-color:var(--ct-h6-light);}
+.markdown-preview-view h1 .collapse-indicator,
+.markdown-preview-view h2 .collapse-indicator,
+.markdown-preview-view h3 .collapse-indicator,
+.markdown-preview-view h4 .collapse-indicator,
+.markdown-preview-view h5 .collapse-indicator,
+.markdown-preview-view h6 .collapse-indicator{margin-left:auto;}
+
+.cm-header-1{font-size:1.5em!important;line-height:2em;color:var(--ct-h1-dark);border-bottom:outset 1px var(--ct-h1-dark);}
+.cm-header-2{font-size:1.5em!important;line-height:2em;color:var(--ct-h2-dark);border-bottom:outset 1px var(--ct-h2-dark);}
+.cm-header-3{font-size:1.5em!important;line-height:2em;color:var(--ct-h3-dark);border-bottom:outset 1px var(--ct-h3-dark);}
+.cm-header-4{font-size:1.5em!important;line-height:2em;color:var(--ct-h4-dark);border-bottom:outset 1px var(--ct-h4-dark);}
+.cm-header-5{font-size:1.5em!important;line-height:2em;color:var(--ct-h5-dark);border-bottom:outset 1px var(--ct-h5-dark);}
+.cm-header-6{font-size:1.5em!important;line-height:2em;color:var(--ct-h6-dark);border-bottom:outset 1px var(--ct-h6-dark);}
+.theme-light .cm-header-1{color:var(--ct-h1-light);border-bottom-color:var(--ct-h1-light);}
+.theme-light .cm-header-2{color:var(--ct-h2-light);border-bottom-color:var(--ct-h2-light);}
+.theme-light .cm-header-3{color:var(--ct-h3-light);border-bottom-color:var(--ct-h3-light);}
+.theme-light .cm-header-4{color:var(--ct-h4-light);border-bottom-color:var(--ct-h4-light);}
+.theme-light .cm-header-5{color:var(--ct-h5-light);border-bottom-color:var(--ct-h5-light);}
+.theme-light .cm-header-6{color:var(--ct-h6-light);border-bottom-color:var(--ct-h6-light);}
+
+/*****************************************************************
+ *  리스트 마커 (기능 완전 보존)
+ *****************************************************************/
+.list-number, ol>li::marker, ul>li::marker{color:var(--ct-ol-marker-dark);}
+.theme-light .list-number, .theme-light ol>li::marker, .theme-light ul>li::marker{color:var(--ct-ol-marker-light);}
+.markdown-reading-view ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-1 .list-bullet:after{height:5px;width:5px;border-radius:50%;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-2 .list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-3 .list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--bullet-new-color);border-radius:50%;}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-4 .list-bullet:after{height:5px;width:5px;border-radius:0;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-5 .list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-6 .list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-7 .list-bullet:after{height:2px;width:2px;border-radius:50%;background:var(--bullet-new-color);}
+
+/*****************************************************************
+ *  UI 가독성 – 공통 아이콘 숨김 (기존 유지)
+ *****************************************************************/
+.nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder>.tree-item-self .collapse-icon,
+.tree-item-self.nav-folder-title.has-folder-note::before{display:none!important;}
+
+/*****************************************************************
+ *  테이블 스타일 – 단일 토큰 기반 / 모드별 자동
+ *****************************************************************/
+.el-table table{
+  width:100%!important; border-collapse:collapse;border-spacing:0;
+  border-top:2.27px solid var(--ct-table-border);
+  border-bottom:2.27px solid var(--ct-table-border);
+  box-shadow:0 0 20px var(--ct-table-shadow);
+}
+.el-table th,.el-table td{border:none;padding:.51rem;line-height:1.1;}
+.el-table table>tbody>tr:first-child>th,
+.el-table table>tbody>tr:first-child>td{border-top:1.36px solid var(--ct-table-border);}
+.el-table table>tbody>tr:last-child>th,
+.el-table table>tbody>tr:last-child>td{border-bottom:1.36px solid var(--ct-table-border);}
+.el-table thead th{
+  font-weight:700;padding:8px 9px 5px;
+  background:var(--ct-base-white)!important;color:var(--ct-base-black);
+}
+.theme-dark .el-table thead th{
+  background:var(--background-primary)!important;color:var(--ct-base-white);
+}
+.el-table tbody tr:nth-child(even){background:var(--ct-table-row-even);}
+.el-table tbody tr:hover td   {background:var(--ct-table-row-hover);}
+.theme-dark .el-table td      {color:var(--ct-base-white);}  /* 텍스트 흰색 */
+
+/*****************************************************************
+ *  이미지(Embeds) & 리스트 내 이미지 보호
+ *****************************************************************/
+.el-p.el-embed-image img,
+li .el-p.el-embed-image img,
+ul li img,ol li img,
+.tab-content img,.tabs img{
+  display:block;width:700px;max-width:100%;height:auto;margin:1rem auto;
+  border:1px solid var(--ct-image-border);
+  box-shadow:0 4px 10px var(--ct-image-shadow);
+  border-radius:4px;
+}
+li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
+
+/*****************************************************************
+ *  메타데이터 패널 숨김(.hide_properties) – 원본 유지
+ *****************************************************************/
+.hide_properties .metadata-container,
+.hide_properties .metadata-properties,
+.hide_properties .metadata-property,
+.hide_properties .metadata-collapse-indicator,
+.hide_properties .frontmatter-container,
+.hide_properties .frontmatter{display:none!important;}
+
+/* ──────────────────────────────────────────────────────────────
+   헤더 내부:  번호 → 텍스트 → 접기아이콘(우측)  +  겹침 해소
+   ─────────────────────────────────────────────────────────── */
+
+/* ① 헤더 컨테이너는 이미 flex; 정렬만 확인 */
+.markdown-preview-view h1,
+.markdown-preview-view h2,
+.markdown-preview-view h3,
+.markdown-preview-view h4,
+.markdown-preview-view h5,
+.markdown-preview-view h6{
+  display:flex!important;          /* 혹시 inline-flex가 아닌 경우 대비 */
+  align-items:center;
+  width:100%!important;            /* 밑줄 100 % */
+  margin:5px 0!important;
+  border-bottom-style:outset;
+}
+/* ② 번호(ct-hn-label) – 맨 앞 */
+.markdown-preview-view h1 .ct-hn-label,
+.markdown-preview-view h2 .ct-hn-label,
+.markdown-preview-view h3 .ct-hn-label,
+.markdown-preview-view h4 .ct-hn-label,
+.markdown-preview-view h5 .ct-hn-label,
+.markdown-preview-view h6 .ct-hn-label{
+  order:0;
+  flex:0 0 auto;
+  margin-right:.35em;
+}
+/* ③ 접기 아이콘 – 절대→정적 + 우측 끝 */
+.markdown-preview-view .heading-collapse-indicator.collapse-indicator{
+  position:static!important;       /* ← 겹침 원인 제거 */
+  order:2;                         /* 맨 뒤 */
+  flex:0 0 auto;
+  margin-left:auto;                /* 남은 공간 채우고 우측 정렬 */
+}
+
+
+/* settings 탭 안내 문구 */
+.ct-tip{
+  font-size: 0.85em;
+  margin: 0 0 0.5em 0;
+  color: var(--text-muted);
+}

@@ -1,0 +1,190 @@
+/*****************************************************************
+ *  src/theme/css/interactive-table.css – auto-generated from legacy Cover-Table v2025-05
+ *  📑  Interactive-Table  (⚠ 기능 보존 · 색상 토큰화 완전판)
+ *****************************************************************/
+
+/* ──────────────────────────────────────────────────────────────
+   0. Global Color / UI Tokens  (모든 색상은 여기서만 관리)
+   ──────────────────────────────────────────────────────────── */
+:root{
+  /* 공통 베이스(흰색) & 액티브(주황)  */
+  --it-base-color   : #ffffff;   /* 기존 #fff, #ffffff */
+  --it-active-color : #ff9800;   /* 기존 #ff9800       */
+
+  --basic-color     : var(--it-base-color);
+  --active-color    : var(--it-active-color);
+}
+
+/*****************************************************************
+   1. Generic Overrides
+ *****************************************************************/
+pre.language-ct.ct-it-container{ background:transparent; }
+
+/*****************************************************************
+   2. 상단 바 (Filter-Bar)
+ *****************************************************************/
+.ct-filter-bar{
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  gap:.5rem;
+}
+
+.interactive_table-button,
+input.ct-filter-bar__search{
+  font:600 .8rem/1 var(--font-interface);
+  color:var(--basic-color);
+  padding:.15rem .5rem;
+  border:2px solid var(--basic-color);
+  border-radius:0;
+  background:transparent;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* Hover 효과 */
+.interactive_table-button:hover{
+  background:transparent;
+  transition:all .3s ease;
+  transform:scale(.9);
+  border:2px solid var(--basic-color);
+}
+input.ct-filter-bar__search:hover{
+  background:transparent;
+  transition:all .3s ease;
+  transform:scale(.95);
+  border:2px solid var(--basic-color);
+}
+
+/* Active 상태 */
+.interactive_table-filter__btn.is-active,
+.interactive_table-button--tag-filter.is-active{
+  font:600 .8rem/1 var(--font-interface);
+  border:2px solid var(--active-color);
+  border-radius:0;
+  color:var(--active-color);
+}
+input.ct-filter-bar__search:focus{
+  font:600 .8rem/1 var(--font-interface);
+  border:2px solid var(--active-color);
+  border-radius:0;
+}
+
+/* 새로고침 버튼 좌측 여백 */
+button.interactive_table-button.interactive_table-button--refresh{
+  margin-left:.5rem;
+}
+
+/*****************************************************************
+   3. 데이터 테이블
+ *****************************************************************/
+.ct-data-table{ width:100%!important; }
+
+th.ct-data-table__th{
+  font:600 .8rem/1 var(--font-interface)!important;
+  text-align:center;
+  vertical-align:middle;
+  color:var(--background-primary);
+  white-space:nowrap!important;
+  background:var(--basic-color)!important;
+  border-left-color:transparent;
+  border-right-color:transparent;
+  border-top-color:var(--basic-color)!important;
+  border-bottom-color:var(--basic-color)!important;
+}
+
+/* 정렬 상태 색상 (기존 값 유지) */
+.ct-data-table__th.is-asc { background:#15c06a!important; opacity: .5;}
+.ct-data-table__th.is-desc{ background:#b02727!important; opacity: .5;}
+
+td.ct-data-table__td{
+  font:600 .8rem/1 var(--font-interface);
+  text-align:center;
+  vertical-align:middle;
+  color:var(--basic-color);
+  background:transparent!important;
+  border-left-color:transparent;
+  border-right-color:transparent;
+  border-top-color:var(--basic-color)!important;
+  border-bottom-color:var(--basic-color)!important;
+}
+.ct-data-table tr>td:first-child{ text-align:left!important; }
+.ct-data-table tr>td:last-child { text-align:left!important; }
+
+.ct-row--active td{
+  background:var(--active-color)!important;
+  color:var(--background-primary)!important;
+}
+
+/*****************************************************************
+   4. 하단 바 (Pagination)
+ *****************************************************************/
+.ct-pagination{
+  display:flex!important;
+  justify-content:center!important;
+  gap:.5rem!important;
+}
+
+.interactive_table-pagination__btn{
+  font:600 .8rem/1 var(--font-interface);
+}
+
+.interactive_table-pagination__btn--num{
+  color:var(--basic-color);
+  padding:.15rem .5rem;
+  border:2px solid var(--basic-color);
+  border-radius:0;
+  background:transparent;
+  cursor:pointer;
+  user-select:none;
+}
+
+.interactive_table-pagination__btn--arrow{
+  color:var(--background-primary)!important;
+  padding:.15rem .5rem;
+  border:2px solid var(--basic-color);
+  border-radius:0;
+  background:var(--basic-color)!important;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* Hover 효과 */
+.interactive_table-pagination__btn--num:hover{
+  background:transparent;
+  transition:all .3s ease;
+  transform:scale(.9);
+  border:2px solid var(--basic-color);
+}
+.interactive_table-pagination__btn--arrow:hover{
+  color:var(--background-primary)!important;
+  background:var(--basic-color)!important;
+  transition:all .3s ease;
+  transform:scale(.9);
+  border:2px solid var(--basic-color);
+}
+
+/* Active · Disabled */
+.interactive_table-pagination__btn.is-active{
+  border:2px solid var(--active-color);
+  border-radius:0;
+  color:var(--active-color);
+  cursor:default;
+}
+.interactive_table-pagination__btn--arrow.is-active{
+  background:var(--active-color)!important;
+  border-color:var(--active-color)!important;
+  color:var(--background-primary)!important;
+}
+.interactive_table-pagination__btn--disabled{
+  opacity:.5;
+  cursor:default;
+}
+
+/*****************************************************************
+   5. Gantt 삽입 뷰 (테이블 레이아웃 고정)
+ *****************************************************************/
+.gantt-container .gantt-table{
+  table-layout:fixed!important;
+  width:100%!important;
+}

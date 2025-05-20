@@ -14,7 +14,7 @@ const prod = process.argv.includes("--production");
 
 const ctx = await esbuild.context({
   banner: { js: banner },
-  entryPoints: ["src/main.ts"],
+  entryPoints: ["src/core/Plugin.ts"],
   bundle: true,
   external: [
     "obsidian",
@@ -30,7 +30,23 @@ const ctx = await esbuild.context({
   treeShaking: true,
   outfile: "dist/main.js",
   minify: prod,
+  plugins: [],
 });
 
-await ctx.rebuild();
+async function buildStyle() {
+  const parts = [
+    "src/theme/css/base.css",
+    "src/theme/css/gantt.css",
+    "src/theme/css/interactive-table.css",
+  ];
+
+  let out = "";
+  for (const file of parts) {
+    out += await readFile(file, "utf8") + "\n";
+  }
+  await writeFile("style.css", out);   // 플러그인 루트에 생성
+  console.log("✓ style.css built");
+}
+
+await buildStyle();
 process.exit(0);

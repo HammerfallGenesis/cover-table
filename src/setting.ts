@@ -1,804 +1,409 @@
-/***********************************************************************
- * setting.ts – rev.2025-05-11-zero-folder
- *   • **0_ 폴더 숨김 토글(hideZeroFolders) 추가**                  *
- *   • “⚙️ General” 섹션에 UI   (+ plugin.applyZeroFolderVisibility) *
- *   • FULL SOURCE – 복사‧붙여넣기용                                *
- ***********************************************************************/
-
+/*****************************************************************
+ * src/setting.ts – Cover-Table v3 (error-free, dual-picker UI)
+ *****************************************************************/
 import {
-  App,
-  PluginSettingTab,
-  Setting,
-  ColorComponent,
-  TextComponent,
-  Notice,
-} from "obsidian";
-import type CoverTablePlugin from "./main";
-import type { EmbedFileHandlerSettings } from "./theme/embed";
+  DEFAULT_TOKENS,
+  injectTokens,
+  type AppDesignTokens,
+  type TablePalette,
+  type ImagePalette,
+} from "./theme/tokens";
 
-/*───────────────────────────────────────────────────────────────
-  0.  Type Definitions
-───────────────────────────────────────────────────────────────*/
-export interface ModeColorConfig {
-  buttonColor      : string;
-  buttonHoverColor : string;
-  itHeaderBg       : string;
-  itHeaderFg       : string;
-  itRowOdd         : string;
-  itRowEven        : string;
-  itRowHover       : string;
-  itBorder         : string;
-  itBorderV         : string;
-}
-export interface DesignOptions { dark: ModeColorConfig; light: ModeColorConfig; }
-export type   BaseThemeVars   = Record<string, string>;
+import type { EmbedFileHandlerSettings } from "./features/embed/EmbedService";
+import { App, PluginSettingTab, Setting } from "obsidian";
+import type CoverTablePlugin from "./core/Plugin";   // 플러그인 클래스
 
+/*────────────── 1. List-callout 정의 ─────────────*/
 export interface ListCallout {
   char    : string;
-  bgLight : string;
-  bgDark  : string;
-  fgLight : string;
-  fgDark  : string;
+  bgLight : string; fgLight : string;
+  bgDark  : string; fgDark  : string;
 }
 
+/*────────────── 2. 설정 스키마 / 기본값 ──────────*/
 export interface CoverTableSettings {
-  enableBaseTheme      : boolean;
   enableHeaderNumbering: boolean;
-  /** ◀ NEW – “0_” 폴더 숨김 */
   hideZeroFolders      : boolean;
-  embed: EmbedFileHandlerSettings;
-  design               : DesignOptions;
-  globalTokens         : GlobalTokenDesign;       /* ← NEW */
-  baseVars             : BaseThemeVars;
-  customCss            : string;
+  hideAllNotes         : boolean;
   listCallouts         : ListCallout[];
+
+  embed     : EmbedFileHandlerSettings;
+  baseVars  : Record<string,string>;
+  tokens    : AppDesignTokens;
+  customCss : string;
 }
 
-/*───────────────────────────────────────────────────────────────
-  0-B.  Global Token Color Config  ← NEW
-───────────────────────────────────────────────────────────────*/
-export interface GlobalTokenColorConfig {
-  /* GANTT */
-  gHeaderFg      : string;   /* --g-h-fg            */
-  gLine          : string;   /* --g-line            */
-  gRowOdd        : string;   /* --g-row-odd         */
-  gRowEven       : string;   /* --g-row-even        */
-  gRowHover      : string;   /* --g-row-hover       */
-  gTodayOutline  : string;   /* --g-today-outline   */
-
-  /* INTERACTIVE TABLE */
-  itHeaderBg     : string;   /* --it-header-bg      */
-  itHeaderFg     : string;   /* --it-header-fg      */
-  itRowOdd       : string;   /* --it-row-odd        */
-  itRowEven      : string;   /* --it-row-even       */
-  itRowHover     : string;   /* --it-row-hover      */
-  itBorder       : string;   /* --it-border         */
-  itBorderV       : string;   /* --it-border-v         */
-
-  /* BUTTONS / HEADER BAR / SEPARATORS */
-  btnFg          : string;   /* --btn-fg            */
-  btnGradTop     : string;   /* --btn-grad-top      */
-  btnGradBottom  : string;   /* --btn-grad-bottom   */
-  hdrBarBg       : string;   /* --hdr-bar-bg        */
-  sepColor       : string;   /* --sep-color         */
-}
-
-export interface GlobalTokenDesign { dark: GlobalTokenColorConfig; light: GlobalTokenColorConfig; }
-
-/*───────────────────────────────────────────────────────────────
-  0-C.  CSS Token ↔ CSS Var Map (Global Tokens)  ← NEW
-───────────────────────────────────────────────────────────────*/
-export const CSS_VAR_MAP_GLOBAL: Record<keyof GlobalTokenColorConfig, string> = {
-  gHeaderFg     : "--g-h-fg",
-  gLine         : "--g-line",
-  gRowOdd       : "--g-row-odd",
-  gRowEven      : "--g-row-even",
-  gRowHover     : "--g-row-hover",
-  gTodayOutline : "--g-today-outline",
-
-  itHeaderBg    : "--it-header-bg",
-  itHeaderFg    : "--it-header-fg",
-  itRowOdd      : "--it-row-odd",
-  itRowEven     : "--it-row-even",
-  itRowHover    : "--it-row-hover",
-  itBorder      : "--it-border",
-  itBorderV     : "--it-border-v", 
-
-  btnFg         : "--btn-fg",
-  btnGradTop    : "--btn-grad-top",
-  btnGradBottom : "--btn-grad-bottom",
-  hdrBarBg      : "--hdr-bar-bg",
-  sepColor      : "--sep-color",
-};
-
-
-/*───────────────────────────────────────────────────────────────
-  1.  Defaults
-───────────────────────────────────────────────────────────────*/
-export const DEFAULT_IT_COLOR: ModeColorConfig = {
-  buttonColor      : "#7a481d",
-  buttonHoverColor : "rgba(140,70,30,0.9)",
-  itHeaderBg       : "#7a481d",
-  itHeaderFg       : "#fff0e6",
-  itRowOdd         : "rgba(160,85,40,0.25)",
-  itRowEven        : "rgba(135,70,30,0.25)",
-  itRowHover       : "rgba(200,120,50,0.28)",
-  itBorder         : "rgba(200,145,80,0.45)",
-  itBorderV        : "rgba(150,115,70,0.45)",
-};
-
-/* (Light/Dark Base Vars 전체 – 동일) */
-export const DEFAULT_BASE_VARS: BaseThemeVars = {
-  /* … 70 여 종 그대로 (생략 없음) … */
-  "--folder-lvl0-01-light": "#0076ad",
-  "--folder-lvl0-25-light": "#989300",
-  "--folder-lvl0-68-light": "#9b1000",
-  "--folder-lvl1-01-light": "#003d5a",
-  "--folder-lvl1-25-light": "#453a01",
-  "--folder-lvl1-68-light": "#461300",
-  "--folder-q-color-light": "#848484",
-  "--bold-color-light": "rgb(138,0,119)",
-  "--heading-bg-h1-light": "rgba(255,204,203,0.6)",
-  "--heading-bg-h2-light": "rgba(255,218,185,0.6)",
-  "--heading-bg-h3-light": "rgba(255,255,204,0.6)",
-  "--heading-bg-h4-light": "rgba(224,255,255,0.6)",
-  "--heading-bg-h5-light": "rgba(230,230,250,0.6)",
-  "--heading-bg-h6-light": "rgba(245,245,245,0.6)",
-  "--heading-color-light": "#333",
-  "--table-border-light": "#000000",
-  "--table-shadow-light": "rgba(0,0,0,0.15)",
-  "--table-row-even-light": "#ebecf1",
-  "--table-row-hover-light": "#f5f1da",
-  "--image-border": "rgba(0,0,0,0.2)",
-  "--image-shadow": "rgba(0,0,0,0.15)",
-  "--bullet-new-color": "rgb(255,255,255)",
-  "--folder-lvl0-01-dark": "#5bcbff",
-  "--folder-lvl0-25-dark": "#fae05b",
-  "--folder-lvl0-68-dark": "#ff7e75",
-  "--folder-lvl1-01-dark": "#ade5ff",
-  "--folder-lvl1-25-dark": "#fff5b3",
-  "--folder-lvl1-68-dark": "#ffa9a9",
-  "--folder-q-color-dark": "#848484",
-  "--bold-color-dark": "rgb(255,188,188)",
-  "--heading-bg-h1-dark": "rgba(139,0,0,0.6)",
-  "--heading-bg-h2-dark": "rgba(139,69,19,0.6)",
-  "--heading-bg-h3-dark": "rgba(139,139,0,0.6)",
-  "--heading-bg-h4-dark": "rgba(0,139,139,0.6)",
-  "--heading-bg-h5-dark": "rgba(72,61,139,0.6)",
-  "--heading-bg-h6-dark": "rgba(105,105,105,0.6)",
-  "--heading-color-dark": "#ffffff",
-  "--table-border-dark": "#888888",
-  "--table-shadow-dark": "rgba(0,0,0,0.5)",
-  "--table-row-even-dark": "#2e2e2e",
-  "--table-row-hover-dark": "#3e3e3e",
-};
-
-/*───────────────────────────────────────────────────────────────
-  1-B. DEFAULT GLOBAL TOKEN COLOURS
-───────────────────────────────────────────────────────────────*/
-const DEFAULT_GLOBAL_TOKENS_DARK: GlobalTokenColorConfig = {
-  gHeaderFg     : "#fafafa",
-  gLine         : "#444444",
-  gRowOdd       : "#3c2110",
-  gRowEven      : "#351e0d",
-  gRowHover     : "#4b2c16",
-  gTodayOutline : "#ff7675",
-
-  itHeaderBg    : "#7a481d",
-  itHeaderFg    : "#fff0e6",
-  itRowOdd      : "#171717",
-  itRowEven     : "#171717",
-  itRowHover    : "rgba(200,120,50,0.28)",
-  itBorder      : "rgba(200,145,80,0.45)",
-  itBorderV     : "rgba(200,145,80,0.45)",
-
-  btnFg         : "#ffffff",
-  btnGradTop    : "#845127",
-  btnGradBottom : "#633818",
-  hdrBarBg      : "#7a481d",
-  sepColor      : "#7a481d",
-};
-
-const DEFAULT_GLOBAL_TOKENS_LIGHT: GlobalTokenColorConfig = {
-  gHeaderFg     : "#202020",
-  gLine         : "#444444",
-  gRowOdd       : "#f7f7f7",
-  gRowEven      : "#f1f1f1",
-  gRowHover     : "#eaeaea",
-  gTodayOutline : "#ffffff",
-
-  itHeaderBg    : "#0644fe",
-  itHeaderFg    : "#ffffff",
-  itRowOdd      : "#171717",
-  itRowEven     : "#171717",
-  itRowHover    : "#616161",
-  itBorder      : "#0076f5",
-  itBorderV     : "#171717",
-
-  btnFg         : "#ffffff",
-  btnGradTop    : "#3d4aff",
-  btnGradBottom : "#030099",
-  hdrBarBg      : "#338bff",
-  sepColor      : "#5c9aff",
-};
-
-
-/*───────────────────────────────────────────────────────────────
-  1-C.  DEFAULT_SETTINGS  ← GLOBAL TOKEN 필드 추가
-───────────────────────────────────────────────────────────────*/
 export const DEFAULT_SETTINGS: CoverTableSettings = {
-  enableBaseTheme      : true,
   enableHeaderNumbering: true,
-  hideZeroFolders      : false,
-  embed: {
-    enableEmbedNoPreview: true,
-    nonPreviewExtensions: [".pdf", ".exe", ".zip", ".rar"],
-    },
-  design       : { dark: { ...DEFAULT_IT_COLOR },
-                   light: { ...DEFAULT_IT_COLOR,
-                    buttonColor     : "#c6934b",
-                    buttonHoverColor: "#dba663",
-                    itHeaderBg      : "#c6934b",
-                    itHeaderFg      : "#382409",
-                    itRowOdd        : "rgba(230,210,190,.45)",
-                    itRowEven       : "rgba(220,200,180,.45)",
-                    itRowHover      : "rgba(255,225,185,.55)",
-                    itBorder        : "rgba(150,115,70,.45)",
-                    itBorderV       : "rgba(150,115,70,0.45)",} },
-  globalTokens : { dark : { ...DEFAULT_GLOBAL_TOKENS_DARK },
-                   light: { ...DEFAULT_GLOBAL_TOKENS_LIGHT } },   /* ← NEW */
-  baseVars     : { ...DEFAULT_BASE_VARS },
-  customCss    : "",
-  listCallouts : [],
+  hideZeroFolders      : true,
+  hideAllNotes         : true,
+  listCallouts         : [],
+
+  embed : { enableEmbedNoPreview: true,
+            nonPreviewExtensions: [".pdf",".exe",".zip",".rar"] },
+
+  tokens   : structuredClone(DEFAULT_TOKENS),
+  baseVars : {},
+  customCss: "",
 };
 
-/*───────────────────────────────────────────────────────────────
-  2.  CSS Token ↔ CSS Var Map (동일)
-───────────────────────────────────────────────────────────────*/
-export const CSS_VAR_MAP: Record<keyof ModeColorConfig, string> = {
-  itHeaderBg       : "--it-header-bg",
-  itHeaderFg       : "--it-header-fg",
-  itRowOdd         : "--it-row-odd",
-  itRowEven        : "--it-row-even",
-  itRowHover       : "--it-row-hover",
-  itBorder         : "--it-border",
-  itBorderV        : "--it-border-v",
-};
+/*────────────── 3. 라벨 사전 (UI 텍스트) ─────────*/
+const LABEL = {
+  /* Base */
+  baseWhite : "Base ‧ 배경(흰색)",
+  baseBlack : "Base ‧ 글자(검정)",
+  /* Heading */
+  h1:"H1 (Red)", h2:"H2 (Orange)", h3:"H3 (Yellow)",
+  h4:"H4 (Green)", h5:"H5 (Blue)", h6:"H6 (Violet)",
+  /* List */
+  bullet:"List Bullet", olMarker:"Ordered-list Number",
+  /* Explorer – folders */
+  lvl0_01:"Folder L0 - 0~1", lvl0_25:"Folder L0 - 2~5", lvl0_68:"Folder L0 - 6~8",
+  lvl1_01:"Folder L1 - 0~1", lvl1_25:"Folder L1 - 2~5", lvl1_68:"Folder L1 - 6~8",
+  folderQ :"Folder “Q)”",
+  /* Table / Image */
+  tBorder:"Table Border", tShadow:"Table Shadow",
+  tRowEven:"Table Row (even)", tRowHover:"Table Row (hover)",
+  iBorder:"Image Border", iShadow:"Image Shadow",
+} as const;
+const CALLOUT_LIMIT = 5;
 
-/*───────────────────────────────────────────────────────────────
-  3.  Setting Tab
-───────────────────────────────────────────────────────────────*/
+/*────────────── 4. SettingTab 클래스 ────────────*/
+type ModeKey = keyof AppDesignTokens;    // "dark" | "light"
+
 export class CoverTableSettingTab extends PluginSettingTab {
-  constructor(public app: App, public plugin: CoverTablePlugin){ super(app, plugin); }
+  private plugin: CoverTablePlugin;
+
+  constructor(app: App, plugin: CoverTablePlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+
+private async commit() {
+  await this.plugin.saveSettings();
+
+  const mode: ModeKey =
+    document.body.classList.contains("theme-dark") ? "dark" : "light";
+  injectTokens(mode, this.plugin.settings.tokens);
+
+  /* ✅ 플러그인 공개 메서드 호출만 남김 */
+  this.plugin.rebuildListCallouts();
+}
+
+
 
 /*───────────────────────────────────────────────────────────────
-  📚 Setting Descriptions  (클래스 상단에 추가)
+  fillMissing() – 누락값 보충
 ───────────────────────────────────────────────────────────────*/
-private readonly DESC_GENERAL = {
-  enableBaseTheme      : "내장된 Cover-Table 기본 테마(CSS 변수)를 사용할지 여부입니다. 끄면 Obsidian / 커스텀 CSS만 적용됩니다.",
-  enableHeaderNumbering: "문서 Heading(H1~H6)에 자동 번호를 붙입니다. 예) 1.2.3 형식",
-  hideZeroFolders      : "파일 탐색기에서 이름이 “0_” 로 시작하는 폴더를 숨깁니다(프로젝트 템플릿·아카이브용).",
-};
-private readonly DESC_BASE_THEME = "Cover-Table 기본 테마의 색상 변수입니다. Obsidian 전역 CSS 변수로 주입됩니다.";
-private readonly DESC_GLOBAL_TOKEN =
-  "Gantt / Interactive-Table / 버튼 등 Cover-Table 구성요소의 전역 색상 토큰입니다. 테마별로 개별 지정할 수 있습니다.";
-private readonly DESC_BOLD_COLOR =
-  "Markdown **Bold**(굵은 글꼴) 텍스트에 적용되는 색상입니다. 라이트/다크 테마별로 지정하세요.";
+private fillMissing(tokens: AppDesignTokens) {
+  (["dark","light"] as const).forEach(mode => {
+    const def = DEFAULT_TOKENS[mode];
+    const tgt = tokens[mode];
 
+    tgt.base    = { ...def.base,    ...tgt.base    };
+    tgt.heading = { ...def.heading, ...tgt.heading };
+    tgt.list    = { ...def.list,    ...tgt.list    };
 
-  /*───────────────────────────────────────────────────────────────
-    🔧 Color Util
-  ───────────────────────────────────────────────────────────────*/
-  
-  private static isHex(v?:string){
-    return typeof v==="string" && /^#[0-9a-f]{3,8}$/i.test(v.trim());
-  }
-  private static toHex6(hex:string){
-    hex = hex.replace("#","");
-    if(hex.length===3) hex = hex.split("").map(c=>c+c).join("");
-    if(hex.length===4) hex = hex.slice(0,3).split("").map(c=>c+c).join("");
-    if(hex.length===8) hex = hex.slice(0,6);
-    return "#"+hex.padEnd(6,"0").slice(0,6).toLowerCase();
-  }
-  /* NEW ▶ rgba() · rgb() · 8-digit hex → 6/8-digit hex */
-  private static colorToHex(src:string):string{
-    src = src.trim();
-    if(this.isHex(src)) return this.toHex6(src);
+    /* ▲ ① 기본 블록은 전부 OK — 아래 merge 함수만 수정 */
 
-    const m = src.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([0-9.]+))?\)$/i);
-    if(!m) return "#000000";
-
-    const [r,g,b] = [m[1],m[2],m[3]].map(n=>Math.min(255,Math.max(0,parseInt(n,10))));
-    const a = m[4] ? Math.round(Math.min(1,Math.max(0,parseFloat(m[4]))) * 255) : 255;
-    const hex = `#${[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("")}`;
-    return a!==255 ? hex + a.toString(16).padStart(2,"0") : hex;
-  }
-
-  /*───────────────────────────────────────────────────────────────
-      cssColorToHex()  –  any CSS → 6-digit HEX  (NULL SAFE)   🆕
-  ───────────────────────────────────────────────────────────────*/
-  private static cssColorToHex(src?: string): string {
-    /* ❶ undefined / null / 빈 문자 → 기본값 */
-    if (!src || typeof src !== "string") return "#000000";
-
-    src = src.trim();
-
-    /* (#abc | #abcdef | #abcdef80) → 표준화 */
-    if (/^#[0-9a-f]{3,8}$/i.test(src)) {
-      const hex = src.replace("#", "");
-      if (hex.length === 3) return "#" + hex.split("").map(c => c + c).join("");
-      if (hex.length === 4) return (
-        "#" + hex.slice(0, 3).split("").map(c => c + c).join("") +
-        hex.slice(3, 4).repeat(2)
-      );
-      return "#" + hex.toLowerCase();                 /* 6 or 8 digits */
-    }
-
-    /* rgb / rgba → HEX(A) */
-    const m = src.match(
-      /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([0-9.]+))?\)$/i
-    );
-    if (m) {
-      const [r, g, b] = [m[1], m[2], m[3]].map(n =>
-        Math.min(255, Math.max(0, parseInt(n, 10)))
-      );
-      const a = m[4]
-        ? Math.round(Math.min(1, Math.max(0, parseFloat(m[4]))) * 255)
-        : 255;
-      const hexRGB = [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
-      return "#" + hexRGB + (a === 255 ? "" : a.toString(16).padStart(2, "0"));
-    }
-
-    /* 기타(hsl 등) → 기본값 */
-    return "#000000";
-  }
-  /*───────────────────────────────────────────────────────────────
-    📌 Bold Color Variable Key
-  ───────────────────────────────────────────────────────────────*/
-  private static readonly BOLD_VAR_LIGHT = "--bold-color-light";
-  private static readonly BOLD_VAR_DARK  = "--bold-color-dark";
-
-
-
-/*─────────────────────────────────────────────────────────────
-    display() – ENTRY  
-─────────────────────────────────────────────────────────────*/
-
-/*─────────────────────────────────────────────────────────────
-    display() – ENTRY  (INTERACTIVE-TABLE 블록 제거 버전)
-─────────────────────────────────────────────────────────────*/
-display(): void {
-  if (!Array.isArray(this.plugin.settings.listCallouts))
-    this.plugin.settings.listCallouts = [];
-
-  const el = this.containerEl;
-  el.empty();
-  el.createEl("h2", { text: "Cover-Table — Settings" });
-
-  /* ───────────────── Embed 옵션 ───────────────── */
-  el.createEl("h3", { text: "Drag / Paste Embed Override" });
-
-  new Setting(el)
-    .setName("Enable embed override")
-    .setDesc("ON → 지정 확장자는 [[링크]], 그 외는 ![[embed]] 로 삽입")
-    .addToggle(t => t
-      .setValue(this.plugin.settings.embed.enableEmbedNoPreview)
-      .onChange(async v => {
-        this.plugin.settings.embed.enableEmbedNoPreview = v;
-        await this.plugin.saveSettings();
-      }));
-
-  new Setting(el)
-    .setName("Non-preview extensions")
-    .setDesc("쉼표 구분, 반드시 점(.) 포함. 예) .pdf, .dwg")
-    .addTextArea(t => t
-      .setValue(this.plugin.settings.embed.nonPreviewExtensions.join(", "))
-      .onChange(async v => {
-        const arr = v.split(",")
-          .map(s => s.trim().toLowerCase())
-          .filter(s => s.length)
-          .map(s => (s.startsWith(".") ? s : `.${s}`));
-        this.plugin.settings.embed.nonPreviewExtensions = [...new Set(arr)];
-        await this.plugin.saveSettings();
-      }));
-
-
-
-  /* (A) General Toggles */
-  this.buildToggleSection(el);
-
-  /* (B) 🌟 Global Token Colours (Dark / Light) */
-  this.buildGlobalTokenColorSection(el, "dark");
-  this.buildGlobalTokenColorSection(el, "light");
-
-  /* (B2) 🔠 Bold Colour */
-  this.buildBoldColorSection(el);
-
-  /* (C) Base-Theme Vars */
-  this.buildBaseThemeSection(el, "light");
-  this.buildBaseThemeSection(el, "dark");
-  this.buildBaseThemeSection(el, "global");
-
-
-  /* (D) Custom CSS */
-  this.buildCustomCssSection(el);
-
-  /* (E) 📝 List Callouts */
-  this.buildListCalloutsSection(el);
-}
-
-
-
-/*─────────────────────────────────────────────────────────────
-    A. General Toggle Section  – 설명 강화 (전체 교체)
-─────────────────────────────────────────────────────────────*/
-private buildToggleSection(container:HTMLElement){
-  container.createEl("h3",{text:"⚙️ General"});
-
-  /* built-in Base Theme */
-  new Setting(container)
-    .setName("Use Cover-Table Base Theme CSS")
-    .setDesc(this.DESC_GENERAL.enableBaseTheme)
-    .addToggle(t=>t
-      .setValue(this.plugin.settings.enableBaseTheme)
-      .onChange(async v=>{
-        this.plugin.settings.enableBaseTheme = v;
-        await this.plugin.saveSettings();
-        this.plugin.applyDesignSettings();
-      }));
-
-  /* heading numbering */
-  new Setting(container)
-    .setName("Auto-number Headings")
-    .setDesc(this.DESC_GENERAL.enableHeaderNumbering)
-    .addToggle(t=>t
-      .setValue(this.plugin.settings.enableHeaderNumbering)
-      .onChange(async v=>{
-        this.plugin.settings.enableHeaderNumbering = v;
-        await this.plugin.saveSettings();
-        this.plugin.reloadHeaderLabeller();
-      }));
-
-  /* “0_” 폴더 숨김 */
-  new Setting(container)
-    .setName(`Hide “0_” Folders`)
-    .setDesc(this.DESC_GENERAL.hideZeroFolders)
-    .addToggle(t=>t
-      .setValue(this.plugin.settings.hideZeroFolders)
-      .onChange(async v=>{
-        this.plugin.settings.hideZeroFolders = v;
-        await this.plugin.saveSettings();
-        this.plugin.applyZeroFolderVisibility();
-      }));
-}
-
-
-/*─────────────────────────────────────────────────────────────
-    3-C. Base-Theme Variable Editor  (전체 교체)
-─────────────────────────────────────────────────────────────*/
-private buildBaseThemeSection(
-  container: HTMLElement,
-  suffix: "light" | "dark" | "global"
-){
-  const hdr =
-    suffix==="global" ? "⚙️ Base-Theme (Global)" :
-    suffix==="light"  ? "☀️ Base-Theme Light"   :
-                        "🌙 Base-Theme Dark";
-  container.createEl("h3",{text:hdr});
-  container.createEl("p",{text:this.DESC_BASE_THEME, cls:"ct-desc"});
-
-  Object.keys(this.plugin.settings.baseVars)
-    .filter(k=> suffix==="global"
-      ? !k.endsWith("-light") && !k.endsWith("-dark")
-      : k.endsWith(`-${suffix}`))
-    .forEach(key=>{
-      const cur = this.plugin.settings.baseVars[key];
-      const row = new Setting(container).setName(key);
-
-      row.addColorPicker((cp:ColorComponent)=>cp
-        .setValue(CoverTableSettingTab.cssColorToHex(cur))
-        .onChange(async v=>{
-          this.plugin.settings.baseVars[key] = v;
-          await this.plugin.saveSettings();
-          this.plugin.applyDesignSettings();
-        }));
-    });
-}
-
-
-
-  /*─────────────────────────────────────────────────────────────
-      3-D. Custom CSS Section
-  ─────────────────────────────────────────────────────────────*/
-  private buildCustomCssSection(container: HTMLElement){
-    container.createEl("h3",{text:"✏️ Extra Custom CSS"});
-    new Setting(container)
-      .addTextArea((ta:TextComponent)=>ta
-        .setPlaceholder("/* your CSS here */")
-        .setValue(this.plugin.settings.customCss)
-        .onChange(async v=>{
-          this.plugin.settings.customCss = v;
-          await this.plugin.saveSettings();
-          this.plugin.applyDesignSettings();
-        }));
-  }
-
-/*─────────────────────────────────────────────────────────────
-    3-E. 📝 List Callouts Section  (행 렌더 방식 교체)
-─────────────────────────────────────────────────────────────*/
-private buildListCalloutsSection(container: HTMLElement){
-  container.createEl("h3",{text:"📝 List Callouts"});
-  container.createEl("p",{
-    text:"지정한 Char 로 시작하는 목록 항목에 배경/글자색을 적용합니다. 라이트·다크 테마별 색상을 한 번에 설정하세요.",
-    cls:"ct-desc",
-  });
-
-  const body = container.createDiv({cls:"lc-callout-list"});
-  const saveRefresh = async ()=>{
-    await this.plugin.saveSettings();
-    this.plugin.listCallouts.rebuild();
-    renderRows();
-  };
-  const renderRows = ()=>{
-    body.empty();
-    this.plugin.settings.listCallouts.forEach((co,idx)=>{
-      this.buildCalloutRow(body,co,idx,saveRefresh);
-    });
-  };
-  renderRows();
-
-  new Setting(container).addButton(btn=>btn
-    .setButtonText("+ Add Callout")
-    .setCta()
-    .onClick(async ()=>{
-      const used = new Set(
-        this.plugin.settings.listCallouts.map(c=>c.char)
-      );
-      const pool = "!@#$%^&*+=?<>/".split("");
-      const free = pool.find(ch=>!used.has(ch)) ?? "~";
-
-      this.plugin.settings.listCallouts.push({
-        char:free,
-        bgLight:"#e0e0e0", fgLight:"#000000",
-        bgDark:"#3a3a3a",  fgDark:"#ffffff",
+    /** d(기본)에서 존재하는 key 를 t(현재)로 채워 넣는다 */
+    const merge = <O extends { [K in keyof O]: string }>(d: O, t: O): void => {
+      (Object.keys(d) as (keyof O)[]).forEach(k => {
+        t[k] ??= d[k];
       });
-      await saveRefresh();
-    }));
-}
+    };
 
+    /* Folder - L0 · L1 */
+    merge(def.folder.lvl0, tgt.folder.lvl0);
+    merge(def.folder.lvl1, tgt.folder.lvl1);
+    tgt.folder.q ??= def.folder.q;
 
-/*─────────────────────────────────────────────────────────────
-    🌟 Global Token Colour Section  (NULL SAFE)   🆕
-─────────────────────────────────────────────────────────────*/
-private buildGlobalTokenColorSection(
-  container: HTMLElement,
-  mode: "dark" | "light"
-){
-  container.createEl("h3",{
-    text: mode==="dark"
-      ? "🌙 Global Token Colours — Dark Theme"
-      : "☀️ Global Token Colours — Light Theme",
-  });
-  container.createEl("p",{text:this.DESC_GLOBAL_TOKEN, cls:"ct-desc"});
-
-  const NOTE: Partial<Record<keyof GlobalTokenColorConfig,string>> = {
-    gHeaderFg  :"Gantt 헤더 글자색",
-    itHeaderBg :"테이블 헤더 배경",
-    itRowOdd   :"테이블 홀수행 배경",
-    hdrBarBg   :"설정창 헤더 바 배경",
-  };
-
-  (Object.keys(CSS_VAR_MAP_GLOBAL) as (keyof GlobalTokenColorConfig)[])
-    .forEach(tok=>{
-      /* ❶ 값이 없으면 임시 기본값(#000000) 주입 */
-      if (this.plugin.settings.globalTokens[mode][tok] === undefined)
-        this.plugin.settings.globalTokens[mode][tok] = "#000000";
-
-      const cur = this.plugin.settings.globalTokens[mode][tok];
-      const row = new Setting(container)
-        .setName(tok)
-        .setDesc(NOTE[tok] ?? "");
-
-      row.addColorPicker(cp=>cp
-        .setValue(CoverTableSettingTab.cssColorToHex(cur))
-        .onChange(async v=>{
-          this.plugin.settings.globalTokens[mode][tok] = v;
-          await this.plugin.saveSettings();
-          this.plugin.applyDesignSettings();
-        }));
-    });
-}
-
-
-
-/*─────────────────────────────────────────────────────────────
-    buildCalloutRow() – Char + Light/Dark BG/FG 한 행 레이아웃
-─────────────────────────────────────────────────────────────*/
-private buildCalloutRow(
-  parent : HTMLElement,
-  co     : ListCallout,
-  idx    : number,
-  persist: ()=>Promise<void>,
-){
-  const row = parent.createDiv({cls:"lc-callout-row-grid"}); /* CSS grid */
-
-  /* Char + Delete */
-  const charSet = new Setting(row)
-    .setClass("lc-callout-char")
-    .addText(t=>t
-      .setPlaceholder("!")
-      .setValue(co.char)
-      .onChange(async v=>{
-        const ch = v.trim().slice(0,1)||"!";
-        if(this.plugin.settings.listCallouts
-          .some((c,i)=>i!==idx && c.char===ch)){
-          new Notice(`Character "${ch}" already in use.`);
-          return;
-        }
-        co.char = ch;
-        await persist();
-      }))
-    .addExtraButton(b=>b
-      .setIcon("trash")
-      .setTooltip("Delete this callout")
-      .onClick(async ()=>{
-        this.plugin.settings.listCallouts.splice(idx,1);
-        await persist();
-      }));
-
-  charSet.infoEl.setText("Char");
-
-  /* Light BG / FG */
-  new Setting(row)
-    .setName("Light")
-    .setClass("lc-callout-light")
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.bgLight))
-      .onChange(async v=>{
-        co.bgLight = v;
-        await persist();
-      }))
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.fgLight))
-      .onChange(async v=>{
-        co.fgLight = v;
-        await persist();
-      }));
-
-  /* Dark BG / FG */
-  new Setting(row)
-    .setName("Dark")
-    .setClass("lc-callout-dark")
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.bgDark))
-      .onChange(async v=>{
-        co.bgDark = v;
-        await persist();
-      }))
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.fgDark))
-      .onChange(async v=>{
-        co.fgDark = v;
-        await persist();
-      }));
-}
-
-
-/*─────────────────────────────────────────────────────────────
-    buildCalloutRow() – Char + Light/Dark BG/FG 한 행 레이아웃
-─────────────────────────────────────────────────────────────*/
-private buildCalloutRow(
-  parent : HTMLElement,
-  co     : ListCallout,
-  idx    : number,
-  persist: ()=>Promise<void>,
-){
-  const row = parent.createDiv({cls:"lc-callout-row-grid"}); /* CSS grid */
-
-  /* Char + Delete */
-  const charSet = new Setting(row)
-    .setClass("lc-callout-char")
-    .addText(t=>t
-      .setPlaceholder("!")
-      .setValue(co.char)
-      .onChange(async v=>{
-        const ch = v.trim().slice(0,1)||"!";
-        if(this.plugin.settings.listCallouts
-          .some((c,i)=>i!==idx && c.char===ch)){
-          new Notice(`Character "${ch}" already in use.`);
-          return;
-        }
-        co.char = ch;
-        await persist();
-      }))
-    .addExtraButton(b=>b
-      .setIcon("trash")
-      .setTooltip("Delete this callout")
-      .onClick(async ()=>{
-        this.plugin.settings.listCallouts.splice(idx,1);
-        await persist();
-      }));
-
-  charSet.infoEl.setText("Char");
-
-  /* Light BG / FG */
-  new Setting(row)
-    .setName("Light")
-    .setClass("lc-callout-light")
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.bgLight))
-      .onChange(async v=>{
-        co.bgLight = v;
-        await persist();
-      }))
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.fgLight))
-      .onChange(async v=>{
-        co.fgLight = v;
-        await persist();
-      }));
-
-  /* Dark BG / FG */
-  new Setting(row)
-    .setName("Dark")
-    .setClass("lc-callout-dark")
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.bgDark))
-      .onChange(async v=>{
-        co.bgDark = v;
-        await persist();
-      }))
-    .addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(co.fgDark))
-      .onChange(async v=>{
-        co.fgDark = v;
-        await persist();
-      }));
-}
-
-
-
-/*─────────────────────────────────────────────────────────────
-    🅱️ Bold Text Colour Section  (전체 교체/추가)
-─────────────────────────────────────────────────────────────*/
-private buildBoldColorSection(container: HTMLElement){
-  container.createEl("h3",{text:"🔠 Bold Text Colour"});
-  container.createEl("p",{text:this.DESC_BOLD_COLOR, cls:"ct-desc"});
-
-  type Mode = "light" | "dark";
-  const KEY:Record<Mode,string>={
-    light: CoverTableSettingTab.BOLD_VAR_LIGHT,
-    dark : CoverTableSettingTab.BOLD_VAR_DARK,
-  };
-
-  (["light","dark"] as Mode[]).forEach(mode=>{
-    const row = new Setting(container)
-      .setName(mode==="light"?"☀️ Light":"🌙 Dark");
-
-    row.addColorPicker(cp=>cp
-      .setValue(CoverTableSettingTab.cssColorToHex(
-        this.plugin.settings.baseVars[KEY[mode]]
-      ))
-      .onChange(async v=>{
-        this.plugin.settings.baseVars[KEY[mode]] = v;
-        await this.plugin.saveSettings();
-        this.plugin.applyDesignSettings();
-      }));
+    /* Table / Image */
+    tgt.table = { ...def.table, ...tgt.table };
+    tgt.image = { ...def.image, ...tgt.image };
   });
 }
+
+
+/** 1 행에 ☀(Light) + 🌙(Dark) 두 컬러피커를 그린다 – 안전 버전 */
+private addDualPicker(
+  host        : HTMLElement,
+  label       : string,
+  lightGetter : () => string,
+  darkGetter  : () => string,
+  lightSetter : (v: string) => void,
+  darkSetter  : (v: string) => void,
+) {
+  const row = new Setting(host).setName(label).setDesc("☀ Light ▸ left   ·   🌙 Dark ▸ right");
+
+
+  
+
+  /* 내부 헬퍼: 컬러피커 공통 초기화 -------------------------------- */
+  const initPicker = (
+    cp  : any,                    // ColorComponent (런타임 구조 이용)
+    get : () => string,
+    set : (v: string) => void,
+    tip : string,
+  ) => {
+    cp.setValue(get())
+      .onChange(async (v: string) => { set(v); await this.commit(); });
+
+    /* ① inputEl 이 있으면 바로 */
+    let inp: HTMLInputElement | null =
+      (cp as any).inputEl ?? null;
+
+    /* ② 아직 없으면 다음 tick 에 containerEl 로 조회 */
+    if (!inp) {
+      queueMicrotask(() => {
+        inp = cp.containerEl?.querySelector("input[type='color']") as HTMLInputElement | null;
+
+        inp?.setAttribute("title", tip);
+      });
+    } else {
+      inp.setAttribute("title", tip);
+    }
+  };
+
+  /* ☀ Light ---------------------------------------------------------- */
+  row.addColorPicker(cp =>
+    initPicker(cp, lightGetter, lightSetter, "Light mode colour (☀)"),
+  );
+
+  /* 🌙 Dark ----------------------------------------------------------- */
+  row.addColorPicker(cp =>
+    initPicker(cp, darkGetter, darkSetter, "Dark mode colour (🌙)"),
+  );
 }
 
-/*───────────────────────────────────────────────────────────────
-  helper (module-scope) – RGB ↔ HEX (UNUSED in UI, kept for API)
-───────────────────────────────────────────────────────────────*/
-function hexToRgb(hex:string){
-  hex = hex.replace("#","");
-  if(hex.length===3) hex = hex.split("").map(c=>c+c).join("");
-  const n = parseInt(hex,16);
-  return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
+/* === List-Callout 한 행 생성 === */
+private buildCalloutRow(
+  host : HTMLElement,     // Setting 컨테이너
+  co   : ListCallout,     // 현재 데이터
+  idx  : number,          // 배열 인덱스
+  S    : CoverTableSettings,   // settings 객체 (저장용)
+){
+  const row = new Setting(host);
+
+  /* ① 글머리 기호 입력 ─────────────────────────── */
+  row.addText(t =>
+    t.setPlaceholder("★")
+     .setValue(co.char)
+     .onChange(async v => {
+       co.char = v.trim().charAt(0) || "•";
+       await this.commit();
+       this.display();          // 중복 검사 위해 전체 재렌더
+     }),
+  ).setName(`Marker ${idx + 1}`);
+
+  /* ② 4 개 컬러피커 (bgLight / fgLight / bgDark / fgDark) */
+/* ② 4 개 컬러피커 (bgLight / fgLight / bgDark / fgDark) */
+/* ───────────────────────────────────────────────────────── */
+/* ② 4 개 컬러피커 (bgLight / fgLight / bgDark / fgDark) */
+/* ───────────────────────────────────────────────────────── */
+const addClr = (
+  lab : string,
+  get : () => string,
+  set : (v: string) => void,
+) => {
+  row.addColorPicker(cp => {
+    cp.setValue(get())
+      .onChange(async v => { set(v); await this.commit(); });
+
+    /* tooltip 부여 — 타입 오류 없이 */
+    const setTip = () => {
+      const anyCp = cp as any;                     // 런타임 객체
+      const inp = (anyCp.containerEl as HTMLElement | null)
+                    ?.querySelector("input[type='color']") as HTMLInputElement | null;
+      inp?.setAttribute("title", lab);
+    };
+    setTip();
+    queueMicrotask(setTip);    // 지연 생성 대비
+  });
+};
+
+
+
+
+  addClr("bgLight", () => co.bgLight, v => (co.bgLight = v));
+  addClr("fgLight", () => co.fgLight, v => (co.fgLight = v));
+  addClr("bgDark" , () => co.bgDark , v => (co.bgDark  = v));
+  addClr("fgDark" , () => co.fgDark , v => (co.fgDark  = v));
+
+  /* ③ 삭제 버튼 ─────────────────────────────────── */
+/* ③ 삭제 버튼 ------------------------------------------- */
+row.addExtraButton(btn =>
+  btn.setIcon("trash")
+     .setTooltip("Delete")
+     .onClick(async () => {
+       S.listCallouts.splice(idx, 1);
+       await this.commit();
+       this.display();                  // 행 재그리기
+     }),
+);
+
 }
-function rgbToHex(rgb:string){
-  const nums = rgb.split(",").map(p=>parseInt(p.trim(),10));
-  if(nums.length!==3 || nums.some(isNaN)) return "#000000";
-  return "#"+nums.map(n=>n.toString(16).padStart(2,"0")).join("");
+
+/* === 새 Callout 기본값 반환 === */
+private newCallout(): ListCallout {
+  return {
+    char   : "★",
+    bgLight: "#dbeafe",
+    fgLight: "#1e40af",
+    bgDark : "#1e3a8a",
+    fgDark : "#dbeafe",
+  };
+}
+
+
+
+/*──────── 5. UI 렌더링 ────────*/
+override display(): void {
+  const c = this.containerEl;
+  c.empty();
+  const S = this.plugin.settings;
+  this.fillMissing(S.tokens);
+
+/* ===================== General options ===================== */
+
+/* ===================== General options ===================== */
+
+/* (A) _0  On / Off  → hideZeroFolders 토글 */
+new Setting(c)
+  .setName("_0  On / Off")
+  .setDesc('Hide every folder or file whose name starts with "0_" in Explorer')
+  .addToggle(t =>
+    t.setValue(S.hideZeroFolders)
+     .onChange(async v => {
+       S.hideZeroFolders = v;
+       await this.commit();
+       this.plugin.applyZeroFolderVisibility();   // 즉시 반영
+     }),
+  );
+
+/* (B) 모든 노트 숨김 토글 (hideAllNotes) */
+new Setting(c)
+  .setName("Hide all notes in Explorer")
+  .setDesc("Temporarily hide every file (nav-file); folders stay visible.")
+  .addToggle(t =>
+    t.setValue(S.hideAllNotes)
+     .onChange(async v => {
+       S.hideAllNotes = v;
+       await this.commit();
+       this.plugin.applyExplorerHide();
+     }),
+  );
+
+
+
+/* ===================== 이하 기존 팔레트 코드 등 그대로 ===================== */
+
+
+    /*-- Palette headline --*/
+    c.createEl("h3", { text: "🎨 Color palette – Light / Dark" });
+
+
+    /* 🆕 안내 문구 -------------------------------------------------- */
+c.createEl("p", {
+  text: "Each row shows two colour pickers:  ☀  = Light mode   ·   🌙  = Dark mode.",
+  cls : "ct-tip",
+});
+
+    /* 1) Base */
+    this.addDualPicker(
+      c, LABEL.baseWhite,
+      () => S.tokens.light.base.white, () => S.tokens.dark.base.white,
+      v  => S.tokens.light.base.white = v, v  => S.tokens.dark.base.white = v,
+    );
+    this.addDualPicker(
+      c, LABEL.baseBlack,
+      () => S.tokens.light.base.black, () => S.tokens.dark.base.black,
+      v  => S.tokens.light.base.black = v, v  => S.tokens.dark.base.black = v,
+    );
+
+    /* 2) Headings */
+    c.createEl("h4", { text: "Headings (H1–H6)" });
+    (["h1","h2","h3","h4","h5","h6"] as const).forEach(k =>
+      this.addDualPicker(
+        c, LABEL[k],
+        () => S.tokens.light.heading[k], () => S.tokens.dark.heading[k],
+        v  => S.tokens.light.heading[k] = v, v  => S.tokens.dark.heading[k]  = v,
+      )
+    );
+
+    /* 3) List / Bold */
+    c.createEl("h4", { text: "List / Bold" });
+    (["bullet","olMarker"] as const).forEach(k =>
+      this.addDualPicker(
+        c, LABEL[k],
+        () => S.tokens.light.list[k], () => S.tokens.dark.list[k],
+        v  => S.tokens.light.list[k] = v, v  => S.tokens.dark.list[k]  = v,
+      )
+    );
+
+    /* 4) Explorer folders – Level 0 */
+    c.createEl("h4", { text: "Explorer folders – Level 0" });
+    (["_01","_25","_68"] as const).forEach(k =>
+      this.addDualPicker(
+        c, LABEL[`lvl0_${k.slice(1)}` as keyof typeof LABEL],
+        () => S.tokens.light.folder.lvl0[k],
+        () => S.tokens.dark .folder.lvl0[k],
+        v  => S.tokens.light.folder.lvl0[k] = v,
+        v  => S.tokens.dark .folder.lvl0[k] = v,
+      )
+    );
+
+    /* 5) Explorer folders – Level 1 */
+    c.createEl("h4", { text: "Explorer folders – Level 1" });
+    (["_01","_25","_68"] as const).forEach(k =>
+      this.addDualPicker(
+        c, LABEL[`lvl1_${k.slice(1)}` as keyof typeof LABEL],
+        () => S.tokens.light.folder.lvl1[k],
+        () => S.tokens.dark .folder.lvl1[k],
+        v  => S.tokens.light.folder.lvl1[k] = v,
+        v  => S.tokens.dark .folder.lvl1[k] = v,
+      )
+    );
+
+    /* Folder “Q)” */
+c.createEl("h4", { text: 'Explorer folder – "Q)"' });    
+    this.addDualPicker(
+      c, LABEL.folderQ,
+      () => S.tokens.light.folder.q, () => S.tokens.dark.folder.q,
+      v  => S.tokens.light.folder.q = v, v  => S.tokens.dark.folder.q = v,
+    );
+
+
+/* 6) 📝 List Callouts --------------------------------------- */
+c.createEl("h3", { text: "📝 List Callouts" });
+
+/* (A) 기존 Callout 행 렌더 */
+S.listCallouts.forEach((co, i) => this.buildCalloutRow(c, co, i, S));
+
+/* (B) + Add 버튼 – 최대 5개 제한 */
+new Setting(c)
+  .addButton(btn => {
+    const full = S.listCallouts.length >= CALLOUT_LIMIT;
+
+    btn.setButtonText(full ? "Limit reached" : "+ Add")
+       .setDisabled(full)               // 5개가 되면 비활성화
+       .setCta()
+       .setTooltip(full
+         ? `You can register up to ${CALLOUT_LIMIT} callouts`
+         : "Add a new callout")
+       .onClick(async () => {
+         /* 안전가드: 더블-클릭/레이스 컨디션 대비 */
+         if (S.listCallouts.length >= CALLOUT_LIMIT) return;
+
+         S.listCallouts.push(this.newCallout());
+         await this.commit();
+         this.display();                // 새 행까지 다시 그리기
+       });
+  })
+  .setName(`새 Callout 추가 (max ${CALLOUT_LIMIT})`);
+
+  
+
+
+  }
 }
