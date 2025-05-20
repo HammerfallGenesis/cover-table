@@ -1,0 +1,646 @@
+/*****************************************************************
+ *  Cover-Table  –  Global Color · Style Tokens  (최종 통합판)
+ *  · 기존 기능 “모두” 보존  · 요약/함축/삭제 없음
+ *  · 테이블·이미지 색상은 단일 토큰 + 다크/라이트 자동 오버라이드
+ *  · 헤딩은 무지개 6색(토큰)으로 직관적 구분
+ *****************************************************************/
+:root{
+  /* ─────────── 베이스 / 공통 ─────────── */
+  --ct-base-white        : #ffffff;
+  --ct-base-black        : #000000;
+
+  /* ─────────── 탐색기 폴더 색상 ─────────── */
+  /* 0 단계(최상위) */
+  --ct-folder-lvl0-01-dark  : #91dcff;   --ct-folder-lvl0-01-light  : #0076ad;
+  --ct-folder-lvl0-25-dark  : #fffcab;   --ct-folder-lvl0-25-light  : #989300;
+  --ct-folder-lvl0-68-dark  : #ffb3ab;   --ct-folder-lvl0-68-light  : #9b1000;
+  /* 1 단계(내부) */
+  --ct-folder-lvl1-01-dark  : #2ebdff;   --ct-folder-lvl1-01-light  : #003d5a;
+  --ct-folder-lvl1-25-dark  : #ffdf3e;   --ct-folder-lvl1-25-light  : #453a01;
+  --ct-folder-lvl1-68-dark  : #ff7e4f;   --ct-folder-lvl1-68-light  : #461300;
+  /* ‘Q)’ 폴더노트 */
+  --ct-folder-q-dark        : #848484;   --ct-folder-q-light        : #848484;
+
+  /* ─────────── 본문 텍스트 스타일 ─────────── */
+  --ct-bold-dark            : rgb(255,188,188);
+  --ct-bold-light           : rgb(138,0,119);
+
+  /* ─────────── 헤딩(무지개 토큰: 읽기+편집 공통) ─────────── */
+  --ct-h1-dark : #ff5555;  --ct-h1-light : #ff5555;   /* red    */
+  --ct-h2-dark : #ffae42;  --ct-h2-light : #ffae42;   /* orange */
+  --ct-h3-dark : #f7ff50;  --ct-h3-light : #f7ff50;   /* yellow */
+  --ct-h4-dark : #4cd964;  --ct-h4-light : #4cd964;   /* green  */
+  --ct-h5-dark : #5ac8fa;  --ct-h5-light : #5ac8fa;   /* blue   */
+  --ct-h6-dark : #af52de;  --ct-h6-light : #af52de;   /* violet */
+
+  /* ─────────── 리스트 불릿/번호 ─────────── */
+  --ct-bullet-dark          : rgb(89,89,223);
+  --ct-bullet-light         : rgb(54,54,190);
+  --ct-ol-marker-dark       : red;
+  --ct-ol-marker-light      : red;
+
+  /* ─────────── 테이블(단일 토큰) ─────────── */
+  --ct-table-border         : #c0c0c0;         /* light 기본, dark 모드에서 재정의 */
+  --ct-table-shadow         : rgba(0,0,0,.10);
+  --ct-table-row-even       : rgba(0,0,0,.03);
+  --ct-table-row-hover      : rgba(0,0,0,.07);
+
+  /* ─────────── 이미지(단일 토큰) ─────────── */
+  --ct-image-border         : #d0d0d0;
+  --ct-image-shadow         : rgba(0,0,0,.10);
+}
+
+/* 다크 모드 오버라이드 – 자동 색상 전환 */
+.theme-dark:root{
+  --bullet-new-color        : var(--ct-bullet-dark);
+  --image-border            : #555555;
+  --image-shadow            : rgba(0,0,0,.60);
+
+  /* 테이블 토큰(투명·배경계열) */
+  --ct-table-border         : #444444;
+  --ct-table-shadow         : rgba(0,0,0,.55);
+  --ct-table-row-even       : transparent;
+  --ct-table-row-hover      : rgba(255,255,255,.07);
+}
+
+/* 라이트 모드 오버라이드 – 자동 색상 전환 */
+.theme-light:root{
+  --bullet-new-color        : var(--ct-bullet-light);
+  --image-border            : #d0d0d0;
+  --image-shadow            : rgba(0,0,0,.10);
+
+  --ct-table-border         : #c0c0c0;
+  --ct-table-shadow         : rgba(0,0,0,.10);
+  --ct-table-row-even       : rgba(0,0,0,.03);
+  --ct-table-row-hover      : rgba(0,0,0,.07);
+}
+
+/*****************************************************************
+ *  공통 타이포그래피 / 레이아웃
+ *****************************************************************/
+p               { text-indent:25px; margin:5px 0!important; text-align:justify; }
+li              { margin-block:5px; }
+.hr.cm-line     { text-indent:0!important; }
+.cm-line        { font-size:1em!important; text-align:justify; text-indent:25px; line-height:1.5em; }
+.cm-s-obsidian .cm-line.HyperMD-header { padding:0!important; text-indent:0; }
+.HyperMD-list-line.HyperMD-list-line-1.cm-line { text-indent:-50px!important; padding-inline-start:40px!important; }
+
+/*****************************************************************
+ *  탐색기 폴더 색상 (모든 단계·모드 보존)
+ *****************************************************************/
+
+/* ──────────────────────────────────────────────────────────────
+   0 단계(최상위)  ────────────────────────────────────────────*/
+/* DARK */
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl0-01-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl0-25-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl0-68-dark)!important;
+}
+
+/* LIGHT */
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl0-01-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl0-25-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl0-68-light)!important;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   1 단계(내부)  ─────────────────────────────────────────────*/
+/* DARK */
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl1-01-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl1-25-dark)!important;
+}
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl1-68-dark)!important;
+}
+
+/* LIGHT */
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
+  color:var(--ct-folder-lvl1-01-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
+  color:var(--ct-folder-lvl1-25-light)!important;
+}
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
+  color:var(--ct-folder-lvl1-68-light)!important;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   ‘Q)’ 폴더노트 색상  ─────────────────────────────────────────*/
+/* DARK */
+.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item-self.is-clickable.mod-collapsible.has-folder-note[data-path*="Q)"]{
+  color:var(--ct-folder-q-dark)!important;
+}
+/* LIGHT */
+.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item-self.is-clickable.mod-collapsible.has-folder-note[data-path*="Q)"]{
+  color:var(--ct-folder-q-light)!important;
+}
+
+
+/*****************************************************************
+ *  볼드 컬러 (기존 기능 유지)
+ *****************************************************************/
+.theme-dark .markdown-preview-view strong,
+.theme-dark .markdown-preview-view b,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content strong,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content b,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content .cm-strong{
+  font-weight:normal!important; color:var(--ct-bold-dark)!important;
+}
+.theme-light .markdown-preview-view strong,
+.theme-light .markdown-preview-view b,
+.theme-light .markdown-source-view.mod-cm6 .cm-content strong,
+.theme-light .markdown-source-view.mod-cm6 .cm-content b,
+.theme-light .markdown-source-view.mod-cm6 .cm-content .cm-strong{
+  font-weight:normal!important; color:var(--ct-bold-light)!important;
+}
+
+/*****************************************************************
+ *  헤딩 – 무지개 + 밑줄 100% + 아이콘 우측
+ *****************************************************************/
+.markdown-preview-view h1,
+.markdown-preview-view h2,
+.markdown-preview-view h3,
+.markdown-preview-view h4,
+.markdown-preview-view h5,
+.markdown-preview-view h6{
+  display:flex!important; align-items:center; width:100%!important;
+  font-size:1.5em; line-height:1em; margin:5px 0!important; border-bottom-style:outset;
+}
+.markdown-preview-view h1{color:var(--ct-h1-dark); border-bottom-color:var(--ct-h1-dark);}
+.markdown-preview-view h2{color:var(--ct-h2-dark); border-bottom-color:var(--ct-h2-dark);}
+.markdown-preview-view h3{color:var(--ct-h3-dark); border-bottom-color:var(--ct-h3-dark);}
+.markdown-preview-view h4{color:var(--ct-h4-dark); border-bottom-color:var(--ct-h4-dark);}
+.markdown-preview-view h5{color:var(--ct-h5-dark); border-bottom-color:var(--ct-h5-dark);}
+.markdown-preview-view h6{color:var(--ct-h6-dark); border-bottom-color:var(--ct-h6-dark);}
+.theme-light .markdown-preview-view h1{color:var(--ct-h1-light); border-bottom-color:var(--ct-h1-light);}
+.theme-light .markdown-preview-view h2{color:var(--ct-h2-light); border-bottom-color:var(--ct-h2-light);}
+.theme-light .markdown-preview-view h3{color:var(--ct-h3-light); border-bottom-color:var(--ct-h3-light);}
+.theme-light .markdown-preview-view h4{color:var(--ct-h4-light); border-bottom-color:var(--ct-h4-light);}
+.theme-light .markdown-preview-view h5{color:var(--ct-h5-light); border-bottom-color:var(--ct-h5-light);}
+.theme-light .markdown-preview-view h6{color:var(--ct-h6-light); border-bottom-color:var(--ct-h6-light);}
+.markdown-preview-view h1 .collapse-indicator,
+.markdown-preview-view h2 .collapse-indicator,
+.markdown-preview-view h3 .collapse-indicator,
+.markdown-preview-view h4 .collapse-indicator,
+.markdown-preview-view h5 .collapse-indicator,
+.markdown-preview-view h6 .collapse-indicator{margin-left:auto;}
+
+.cm-header-1{font-size:1.5em!important;line-height:2em;color:var(--ct-h1-dark);border-bottom:outset 1px var(--ct-h1-dark);}
+.cm-header-2{font-size:1.5em!important;line-height:2em;color:var(--ct-h2-dark);border-bottom:outset 1px var(--ct-h2-dark);}
+.cm-header-3{font-size:1.5em!important;line-height:2em;color:var(--ct-h3-dark);border-bottom:outset 1px var(--ct-h3-dark);}
+.cm-header-4{font-size:1.5em!important;line-height:2em;color:var(--ct-h4-dark);border-bottom:outset 1px var(--ct-h4-dark);}
+.cm-header-5{font-size:1.5em!important;line-height:2em;color:var(--ct-h5-dark);border-bottom:outset 1px var(--ct-h5-dark);}
+.cm-header-6{font-size:1.5em!important;line-height:2em;color:var(--ct-h6-dark);border-bottom:outset 1px var(--ct-h6-dark);}
+.theme-light .cm-header-1{color:var(--ct-h1-light);border-bottom-color:var(--ct-h1-light);}
+.theme-light .cm-header-2{color:var(--ct-h2-light);border-bottom-color:var(--ct-h2-light);}
+.theme-light .cm-header-3{color:var(--ct-h3-light);border-bottom-color:var(--ct-h3-light);}
+.theme-light .cm-header-4{color:var(--ct-h4-light);border-bottom-color:var(--ct-h4-light);}
+.theme-light .cm-header-5{color:var(--ct-h5-light);border-bottom-color:var(--ct-h5-light);}
+.theme-light .cm-header-6{color:var(--ct-h6-light);border-bottom-color:var(--ct-h6-light);}
+
+/*****************************************************************
+ *  리스트 마커 (기능 완전 보존)
+ *****************************************************************/
+.list-number, ol>li::marker, ul>li::marker{color:var(--ct-ol-marker-dark);}
+.theme-light .list-number, .theme-light ol>li::marker, .theme-light ul>li::marker{color:var(--ct-ol-marker-light);}
+.markdown-reading-view ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-1 .list-bullet:after{height:5px;width:5px;border-radius:50%;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-2 .list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-3 .list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--bullet-new-color);border-radius:50%;}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-4 .list-bullet:after{height:5px;width:5px;border-radius:0;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-5 .list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-6 .list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--bullet-new-color);}
+.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.markdown-source-view.mod-cm6 .HyperMD-list-line-7 .list-bullet:after{height:2px;width:2px;border-radius:50%;background:var(--bullet-new-color);}
+
+/*****************************************************************
+ *  UI 가독성 – 공통 아이콘 숨김 (기존 유지)
+ *****************************************************************/
+.nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder>.tree-item-self .collapse-icon,
+.tree-item-self.nav-folder-title.has-folder-note::before{display:none!important;}
+
+/*****************************************************************
+ *  테이블 스타일 – 단일 토큰 기반 / 모드별 자동
+ *****************************************************************/
+.el-table table{
+  width:100%!important; border-collapse:collapse;border-spacing:0;
+  border-top:2.27px solid var(--ct-table-border);
+  border-bottom:2.27px solid var(--ct-table-border);
+  box-shadow:0 0 20px var(--ct-table-shadow);
+}
+.el-table th,.el-table td{border:none;padding:.51rem;line-height:1.1;}
+.el-table table>tbody>tr:first-child>th,
+.el-table table>tbody>tr:first-child>td{border-top:1.36px solid var(--ct-table-border);}
+.el-table table>tbody>tr:last-child>th,
+.el-table table>tbody>tr:last-child>td{border-bottom:1.36px solid var(--ct-table-border);}
+.el-table thead th{
+  font-weight:700;padding:8px 9px 5px;
+  background:var(--ct-base-white)!important;color:var(--ct-base-black);
+}
+.theme-dark .el-table thead th{
+  background:var(--background-primary)!important;color:var(--ct-base-white);
+}
+.el-table tbody tr:nth-child(even){background:var(--ct-table-row-even);}
+.el-table tbody tr:hover td   {background:var(--ct-table-row-hover);}
+.theme-dark .el-table td      {color:var(--ct-base-white);}  /* 텍스트 흰색 */
+
+/*****************************************************************
+ *  이미지(Embeds) & 리스트 내 이미지 보호
+ *****************************************************************/
+.el-p.el-embed-image img,
+li .el-p.el-embed-image img,
+ul li img,ol li img,
+.tab-content img,.tabs img{
+  display:block;width:700px;max-width:100%;height:auto;margin:1rem auto;
+  border:1px solid var(--ct-image-border);
+  box-shadow:0 4px 10px var(--ct-image-shadow);
+  border-radius:4px;
+}
+li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
+
+/*****************************************************************
+ *  메타데이터 패널 숨김(.hide_properties) – 원본 유지
+ *****************************************************************/
+.hide_properties .metadata-container,
+.hide_properties .metadata-properties,
+.hide_properties .metadata-property,
+.hide_properties .metadata-collapse-indicator,
+.hide_properties .frontmatter-container,
+.hide_properties .frontmatter{display:none!important;}
+
+/* ──────────────────────────────────────────────────────────────
+   헤더 내부:  번호 → 텍스트 → 접기아이콘(우측)  +  겹침 해소
+   ─────────────────────────────────────────────────────────── */
+
+/* ① 헤더 컨테이너는 이미 flex; 정렬만 확인 */
+.markdown-preview-view h1,
+.markdown-preview-view h2,
+.markdown-preview-view h3,
+.markdown-preview-view h4,
+.markdown-preview-view h5,
+.markdown-preview-view h6{
+  display:flex!important;          /* 혹시 inline-flex가 아닌 경우 대비 */
+  align-items:center;
+  width:100%!important;            /* 밑줄 100 % */
+  margin:5px 0!important;
+  border-bottom-style:outset;
+}
+/* ② 번호(ct-hn-label) – 맨 앞 */
+.markdown-preview-view h1 .ct-hn-label,
+.markdown-preview-view h2 .ct-hn-label,
+.markdown-preview-view h3 .ct-hn-label,
+.markdown-preview-view h4 .ct-hn-label,
+.markdown-preview-view h5 .ct-hn-label,
+.markdown-preview-view h6 .ct-hn-label{
+  order:0;
+  flex:0 0 auto;
+  margin-right:.35em;
+}
+/* ③ 접기 아이콘 – 절대→정적 + 우측 끝 */
+.markdown-preview-view .heading-collapse-indicator.collapse-indicator{
+  position:static!important;       /* ← 겹침 원인 제거 */
+  order:2;                         /* 맨 뒤 */
+  flex:0 0 auto;
+  margin-left:auto;                /* 남은 공간 채우고 우측 정렬 */
+}
+
+
+/* settings 탭 안내 문구 */
+.ct-tip{
+  font-size: 0.85em;
+  margin: 0 0 0.5em 0;
+  color: var(--text-muted);
+}
+
+/*****************************************************************
+ *  src/theme/css/gantt.css – auto-generated from legacy Cover-Table v2025-05
+ *  📊  Gantt-specific Theme Rules   (⚠ 수정 금지 · 기능 보존)
+ *****************************************************************/
+
+/* ──────────────────────────────────────────────────────────────
+   0. Global Color Tokens (모든 색상은 여기서만 정의)
+   ──────────────────────────────────────────────────────────── */
+:root{
+  /* 공통 베이스 컬러 */
+  --ct-base-white : #ffffff;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   1. View Wrapper & Animation
+   ──────────────────────────────────────────────────────────── */
+.gantt-corner-col{
+  width:20ch;
+  text-align:left!important;
+  background:transparent;
+}
+
+.gantt-table tbody tr:nth-child(odd) td,
+.gantt-table tbody tr:nth-child(even) td{
+  background-color:transparent;
+  border-color:transparent;
+  border-bottom-color:var(--ct-base-white) !important;   /* ⬅ white → token */
+}
+
+th.gantt-day-col{
+  font:300 .7rem/1 var(--font-interface);
+  white-space:nowrap!important;
+  border-color:transparent!important;
+}
+
+th.gantt-corner-col{
+  border-color:transparent!important;
+}
+
+td.gantt-note-col{
+  font:300 .9rem/1 var(--font-interface);
+  white-space:nowrap!important;
+  border-color:transparent!important;
+  background-color:transparent!important;
+  text-align:left;
+}
+
+.gantt-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  font:300 .7rem/1 var(--font-interface);
+  border-bottom-style:outset;
+  padding-bottom:10px;
+  margin-bottom:15px;
+}
+.gantt-legend-item{display:flex;align-items:center;font-size:0.85rem;}
+.gantt-legend-color{width:0.9rem;height:0.9rem;border-radius:3px;margin-right:0.25rem;}
+
+.gantt-month-year{
+  font:500 1.5rem/1 var(--font-interface);
+  border-bottom-style:outset;
+  border-bottom-color:var(--ct-base-white);  /* ⬅ white → token */
+  color:var(--ct-base-white);                /* ⬅ white → token */
+}
+
+.gantt-debug{display:none;}
+code.language-ct.is-loaded{display:none;}
+
+/* 오늘 표시 셀 */
+.gantt-table td.is-today{
+  outline:none!important;
+  position:relative;
+}
+.gantt-table td.is-today::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-color:var(--ct-base-white); /* ⬅ white → token */
+  opacity:.5;
+}
+
+/*─────────────────────────────────────────────────────────────
+  is-filled 셀 : --gantt-color → 배경색 · 테두리 둘 다 적용
+─────────────────────────────────────────────────────────────*/
+.gantt-table td.is-filled{
+  background-color:var(--gantt-color) !important;
+  border-color:var(--gantt-color)    !important;   /* 행 경계선 맞춤 */
+  position:relative;                                 /* edge 포인트용 */
+}
+/* 옵션: 작업 시작·끝 포인트에 얇은 줄 표시하고 싶다면 */
+.gantt-table td.gantt-start::before,
+.gantt-table td.gantt-end::before{
+  content:"";position:absolute;top:0;bottom:0;width:2px;
+  background:var(--gantt-color);
+}
+.gantt-table td.gantt-start::before{left:0;}
+.gantt-table td.gantt-end::before  {right:0;}
+
+/*****************************************************************
+ *  src/theme/css/interactive-table.css – auto-generated from legacy Cover-Table v2025-05
+ *  📑  Interactive-Table  (⚠ 기능 보존 · 색상 토큰화 완전판)
+ *****************************************************************/
+
+/* ──────────────────────────────────────────────────────────────
+   0. Global Color / UI Tokens  (모든 색상은 여기서만 관리)
+   ──────────────────────────────────────────────────────────── */
+:root{
+  /* 공통 베이스(흰색) & 액티브(주황)  */
+  --it-base-color   : #ffffff;   /* 기존 #fff, #ffffff */
+  --it-active-color : #ff9800;   /* 기존 #ff9800       */
+
+  --basic-color     : var(--it-base-color);
+  --active-color    : var(--it-active-color);
+}
+
+/*****************************************************************
+   1. Generic Overrides
+ *****************************************************************/
+pre.language-ct.ct-it-container{ background:transparent; }
+
+/*****************************************************************
+   2. 상단 바 (Filter-Bar)
+ *****************************************************************/
+.ct-filter-bar{
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  gap:.5rem;
+}
+
+.interactive_table-button,
+input.ct-filter-bar__search{
+  font:600 .8rem/1 var(--font-interface);
+  color:var(--basic-color);
+  padding:.15rem .5rem;
+  border:2px solid var(--basic-color);
+  border-radius:0;
+  background:transparent;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* Hover 효과 */
+.interactive_table-button:hover{
+  background:transparent;
+  transition:all .3s ease;
+  transform:scale(.9);
+  border:2px solid var(--basic-color);
+}
+input.ct-filter-bar__search:hover{
+  background:transparent;
+  transition:all .3s ease;
+  transform:scale(.95);
+  border:2px solid var(--basic-color);
+}
+
+/* Active 상태 */
+.interactive_table-filter__btn.is-active,
+.interactive_table-button--tag-filter.is-active{
+  font:600 .8rem/1 var(--font-interface);
+  border:2px solid var(--active-color);
+  border-radius:0;
+  color:var(--active-color);
+}
+input.ct-filter-bar__search:focus{
+  font:600 .8rem/1 var(--font-interface);
+  border:2px solid var(--active-color);
+  border-radius:0;
+}
+
+/* 새로고침 버튼 좌측 여백 */
+button.interactive_table-button.interactive_table-button--refresh{
+  margin-left:.5rem;
+}
+
+/*****************************************************************
+   3. 데이터 테이블
+ *****************************************************************/
+.ct-data-table{ width:100%!important; }
+
+th.ct-data-table__th{
+  font:600 .8rem/1 var(--font-interface)!important;
+  text-align:center;
+  vertical-align:middle;
+  color:var(--background-primary);
+  white-space:nowrap!important;
+  background:var(--basic-color)!important;
+  border-left-color:transparent;
+  border-right-color:transparent;
+  border-top-color:var(--basic-color)!important;
+  border-bottom-color:var(--basic-color)!important;
+}
+
+/* 정렬 상태 색상 (기존 값 유지) */
+.ct-data-table__th.is-asc { background:#15c06a!important; opacity: .5;}
+.ct-data-table__th.is-desc{ background:#b02727!important; opacity: .5;}
+
+td.ct-data-table__td{
+  font:600 .8rem/1 var(--font-interface);
+  text-align:center;
+  vertical-align:middle;
+  color:var(--basic-color);
+  background:transparent!important;
+  border-left-color:transparent;
+  border-right-color:transparent;
+  border-top-color:var(--basic-color)!important;
+  border-bottom-color:var(--basic-color)!important;
+}
+.ct-data-table tr>td:first-child{ text-align:left!important; }
+.ct-data-table tr>td:last-child { text-align:left!important; }
+
+.ct-row--active td{
+  background:var(--active-color)!important;
+  color:var(--background-primary)!important;
+}
+
+/*****************************************************************
+   4. 하단 바 (Pagination)
+ *****************************************************************/
+.ct-pagination{
+  display:flex!important;
+  justify-content:center!important;
+  gap:.5rem!important;
+}
+
+.interactive_table-pagination__btn{
+  font:600 .8rem/1 var(--font-interface);
+}
+
+.interactive_table-pagination__btn--num{
+  color:var(--basic-color);
+  padding:.15rem .5rem;
+  border:2px solid var(--basic-color);
+  border-radius:0;
+  background:transparent;
+  cursor:pointer;
+  user-select:none;
+}
+
+.interactive_table-pagination__btn--arrow{
+  color:var(--background-primary)!important;
+  padding:.15rem .5rem;
+  border:2px solid var(--basic-color);
+  border-radius:0;
+  background:var(--basic-color)!important;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* Hover 효과 */
+.interactive_table-pagination__btn--num:hover{
+  background:transparent;
+  transition:all .3s ease;
+  transform:scale(.9);
+  border:2px solid var(--basic-color);
+}
+.interactive_table-pagination__btn--arrow:hover{
+  color:var(--background-primary)!important;
+  background:var(--basic-color)!important;
+  transition:all .3s ease;
+  transform:scale(.9);
+  border:2px solid var(--basic-color);
+}
+
+/* Active · Disabled */
+.interactive_table-pagination__btn.is-active{
+  border:2px solid var(--active-color);
+  border-radius:0;
+  color:var(--active-color);
+  cursor:default;
+}
+.interactive_table-pagination__btn--arrow.is-active{
+  background:var(--active-color)!important;
+  border-color:var(--active-color)!important;
+  color:var(--background-primary)!important;
+}
+.interactive_table-pagination__btn--disabled{
+  opacity:.5;
+  cursor:default;
+}
+
+/*****************************************************************
+   5. Gantt 삽입 뷰 (테이블 레이아웃 고정)
+ *****************************************************************/
+.gantt-container .gantt-table{
+  table-layout:fixed!important;
+  width:100%!important;
+}
+
