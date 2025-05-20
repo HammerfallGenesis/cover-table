@@ -102,63 +102,60 @@ export class ListCalloutManager {
  * ② 읽기모드에서 더블-클릭 ⇒ a.href 트리거
  *****************************************************************/
 
-// …생략…
+/*───────────────────────────────────────────────────────────────
+  postProcessor() – 첫 위키링크가 없으면 순수 텍스트 사용
+───────────────────────────────────────────────────────────────*/
 
+/*───────────────────────────────────────────────────────────────
+  postProcessor() – “첫 링크 노드를 그대로 살려 pill 로 감싸기”
+───────────────────────────────────────────────────────────────*/
 postProcessor(): MarkdownPostProcessor {
   return el => {
     if (!Object.keys(this.map).length) return;
 
     el.querySelectorAll<HTMLLIElement>("li").forEach(li => {
-      const rawTxt = li.textContent ?? "";
-      const ch     = rawTxt.trim().charAt(0);
-      const cfg    = this.map[ch];
-      if (!cfg) return;
+      const raw = li.textContent ?? "";
+      const ch  = raw.trim().charAt(0);
+      if (!this.map[ch]) return;
 
-      /* -------- ① pill 구성: 기존 자식 노드(링크 포함) 보존 -------- */
-      const nodes: Node[] = [];
-      while (li.firstChild) {
-        nodes.push(li.firstChild);
-        li.removeChild(li.firstChild);
-      }
-      // 첫 텍스트 노드에서 callout 문자 제거
-      if (nodes[0]?.nodeType === Node.TEXT_NODE) {
-        nodes[0].textContent = nodes[0].textContent!.replace(/^[\s\S]?/, "").trimStart();
+      /* 1️⃣  첫 <a> 요소 찾기 (내부·외부 링크 모두) */
+      const firstLink = li.querySelector<HTMLAnchorElement>(
+        "a.internal-link, a.external-link, a:not([href^='#'])",
+      );
+
+      /* 2️⃣  표시 라벨 결정 */
+      let labelNode: Node;
+      if (firstLink) {
+        labelNode = firstLink;           // 그대로 사용 – Obsidian 이벤트 유지
+      } else {
+        /* 위키링크도 없고 <a>도 없으면 => 순수 텍스트 */
+        const txt = raw.trim().slice(1).trim();            // 앞의 콜아웃 문자 제거
+        labelNode = document.createTextNode(txt || " ");   // 공백 방지
       }
 
+      /* 3️⃣  li 내부 비우고 pill 구성 */
+      li.replaceChildren();             // 기존 자식 전부 제거
       const pill = document.createElement("span");
       pill.className = "lc-pill";
-      pill.append(...nodes);             // 링크(<a …>) 보존
+      pill.appendChild(labelNode);
       li.appendChild(pill);
 
       li.classList.add("lc-list-callout");
       li.setAttribute("data-callout-char", ch);
 
-      /* -------- ② 더블-클릭 → 첫 링크 클릭 이벤트 전달 -------- */
-      li.addEventListener("dblclick", evt => {
-        // 읽기모드 전용: 편집모드(CodeMirror)에서는 동작 X
-        if (!li.closest(".markdown-reading-view")) return;
-
-        const link = li.querySelector<HTMLAnchorElement>(
-          "a.internal-link, a.external-link, a:not([href^='#'])",
-        );
-        if (!link) return;
-
-        /* Obsidian은 MouseEvent를 그대로 전파해야 ‘Backlinks’ 등 히스토리 기록 */
-        link.dispatchEvent(
-          new MouseEvent("click", {
-            bubbles   : true,
-            cancelable: true,
-            view      : window,
-            /* Cmd/Ctrl+더블-클릭 → 새 탭으로 열고 싶다면 아래 주석 해제
-            ctrlKey   : evt.ctrlKey || evt.metaKey,
-            metaKey   : evt.metaKey,
-            */
-          }),
-        );
-      });
+      /* 4️⃣  더블-클릭 → 첫 링크 트리거 (텍스트만 있을 땐 무시) */
+      if (firstLink) {
+        li.addEventListener("dblclick", () => {
+          if (!li.closest(".markdown-reading-view")) return;
+          firstLink.dispatchEvent(
+            new MouseEvent("click", { bubbles:true, cancelable:true, view:window }),
+          );
+        });
+      }
     });
   };
 }
+
 
 /*───────────────────────────────────────────────────────────────
   injectCss() – 콜아웃 리스트를 “단일 텍스트 + 배경” 버전으로 복원
@@ -172,6 +169,9 @@ private injectCss() {
 
   /* ── ① 공통 베이스: 들여쓰기 제거 + pill 기본 ── */
   let css = `
+    /* 일반 리스트 유지, 콜아웃 안에서만 불릿 숨김 */
+  li.lc-list-callout .list-bullet{display:none!important;}
+
   li.lc-list-callout{
     list-style:none!important;
     margin:0!important;
@@ -207,8 +207,6 @@ private injectCss() {
 
   /* 편집모드 CM6 행 데코 영향 없이, 읽기모드 전용 배경만 유지 */
   .markdown-reading-view li.lc-list-callout .cm-line{background:transparent!important;}
-
-  .list-bullet {display: none;}
   `;
 
   /* ── ② 색상 동적 생성 ── */
