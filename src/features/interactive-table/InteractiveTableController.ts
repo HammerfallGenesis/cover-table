@@ -426,14 +426,21 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
    *  🔍 Helper – “folder Note” 여부
    * =========================================================== */
 private isFolderNote(p: any) {
-  const { path, folder } = p?.file ?? {};
-  if (!path || !folder) return false;
+  const f = p?.file;
+  if (!f?.path || f.folder == null) return false;
 
-  // "folder/foo.md" → basename=foo, folder=folder
+  // 1) 파일 베이스네임: Dataview가 이미 제공
+  const base = f.basename ?? f.path.substring(
+    f.path.lastIndexOf("/") + 1,
+    f.path.lastIndexOf(".")
+  );
 
-  const base = path.substring(path.lastIndexOf("/")+1, path.lastIndexOf("."));
-  return base === folder;                     // “folder/folder.md” 패턴
-  }
+  // 2) 폴더의 "마지막 세그먼트"만 추출
+  const folderName = f.folder.split("/").pop() ?? "";
+
+  return base === folderName;
+}
+
 
   /** 현재 note + view 에 바인딩된 콜백 생성 */
 private makeScopedCb(note: string, vid: string): UITableCallbacks {
