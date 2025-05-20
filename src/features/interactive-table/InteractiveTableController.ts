@@ -63,6 +63,32 @@ function ss(note: string, vid: string, k: string, v: any) {
   }
 }
 
+function todayYMD(): string {
+  const d = new Date();            // 시스템 날짜 (Asia/Seoul)
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  const dd = d.getDate();
+  return `${y}-${m < 10 ? "0" : ""}${m}-${dd < 10 ? "0" : ""}${dd}`;
+}
+
+function injectCreated(page: any): any {
+  // 이미 값이 있으면 그대로 두고, 없으면 오늘 날짜를 넣어 준다
+  if (!page.created || page.created === "-") {
+    const today = todayYMD();
+    return { ...page, created: today, frontmatter:{ ...page.frontmatter, created: today } };
+  }
+  return page;
+}
+
+/** epoch millis → YYYY-MM-DD (Asia/Seoul) */
+function epochToYMD(ms: number): string {
+  const d = new Date(ms);
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  const dd = d.getDate();
+  return `${y}-${m<10?"0":""}${m}-${dd<10?"0":""}${dd}`;
+}
+
 /*──────────────────────────────────────────────────────────────
   1. Controller
 ──────────────────────────────────────────────────────────────*/
@@ -109,6 +135,8 @@ export class InteractiveTableController {
     
   }
 
+  
+
   /* ===========================================================
    *  renderAutoView()
    * -----------------------------------------------------------
@@ -124,6 +152,15 @@ export class InteractiveTableController {
     passive   = false
   ) {
     const settings: TableModelSettings = { ..._settings };
+
+      /* ▸ ② 호환성 패치 ↓↓↓ (이 블록 추가) */
+  if (settings.perPage == null) {
+    const legacyPer =
+      (_settings as any)["entries on page"] ??
+      (_settings as any).entries_on_page ??
+      (_settings as any).entriesOnPage;
+    if (legacyPer != null) settings.perPage = Number(legacyPer) || 0;
+  }
     const c = ctx;
     const notePath = ctx?.sourcePath || "";
 
@@ -146,6 +183,13 @@ if (!hostPre.dataset.coverVid) {
 settings.__viewId  = hostPre.dataset.coverVid;
 settings._notePath = ctx.sourcePath;
 
+/* pull saved page-size from tableState */
+const savedPerPage = gs(notePath, settings.__viewId!, "perPage");
+if (typeof savedPerPage === "number" && savedPerPage > 0) {
+  settings.perPage = savedPerPage;
+}
+
+
 
 
  /*──────── ① 페이지 수집 ────────*/
@@ -156,45 +200,39 @@ settings._notePath = ctx.sourcePath;
  const mdPages = dv.pages()
    .where((p:any)=>p.file.folder===folder)
    .where((p:any)=>!this.isFolderNote(p))
+  .map((p:any)=> injectCreated({        // ← 여기
+    ...p,
+    file:{ ...p.file, basename: p.file.basename ?? p.file.name }
+  }))
    .array();
 
  /* 2) .canvas  ─ Obsidian Canvas 파일 */
- const canvasPages = this.app.vault.getFiles()
-   .filter(f => f.extension==="canvas" && f.path.startsWith(folder + "/"))
-   .map(f => ({
-    file       : {                        // ⬅︎ basename 포함!
-      path   : f.path,
-      link   : dv.fileLink(f.path),
-      folder,
-      basename: f.basename
-    },
-     frontmatter: { title:f.basename },       // ↲ 제목 = 파일명
-     created    : "-",
-     published  : "-",
-     status     : "-",
-     importance : "-",
-     tags       : "#canvas"
-   }));
+const canvasPages = this.app.vault.getFiles()
+  .filter(f => f.extension === "canvas" && f.path.startsWith(folder + "/"))
+  .map(f => {
+    const ctime = epochToYMD(f.stat.ctime);
+    return {
+      file       : { path:f.path, link:dv.fileLink(f.path), folder, basename:f.basename },
+      frontmatter: { title: f.basename },
+      created    : ctime,          // ← 최초 생성일
+      tags       : "#canvas"
+    };
+  });
 
- /* 3) .excalidraw.md  ─ Excalidraw 파일 */
- const excaliPages = this.app.vault.getFiles()
-   .filter(f => f.extension==="md"
-             && f.basename.endsWith(".excalidraw")
-             && f.path.startsWith(folder + "/"))
-   .map(f => ({
-    file       : {                        // ⬅︎ basename 포함!
-      path   : f.path,
-      link   : dv.fileLink(f.path),
-      folder,
-      basename: f.basename
-    },
-     frontmatter: { title:f.basename.replace(/\.excalidraw$/,"") },
-     created    : "-",
-     published  : "-",
-     status     : "-",
-     importance : "-",
-     tags       : "#excalidraw"
-   }));
+/* 3) Excalidraw.md ------------------------------------------- */
+const excaliPages = this.app.vault.getFiles()
+  .filter(f => f.extension === "md"
+            && f.basename.endsWith(".excalidraw")
+            && f.path.startsWith(folder + "/"))
+  .map(f => {
+    const ctime = epochToYMD(f.stat.ctime);
+    return {
+      file       : { path:f.path, link:dv.fileLink(f.path), folder, basename:f.basename },
+      frontmatter: { title: f.basename.replace(/\.excalidraw$/, "") },
+      created    : ctime,          // ← 최초 생성일
+      tags       : "#excalidraw"
+    };
+  });
 
  /* 4) 합치기 */
  const allPages = [...mdPages, ...canvasPages, ...excaliPages];
@@ -343,6 +381,13 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
     while (this._rendering) {
       await new Promise(r => setTimeout(r, 15));
     }
+
+  const tgt = vid ? this.models.get(vid) : null;
+  if (tgt) {
+    const pp = gs(tgt["settings"]._notePath!, tgt["viewId"], "perPage");
+    if (typeof pp === "number" && pp > 0) tgt["settings"].perPage = pp;
+  }
+
   /* ① 명시적으로 넘어온 vid 가 있으면 그 Pane만 갱신 */
   const model = vid
     ? this.models.get(vid)
@@ -373,11 +418,23 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
    * =========================================================== */
 
   /** Dataview Page → 임의 값 (누락 때문에 생긴 TypeError 수정) */
-  private getVal(page: any, prop: string): any {
-    return prop.startsWith("file.")
-      ? prop.split(".").reduce((v, k) => v?.[k], page)
-      : page[prop];
+public getVal(page: any, prop: string): any {
+  /* ① Title 전용 커스텀 처리 ---------------------------------- */
+  if (prop === "__fmTitle") {
+    // 1) front-matter
+    const fmTitle = page?.frontmatter?.title ?? page?.title;
+    if (fmTitle && String(fmTitle).trim() !== "") return fmTitle;
+
+    // 2) 파일명 (Excalidraw 확장자 제거)
+    const base = page?.file?.basename ?? "";
+    return base.replace(/\.excalidraw$/, "");
   }
+
+  /* ② 기존 코드 (그대로 유지) --------------------------------- */
+  return prop.startsWith("file.")
+    ? prop.split(".").reduce((v, k) => v?.[k], page)
+    : page[prop];
+}
 
   private readonly dateYMDRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
   private readonly timeHMRegex  = /^(\d{1,2}):(\d{1,2})$/;
