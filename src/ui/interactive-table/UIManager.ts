@@ -68,18 +68,32 @@ export async function openInNewLeafAndClose(
   /* ③ Interactive-Table Pane 닫기 */
   (currHost.closest(".workspace-leaf") as any)?.view?.leaf?.detach?.();
 
-  /* 창 닫기 헬퍼 ------------------------------------------------ */
+/* 창 닫기 헬퍼 */
 const closeWindow = () =>
   (app as any).commands.executeCommandById("workspace:close-window");
 
-/* 파일 삭제 이벤트 -------------------------------------------- */
+/* 삭제 이벤트 */
 const refDelete = app.vault.on("delete", f => {
-  if (f.path === filePath) {
-    closeWindow();                   // 창 전체 닫기
-    app.vault.offref(refDelete);     // 리스너 해제
+  if (f.path === filePath) closeWindow();
+});
+
+/* ✨ file-open(null) 이벤트 */
+const refOpen = app.workspace.on("file-open", (file: any) => {
+  if (file == null && app.workspace.activeLeaf === popoutLeaf)
+    closeWindow();
+});
+
+/* 창 소멸 시 두 리스너 해제 */
+app.workspace.on("layout-change", () => {
+  if ((popoutLeaf as any).view == null) {
+    app.vault.offref(refDelete);
+    app.workspace.offref(refOpen);
   }
-  });
+});
+
 }
+
+
 
 /*───────────────────────────────────────────────────────────────
   1. UITableCallbacks – Controller ↔ UI contract

@@ -46,9 +46,8 @@ async function buildStyle() {
   for (const file of parts) {
     out += await readFile(file, "utf8") + "\n";
   }
-  await mkdir("dist", { recursive: true });
-  await writeFile("styles.css", out);
-  console.log("✓ styles.css built");
+  await writeFile("style.css", out);
+  console.log("✓ style.css built");
 }
 
 await buildStyle();

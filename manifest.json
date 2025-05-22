@@ -1,14 +1,14 @@
 {
 	"id": "obsidian-cover-table-plugin",
 	"name": "Cover Table Navigator",
-	"version": "3.0.5",
+	"version": "3.0.6",
 	"minAppVersion": "1.4.0",           
 	"description": "Cover 화면에 파일 리스트를 테이블 형태로 표시하고, Dataview 필터·정렬을 지원합니다. 모바일에서도 최적화됨.",
 	"author": "HammerfallGenesis",
 	"authorUrl": "https://github.com/HammerfallGenesis",
 	"isDesktopOnly": false,
 	"main": "main.js",
-	"css": "styles.css",
+	"css": "style.css",
 	"dependencies": ["dataview"]
   }
   
