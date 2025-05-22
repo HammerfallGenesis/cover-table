@@ -33,6 +33,7 @@ export interface TableModelSettings {
   showTagFilterButton?: boolean;
   /** front-matter 필터 버튼 노출 여부 */
   showFrontmatterFilterButton?: boolean;
+  alwaysPopout?: boolean;     // ★ 행 단일 클릭 시 pop-out 강제 여부
   /** 초기 wipe (Gantt ↔ IT 전환 등) */
   __wipeState?: boolean;
   /** 탭-로컬 viewId (자동 주입) */
@@ -95,37 +96,34 @@ export class InteractiveTableModel {
   private readonly settings : TableModelSettings;
   public filteredRows: any[] = [];
 
-  /*──────── ctor ────────*/
-  constructor(
-    dv          : any,
-    pages       : any[],
-    columns     : ColumnDef[],
-    ctx         : MarkdownPostProcessorContext,
-    settings    : TableModelSettings,
-    host        : HTMLElement,
-  ) {
-    if (!ctx?.sourcePath) throw new Error("ctx.sourcePath missing");
+/*──────── ctor ────────*/
+constructor(
+  dv: any,
+  pages: any[],
+  columns: ColumnDef[],
+  ctx: MarkdownPostProcessorContext,
+  settings: TableModelSettings,
+  host: HTMLElement,
+) {
+  if (!ctx?.sourcePath) throw new Error("ctx.sourcePath missing");
 
-    /* 기본 필드 */
-    this.dv        = dv;
-    this.pages     = pages;
-    this.columns   = columns;
-    this.ctx       = ctx;
-    this.settings  = settings;
-    this.notePath  = ctx.sourcePath;
-    this.host      = host;
+  /* ── 0. 필드 저장 ───────────────────── */
+  this.dv        = dv;
+  this.pages     = pages;
+  this.columns   = columns;
+  this.ctx       = ctx;
+  this.settings  = settings;
+  this.notePath  = ctx.sourcePath;
+  this.host      = host;
 
+  /* ── 1. viewId 먼저 확보 (⚠️ 순서 중요) ─ */
+  this.viewId = settings.__viewId ?? (settings.__viewId = uuid());
 
-  /* ▼▼▼ [1] 여기서 Leaf DOM 을 구합니다 ▼▼▼ */
-  const leafEl = host.closest(".workspace-leaf") as HTMLElement;
-    if (!leafEl) throw new Error("workspace-leaf not found");
+  /* ── 2. leafEl 탐색 ──────────────────── */
+  const leafEl = host.closest(".workspace-leaf") as HTMLElement | null;
 
-
-
-    /* viewId 자동 생성 / 재사용 */
-    this.viewId = settings.__viewId ?? (settings.__viewId = uuid());
-
-    /* pane 등록(화면 클린업은 View 측에서 수행) */
+  /* ── 3. pane 등록 (leaf 가 있을 때만) ─ */
+  if (leafEl) {
     tableState.addPane({
       viewId   : this.viewId,
       notePath : this.notePath,
@@ -133,12 +131,14 @@ export class InteractiveTableModel {
       settings,
       ctx,
       container: host,
-      leafEl, 
-rerender    : async p => await this.compute(p),
-refreshView : async p => await settings.___refreshHook?.(p), // ← OK
+      leafEl,
+      rerender    : async p => await this.compute(p),
+      refreshView : async p => await settings.___refreshHook?.(p),
     });
+  } else {
+    console.warn("[Cover-Table] workspace-leaf not found – skip pane registration");
   }
-
+}
   /* ===========================================================
    * 2. 외부 노출 API
    * =========================================================== */

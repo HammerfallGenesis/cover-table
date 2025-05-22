@@ -17,13 +17,14 @@
  *    stays intact.
  * =============================================================== */
 
-import { App, Notice } from "obsidian";
+import { App, Notice, TFolder} from "obsidian";
 import { Dom } from "../atoms/dom";
 import { ButtonFactory } from "../atoms/button";
 import { Input } from "../atoms/input";
 import { Spinner } from "../atoms/spinner";
 import type { ColumnDef } from "../../features/interactive-table/types";
 import type { FmCandidate, UITableCallbacks } from "../interactive-table/UIManager"; // relative to ui folder
+import { openInNewLeafAndClose } from "../interactive-table/UIManager";
 
 /*───────────────────────────────────────────────────────────────
   🔧 Safe-cast helper – tag 값이 어떤 형태든 배열로 변환
@@ -89,8 +90,34 @@ export class FilterBar {
     if (opts.showOpenFolderButton && opts.folderPath)
       this.btns.appendChild(this.btnFactory.openFolder(opts.folderPath));
 
-    if (opts.showNewNoteButton)
-      this.btns.appendChild(this.btnFactory.newNote());
+if (opts.showNewNoteButton) {
+  const btn = this.btnFactory.newNote();
+
+  btn.onclick = async () => {
+    /* A. 새 파일을 만들 대상 폴더 */
+    const folderPath =
+      this.opts.folderPath ??
+      this.note.substring(0, this.note.lastIndexOf("/"));
+
+    /* B. TFolder 확보 (없으면 즉시 생성) */
+    let tFolder = this.app.vault.getAbstractFileByPath(folderPath);
+    if (!(tFolder instanceof TFolder)) {
+      await this.app.vault.createFolder(folderPath);
+      tFolder = this.app.vault.getAbstractFileByPath(folderPath);
+    }
+
+    /* C. 새 마크다운 파일 생성 */
+    const fileName = `Untitled ${window.moment().format("YYYY-MM-DD HHmmss")}.md`;
+    const file = await (this.app as any)
+      .fileManager.createNewMarkdownFile(tFolder, fileName);
+
+    /* D. 새 Leaf 로 열고, Interactive-Table Leaf 닫기 */
+    await openInNewLeafAndClose(this.app, file.path, host);
+  };
+
+  this.btns.appendChild(btn);
+}
+
 
     if (opts.showRefreshButton)
       this.btns.appendChild(this.btnFactory.refresh(async () => {

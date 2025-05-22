@@ -26,6 +26,7 @@ import {
   App,
   TFile,
   MarkdownPostProcessorContext,
+  TAbstractFile
 } from "obsidian";
 
 import { UIManager, UITableCallbacks } from "../../ui/interactive-table/UIManager";
@@ -105,6 +106,52 @@ export class InteractiveTableController {
   constructor(private readonly app: App) {
     /* ◇ 서비스 & UI 초기화 ────────────────────────── */
     this.svc = new TableController(app);            /* 💡 생성 */
+
+  /* ---------------------------------------------------------
+   * 🔄 ① Auto-refresh Hooks 추가
+   * ------------------------------------------------------- */
+  const debounce = <F extends (...a:any[])=>void>(fn:F, ms=250) => {
+    let t:number|null = null;
+    return (...a:Parameters<F>) => {
+      if (t) clearTimeout(t);
+      t = window.setTimeout(() => fn(...a), ms);
+    };
+  };
+
+/* 파라미터를 'TAbstractFile'로 선언(=가장 넓은 타입) */
+const refreshByVault = debounce((file: TAbstractFile) => {
+  // 폴더(TFolder)는 패스하고 .md ·.canvas 등만 처리
+  if (!(file instanceof TFile)) return;
+
+  this.models.forEach(m => {
+    const folder = m["settings"].path ??
+      m["ctx"].sourcePath.substring(
+        0, m["ctx"].sourcePath.lastIndexOf("/"),
+      );
+    if (file.path.startsWith(folder + "/")) {
+      this.rerender(true, m["viewId"]);
+    }
+  });
+}, 300);
+
+/* ✅ Vault 이벤트 연결 – 오버로드 시그니처에 맞춤 */
+this.app.vault.on("modify", refreshByVault);             // (file) => …
+this.app.vault.on("delete", refreshByVault);             // (file) => …
+this.app.vault.on("rename", (file, _oldPath) => {        // (file, oldPath) => …
+  refreshByVault(file);
+});
+
+this.app.workspace.on("active-leaf-change", leaf => {
+  // view.containerEl 에 실제 DOM 이 있음
+  const host = leaf?.view?.containerEl?.querySelector?.("[data-cover-view]");
+  const vid  = (host as HTMLElement | null)?.dataset.coverView;
+  if (vid) this.rerender(true, vid);
+});
+
+
+
+
+
     /* ◇ UI 콜백 정의 ──────────────────────────────── */
     this.cb = {
       /* 상태 */

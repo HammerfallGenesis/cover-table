@@ -180,6 +180,7 @@ if (col.prop !== curProp) {              // ── 다른 열을 눌렀다
     const tbody = Dom.el("tbody", "");
     opts.rows.forEach((row, rowIdx) => {
       const tr = Dom.el("tr", "ct-data-table__tr");
+      tr.dataset.path = row?.file?.path ?? "";
 
 /* ▼ 기존 tr.onclick = … 한 줄을 이 코드로 교체 ▼ */
 tr.onclick = () => {

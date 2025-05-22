@@ -23,7 +23,7 @@
  *        interactive-table/UIManager.ts  ← YOU ARE HERE
  * =============================================================== */
 
-import { App } from "obsidian";
+import { App, TFile, TFolder } from "obsidian";
 import { Dom } from "../atoms/dom";
 import { FilterBar } from "../molecules/FilterBar";
 import { Pagination } from "../molecules/Pagination";
@@ -32,6 +32,54 @@ import { DataTable } from "../layouts/DataTable";
 import type { ColumnDef } from "../../features/interactive-table/types";
 import type { FilterBarOptions } from "../molecules/FilterBar";
 import type { PaginationOptions } from "../molecules/Pagination";
+
+
+
+async function openPathInPopout(app: App, path: string): Promise<void> {
+  if (!path) return;
+  const file =
+        app.metadataCache.getFirstLinkpathDest(path, "") ??
+        app.vault.getAbstractFileByPath(path);
+  if (!(file instanceof TFile)) return;
+
+  const leaf = app.workspace.openPopoutLeaf();
+  await leaf.openFile(file);
+  app.workspace.revealLeaf(leaf);
+}
+
+/* ============================================================= */
+/*  OPEN FILE IN POPOUT WINDOW + AUTOCLOSE LOGIC                  */
+/* ============================================================= */
+export async function openInNewLeafAndClose(
+  app: App,
+  filePath: string,
+  currHost: HTMLElement,
+) {
+  /* ① pop-out Leaf 직접 생성 (가장 확실) */
+  const popoutLeaf = app.workspace.openPopoutLeaf();   // WorkspaceLeaf
+
+  /* ② 새 파일(또는 canvas) 열기 – 반드시 Leaf 에서! */
+  const af = app.vault.getAbstractFileByPath(filePath);
+  if (af instanceof TFile)
+    await popoutLeaf.openFile(af, { active: true });
+  else
+    await app.workspace.openLinkText(filePath, "", true);   // e.g. canvas
+
+  /* ③ Interactive-Table Pane 닫기 */
+  (currHost.closest(".workspace-leaf") as any)?.view?.leaf?.detach?.();
+
+  /* 창 닫기 헬퍼 ------------------------------------------------ */
+const closeWindow = () =>
+  (app as any).commands.executeCommandById("workspace:close-window");
+
+/* 파일 삭제 이벤트 -------------------------------------------- */
+const refDelete = app.vault.on("delete", f => {
+  if (f.path === filePath) {
+    closeWindow();                   // 창 전체 닫기
+    app.vault.offref(refDelete);     // 리스너 해제
+  }
+  });
+}
 
 /*───────────────────────────────────────────────────────────────
   1. UITableCallbacks – Controller ↔ UI contract
@@ -132,25 +180,48 @@ export class UIManager {
     );
 
     /* ── 2. DataTable (layout) ───────────────────────────────*/
-    const table = DataTable.build({
-      columns,
-      rows,
-      zebra: true,
-      onRowClick: (row)=>{
-        /* double‑click to open file (legacy behaviour) */
-        const file = row?.file?.path;
-        if (file) {
-          (this.app as any).workspace.openLinkText(file, "", false);
-        }
-      },
-      notePath,
-      viewId,
-      cb : {
-        getState : cb.getState,
-        sync     : cb.sync,
-      },
-    });
-    hostPre.appendChild(table);
+/* ── 2. DataTable (layout) ───────────────────────────────*/
+const table = DataTable.build({
+  columns,
+  rows,
+  zebra: true,
+onRowClick: (row) => {
+  const file = row?.file?.path;
+  if (!file) return;
+
+  /* 새 Leaf로 열고, 현재 Leaf 닫기 */
+  openInNewLeafAndClose(this.app, file, hostPre);
+},
+  notePath,
+  viewId,
+  cb: {
+    getState: cb.getState,
+    sync    : cb.sync,
+  },
+});
+hostPre.appendChild(table);
+
+
+/* ➌  Delegated handler so “link-in-cell” & dbl-click도 pop-out */
+table.addEventListener(
+  "dblclick",
+  async (e) => {
+    const el = e.target as HTMLElement;
+    if (el.closest(".nav-file-title")) return;      // 탐색기 예외
+
+    const href = el.closest<HTMLAnchorElement>("a")?.getAttribute("href");
+    const row  = el.closest<HTMLTableRowElement>("tr");
+    const path = href ?? row?.dataset.path ?? "";
+    if (!path) return;
+
+    e.preventDefault();                            // 기본 탐색 억제
+    await openPathInPopout(this.app, path);        // ★ Pop-out
+  },
+  true,   // capture 단계
+);
+
+
+
 
     /* ── 3. Pagination (molecule) ────────────────────────────*/
     if (perPage > 0) {
