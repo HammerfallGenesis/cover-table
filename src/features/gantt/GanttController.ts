@@ -11,6 +11,7 @@ import {
 
 import { GanttModel, GanttSettings, GanttDataPack } from "./GanttModel";
 import { GanttUIManager } from "../../ui/gantt/GanttUIManager";
+import { Log } from "../interactive-table/utils/log";
 
 /*───────────────────────────────────────────────────────────────
   📡  GanttController
@@ -54,7 +55,7 @@ export class GanttController {
       let cur = dv.current?.();
       if ((!cur || !cur.file) && ctx?.sourcePath) cur = dv.page(ctx.sourcePath);
       if (!cur?.file) {
-        console.warn("[Gantt] current page not found – abort");
+        Log.w("[Gantt] current page not found – abort");
         return;
       }
 

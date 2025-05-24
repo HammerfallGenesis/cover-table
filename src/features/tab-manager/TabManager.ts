@@ -31,6 +31,10 @@ export class TabManager {
   constructor(private readonly app: App) {
     this.patchOpenLinkText();   // (1) “같은 파일 = 같은 탭” 패치
     this.watchFileOpenEvent();  // (2) leaf 중복 자동 정리
+    this.app.vault.on("delete", (file) => {
+      if (!(file instanceof TFile)) return;
+      this.leavesFor(file).forEach((l) => l.detach());
+    });
     this.registerGlobalClick(); // (3) 탐색기 / PDF 클릭 가로채기
   }
 

@@ -10,6 +10,7 @@ import {
   normalizePath,
   Notice,
 } from "obsidian";
+import { Log } from "../utils/log";
 
 /*──────────────────────────────────────────────────────────────
   1. 타입
@@ -60,7 +61,7 @@ export default class TableController {
         await this.app.vault.rename(file, dest);
         new Notice("✅ File renamed");
       } catch (e) {
-        console.error(e);
+        Log.e(e);
         new Notice("⚠️ Failed to rename file");
       }
     }

@@ -52,7 +52,6 @@
 
 /* 다크 모드 오버라이드 – 자동 색상 전환 */
 .theme-dark:root{
-  --bullet-new-color        : var(--ct-bullet-dark);
   --image-border            : #555555;
   --image-shadow            : rgba(0,0,0,.60);
 
@@ -65,7 +64,6 @@
 
 /* 라이트 모드 오버라이드 – 자동 색상 전환 */
 .theme-light:root{
-  --bullet-new-color        : var(--ct-bullet-light);
   --image-border            : #d0d0d0;
   --image-shadow            : rgba(0,0,0,.10);
 
@@ -79,6 +77,7 @@
  *  공통 타이포그래피 / 레이아웃
  *****************************************************************/
 p               { text-indent:25px; margin:5px 0!important; text-align:justify; }
+li p            { text-indent:0px !important;}
 li              { margin-block:5px; }
 .hr.cm-line     { text-indent:0!important; }
 .cm-line        { font-size:1em!important; text-align:justify; text-indent:25px; line-height:1.5em; }
@@ -238,22 +237,108 @@ li              { margin-block:5px; }
 /*****************************************************************
  *  리스트 마커 (기능 완전 보존)
  *****************************************************************/
-.list-number, ol>li::marker, ul>li::marker{color:var(--ct-ol-marker-dark);}
-.theme-light .list-number, .theme-light ol>li::marker, .theme-light ul>li::marker{color:var(--ct-ol-marker-light);}
-.markdown-reading-view ul>li>.list-bullet:after,
-.markdown-source-view.mod-cm6 .HyperMD-list-line-1 .list-bullet:after{height:5px;width:5px;border-radius:50%;background:var(--bullet-new-color);}
-.markdown-reading-view ul>li>ul>li>.list-bullet:after,
-.markdown-source-view.mod-cm6 .HyperMD-list-line-2 .list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--bullet-new-color);}
-.markdown-reading-view ul>li>ul>li>ul>li>.list-bullet:after,
-.markdown-source-view.mod-cm6 .HyperMD-list-line-3 .list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--bullet-new-color);border-radius:50%;}
-.markdown-reading-view ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
-.markdown-source-view.mod-cm6 .HyperMD-list-line-4 .list-bullet:after{height:5px;width:5px;border-radius:0;background:var(--bullet-new-color);}
-.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
-.markdown-source-view.mod-cm6 .HyperMD-list-line-5 .list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--bullet-new-color);}
-.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
-.markdown-source-view.mod-cm6 .HyperMD-list-line-6 .list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--bullet-new-color);}
-.markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
-.markdown-source-view.mod-cm6 .HyperMD-list-line-7 .list-bullet:after{height:2px;width:2px;border-radius:50%;background:var(--bullet-new-color);}
+/* ── *  DARK MODE  (theme-dark) ────────────────────────────────── */
+.theme-dark .list-number,
+.theme-dark ol>li::marker,
+.theme-dark ul>li::marker {
+  color: var(--ct-ol-marker-dark);
+}
+
+.theme-dark .markdown-reading-view ul>li>.list-bullet:after,
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-list-line-1 .list-bullet:after {
+  height: 5px; width: 5px; border-radius: 50%;
+  background: var(--ct-bullet-dark) !important;
+}
+
+.theme-dark .markdown-reading-view ul>li>ul>li>.list-bullet:after,
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-list-line-2 .list-bullet:after {
+  height: 1px; width: 7px; border-radius: 0;
+  background: var(--ct-bullet-dark) !important;
+}
+
+.theme-dark .markdown-reading-view ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-list-line-3 .list-bullet:after {
+  height: 4px; width: 4px;
+  background: transparent;
+  border: 1px solid var(--ct-bullet-dark) !important; border-radius: 50%;
+}
+
+.theme-dark .markdown-reading-view ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-list-line-4 .list-bullet:after {
+  height: 5px; width: 5px; border-radius: 0;
+  background: var(--ct-bullet-dark) !important;
+}
+
+.theme-dark .markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-list-line-5 .list-bullet:after {
+  height: 1px; width: 7px; border-radius: 0;
+  background: var(--ct-bullet-dark) !important;
+}
+
+.theme-dark .markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-list-line-6 .list-bullet:after {
+  height: 4px; width: 4px;
+  background: transparent;
+  border: 1px solid var(--ct-bullet-dark) !important;
+}
+
+.theme-dark .markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-list-line-7 .list-bullet:after {
+  height: 2px; width: 2px; border-radius: 50%;
+  background: var(--ct-bullet-dark) !important;
+}
+
+
+/* ── LIGHT MODE  (theme-light) ────────────────────────────────── */
+.theme-light .list-number,
+.theme-light ol>li::marker,
+.theme-light ul>li::marker {
+  color: var(--ct-ol-marker-light);
+}
+
+.theme-light .markdown-reading-view ul>li>.list-bullet:after,
+.theme-light .markdown-source-view.mod-cm6 .HyperMD-list-line-1 .list-bullet:after {
+  height: 5px; width: 5px; border-radius: 50%;
+  background: var(--ct-bullet-light) !important;
+}
+
+.theme-light .markdown-reading-view ul>li>ul>li>.list-bullet:after,
+.theme-light .markdown-source-view.mod-cm6 .HyperMD-list-line-2 .list-bullet:after {
+  height: 1px; width: 7px; border-radius: 0;
+  background: var(--ct-bullet-light) !important;
+}
+
+.theme-light .markdown-reading-view ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .markdown-source-view.mod-cm6 .HyperMD-list-line-3 .list-bullet:after {
+  height: 4px; width: 4px;
+  background: transparent;
+  border: 1px solid var(--ct-bullet-light) !important; border-radius: 50%;
+}
+
+.theme-light .markdown-reading-view ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .markdown-source-view.mod-cm6 .HyperMD-list-line-4 .list-bullet:after {
+  height: 5px; width: 5px; border-radius: 0;
+  background: var(--ct-bullet-light) !important;
+}
+
+.theme-light .markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .markdown-source-view.mod-cm6 .HyperMD-list-line-5 .list-bullet:after {
+  height: 1px; width: 7px; border-radius: 0;
+  background: var(--ct-bullet-light) !important;
+}
+
+.theme-light .markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .markdown-source-view.mod-cm6 .HyperMD-list-line-6 .list-bullet:after {
+  height: 4px; width: 4px;
+  background: transparent;
+  border: 1px solid var(--ct-bullet-light) !important;
+}
+
+.theme-light .markdown-reading-view ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .markdown-source-view.mod-cm6 .HyperMD-list-line-7 .list-bullet:after {
+  height: 2px; width: 2px; border-radius: 50%;
+  background: var(--ct-bullet-light) !important;
+}
 
 /*****************************************************************
  *  UI 가독성 – 공통 아이콘 숨김 (기존 유지)

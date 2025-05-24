@@ -69,18 +69,22 @@ export async function openInNewLeafAndClose(
   (currHost.closest(".workspace-leaf") as any)?.view?.leaf?.detach?.();
 
 /* 창 닫기 헬퍼 */
-const closeWindow = () =>
-  (app as any).commands.executeCommandById("workspace:close-window");
+/* ⬇️  팝-아웃 leaf 만 닫는 헬퍼 ------------------------------ */
+const closePopout = () => {
+  /* 이미 닫혔으면 무시 */
+if ((popoutLeaf as any).view == null) return;
+  popoutLeaf.detach();          // ← ★ 핵심 한 줄
+};
 
 /* 삭제 이벤트 */
 const refDelete = app.vault.on("delete", f => {
-  if (f.path === filePath) closeWindow();
+  if (f.path === filePath) closePopout();
 });
 
 /* ✨ file-open(null) 이벤트 */
 const refOpen = app.workspace.on("file-open", (file: any) => {
   if (file == null && app.workspace.activeLeaf === popoutLeaf)
-    closeWindow();
+    closePopout();
 });
 
 /* 창 소멸 시 두 리스너 해제 */

@@ -12,6 +12,7 @@ import {
 import type { EmbedFileHandlerSettings } from "./features/embed/EmbedService";
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type CoverTablePlugin from "./core/Plugin";   // 플러그인 클래스
+import { Log } from "./features/interactive-table/utils/log";
 
 /*────────────── 1. List-callout 정의 ─────────────*/
 export interface ListCallout {
@@ -31,6 +32,7 @@ export interface CoverTableSettings {
   baseVars  : Record<string,string>;
   tokens    : AppDesignTokens;
   customCss : string;
+  debugLog: boolean;
 }
 
 export const DEFAULT_SETTINGS: CoverTableSettings = {
@@ -45,6 +47,7 @@ export const DEFAULT_SETTINGS: CoverTableSettings = {
   tokens   : structuredClone(DEFAULT_TOKENS),
   baseVars : {},
   customCss: "",
+  debugLog: false,
 };
 
 /*────────────── 3. 라벨 사전 (UI 텍스트) ─────────*/
@@ -265,8 +268,16 @@ override display(): void {
   this.fillMissing(S.tokens);
 
 /* ===================== General options ===================== */
-
-/* ===================== General options ===================== */
+// e.g. SettingTab.ts
+new Setting(c)
+  .setName("Debug 로그 표시")
+  .addToggle(t =>
+    t.setValue(this.plugin.settings.debugLog)
+     .onChange(async (v) => {
+        this.plugin.settings.debugLog = v;
+        await this.plugin.saveSettings();
+        Log.setDebug(v);       // <— 토글 즉시 반영
+     }));
 
 /* (A) _0  On / Off  → hideZeroFolders 토글 */
 new Setting(c)

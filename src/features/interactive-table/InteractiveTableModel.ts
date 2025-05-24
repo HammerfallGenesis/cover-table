@@ -19,8 +19,8 @@
 import type { MarkdownPostProcessorContext } from "obsidian";
 import type { ColumnDef }                    from "./types";
 import { tableState }                        from "../../core/state/StateCenter";
-import { tagKey } from "./utils/tag";
 import { normalizeTags } from "./utils/tag";
+import { Log } from "./utils/log";
 
 
 /* ───────────────────────── 타입 ───────────────────────── */
@@ -136,7 +136,7 @@ constructor(
       refreshView : async p => await settings.___refreshHook?.(p),
     });
   } else {
-    console.warn("[Cover-Table] workspace-leaf not found – skip pane registration");
+    Log.w("[Cover-Table] workspace-leaf not found – skip pane registration");
   }
 }
   /* ===========================================================

@@ -12,22 +12,14 @@
   | - `type` 키워드를 붙여 "타입 선언"만 가져오므로 번들 결과 파일에는 포함되지 않음
  */
 import type { MarkdownPostProcessorContext } from "obsidian";
+import { Log } from "../../features/interactive-table/utils/log";
 
 /* 
   ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
   │ Purpose   : 전역 상수 정의                                                                                        │ 
   └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
  */
-/**
- * * 1) 디버깅용 스위치
- * - `true`로 바꾸면 내부 동작 로그가 콘솔에 출력
- * - `COVER_DEBUG`가 꺼져 있으면(false) 즉시 반환해 "실행 비용"을 절감
- */
-const COVER_DEBUG = false;
-function clog(...args: any[]) {
-  if (!COVER_DEBUG) return; 
-  console.log("[Cover-Table]", ...args);
-}
+
 /**
  * * 2) Global Tab 식별자 `TAB_ID`
  * - 같은 노트(URL)이라도 탭(Leaf)마다 고유 문자열을 생성
@@ -134,10 +126,10 @@ export class StateCenter {
     if (list.some(p => p.container === inst.container)) { return; }
     list.push(inst);
     this.paneMap.set(inst.viewId, list);
-    clog("addPane ▶", inst.viewId, "현재 Pane 수:", list.length);
+    Log.d("addPane ▶", inst.viewId, "현재 Pane 수:", list.length);
     this.sweep(inst.viewId);
     const fn: Listener = async () => {
-      clog("listener 호출 ▶", inst.viewId);
+      Log.d("listener 호출 ▶", inst.viewId);
       await inst.refreshView(true);
       const evt = new CustomEvent("__cover_refresh", { detail: inst.viewId });
       window.dispatchEvent(evt);
@@ -149,7 +141,7 @@ export class StateCenter {
           this.unsubscribe(inst.viewId, fn);
           const remain = (this.paneMap.get(inst.viewId) ?? []).filter(p => p !== inst);
           this.paneMap.set(inst.viewId, remain);
-          clog("Pane 제거 ▶", inst.viewId, "남은 Pane:", remain.length);
+          Log.d("Pane 제거 ▶", inst.viewId, "남은 Pane:", remain.length);
           ob.disconnect();
         }
       });
@@ -167,7 +159,7 @@ export class StateCenter {
     this.sweep(viewId);
     const remain = (this.paneMap.get(viewId) ?? []).filter(p => p.notePath !== notePath);
     this.paneMap.set(viewId, remain);
-    clog("removePane ▶", viewId, "남은 Pane:", remain.length);
+    Log.d("removePane ▶", viewId, "남은 Pane:", remain.length);
     if (remain.length === 0) {
       this.subs.get(viewId)?.clear();
       this.subs.delete(viewId);
@@ -198,7 +190,7 @@ export class StateCenter {
    * - 출력 : x
    */
   set(inst: ViewInst, patch: Record<string, any>, wipe = false, silent = false) {
-    clog("set ▶", inst.viewId, { patch, wipe, silent });
+    Log.d("set ▶", inst.viewId, { patch, wipe, silent });
     if ((window as any).__COVER_TABLE_DISABLE_BC) silent = true;
     const key    = this.makeKey(inst.notePath, inst.viewId);
     const before = this.get(inst.notePath, inst.viewId);

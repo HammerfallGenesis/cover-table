@@ -35,6 +35,8 @@ import { InteractiveTableModel,
          TableModelSettings       }     from "./InteractiveTableModel";
 import type { ColumnDef }                    from "./types";
 import { tableState, ViewInst as StateInst }   from "../../core/state/StateCenter";
+import { EventBus } from "../../core/events/EventBus";
+import { Log } from "./utils/log";
 
 
 
@@ -107,46 +109,13 @@ export class InteractiveTableController {
     /* ◇ 서비스 & UI 초기화 ────────────────────────── */
     this.svc = new TableController(app);            /* 💡 생성 */
 
-  /* ---------------------------------------------------------
-   * 🔄 ① Auto-refresh Hooks 추가
-   * ------------------------------------------------------- */
-  const debounce = <F extends (...a:any[])=>void>(fn:F, ms=250) => {
-    let t:number|null = null;
-    return (...a:Parameters<F>) => {
-      if (t) clearTimeout(t);
-      t = window.setTimeout(() => fn(...a), ms);
-    };
-  };
 
-/* 파라미터를 'TAbstractFile'로 선언(=가장 넓은 타입) */
-const refreshByVault = debounce((file: TAbstractFile) => {
-  // 폴더(TFolder)는 패스하고 .md ·.canvas 등만 처리
-  if (!(file instanceof TFile)) return;
+    /* ◇  전역 RefreshBus 구독  ─────────────────────── */
+    const busCb = (file?: TFile) => this.refreshByBus(file);
+    EventBus.i.on(busCb);
+    /* 언로드 대비 */
+    (this as any).__cover_unload__ = () => EventBus.i.off(busCb);
 
-  this.models.forEach(m => {
-    const folder = m["settings"].path ??
-      m["ctx"].sourcePath.substring(
-        0, m["ctx"].sourcePath.lastIndexOf("/"),
-      );
-    if (file.path.startsWith(folder + "/")) {
-      this.rerender(true, m["viewId"]);
-    }
-  });
-}, 300);
-
-/* ✅ Vault 이벤트 연결 – 오버로드 시그니처에 맞춤 */
-this.app.vault.on("modify", refreshByVault);             // (file) => …
-this.app.vault.on("delete", refreshByVault);             // (file) => …
-this.app.vault.on("rename", (file, _oldPath) => {        // (file, oldPath) => …
-  refreshByVault(file);
-});
-
-this.app.workspace.on("active-leaf-change", leaf => {
-  // view.containerEl 에 실제 DOM 이 있음
-  const host = leaf?.view?.containerEl?.querySelector?.("[data-cover-view]");
-  const vid  = (host as HTMLElement | null)?.dataset.coverView;
-  if (vid) this.rerender(true, vid);
-});
 
 
 
@@ -179,8 +148,83 @@ this.app.workspace.on("active-leaf-change", leaf => {
 
     /* ◇ UIManager – 실제 View 구축 담당 */
     this.ui = new UIManager(app, this.cb);
-    
+
+
+
+
+/* ◆ 탭 헤더 클릭 → cover-view refresh */
+/* ── 탭 헤더 클릭 → cover-view refresh ──────────────────── */
+this.app.workspace.containerEl.addEventListener(
+  "click",
+  (evt) => {
+    if (!(evt.target as HTMLElement)
+          .closest(".workspace-tab-header.tappable")) return;
+
+    /* ★ ① 바로 실행하지 말고, leaf 가 완전히 교체된 이후로 미룬다 */
+    setTimeout(() => {                     // ← 0.1-0.2 s 정도면 충분
+      const host = this.app.workspace.activeLeaf?.view
+        ?.containerEl?.querySelector?.("[data-cover-view]") as HTMLElement|null;
+      if (!host) return;                   // 여전히 없으면 아무 일도 안 함
+
+      const vid  = host.dataset.coverView!;
+      const note = (this.app.workspace.activeLeaf?.view as any)?.file?.path ?? "";
+
+      /* ② ALL 버튼과 ‘완전히 동일한’ 트리거 호출 */
+      this.cb.sync(
+        note,                              // notePath
+        vid,                               // viewId
+        // 아무 filter key 나 하나 골라 “ALL” 로 던지면 기존 로직이 rerender
+        `tagFilter_${vid}`,                // ← 존재하는 키
+        "ALL"
+      );
+    }, 180);   // ← delay; 150-200 ms 사이 아무 값 OK
+  },
+  true   // capture
+);
+
+
+
+
+
+
+
+
+
+
   }
+
+/*───────────────────────────────────────────────
+  탭 헤더(click) → 모든 cover-view 강제 rerender
+───────────────────────────────────────────────*/
+private handleWorkspaceTabClick = (e: MouseEvent): void => {
+  /* ① 실제 탭 헤더 영역인지 판별 */
+  const header = (e.target as HTMLElement)
+    .closest(".workspace-tab-header.tappable");
+  if (!header) return;
+
+  /* ② 화면에 존재하는 모든 cover-view 순회 */
+  document.querySelectorAll<HTMLElement>("[data-cover-view]").forEach(el => {
+    const vid = el.dataset.coverView!;
+    /* models 에 이미 등록돼 있으면 바로 rerender  */
+    if (this.models.has(vid)) {
+      this.rerender(true, vid);          // ← Filter ‘ALL’ 과 같은 경로
+      return;
+    }
+
+    /* (드물게) 탭이 새로 열렸는데 models 에 아직 없다면:
+       – viewId 를 이용해 최초 render 후 다시 rerender */
+    const mdl = [...this.models.values()].find(m => !m["host"].isConnected);
+    if (mdl) this.rerender(true, mdl["viewId"]);
+  });
+};
+
+
+
+
+
+
+
+
 
   
 
@@ -218,6 +262,8 @@ this.app.workspace.on("active-leaf-change", leaf => {
     let model: InteractiveTableModel | null = null;
 
     try {
+
+
       if (!ctx?.sourcePath || !hostPre) return;
 
 /* viewId 결정 */
@@ -425,18 +471,15 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
    *  rerender(passive) – 현재 Model 재계산 & UI만 갱신
    * =========================================================== */
   private async rerender(passive = false, vid?: string) {
+    Log.d(`[CT] rerender(${vid ?? "auto"}) ▶ passive=${passive}`);
     while (this._rendering) {
       await new Promise(r => setTimeout(r, 15));
     }
+    
 
-  const tgt = vid ? this.models.get(vid) : null;
-  if (tgt) {
-    const pp = gs(tgt["settings"]._notePath!, tgt["viewId"], "perPage");
-    if (typeof pp === "number" && pp > 0) tgt["settings"].perPage = pp;
-  }
 
-  /* ① 명시적으로 넘어온 vid 가 있으면 그 Pane만 갱신 */
-  const model = vid
+    
+let model: InteractiveTableModel | undefined = vid
     ? this.models.get(vid)
     : (() => {
         const host = (event?.target as HTMLElement)?.closest?.("[data-cover-view]");
@@ -444,8 +487,66 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
         return hvid ? this.models.get(hvid)                // ② DOM 이벤트 발생 Pane
                     : [...this.models.values()].pop();     // ③ fallback
       })();
-    if (!model) return;
 
+/* ──── ★★★ self-heal 시작 ★★★ ──── */
+if (!model && vid) {
+  const host = document.querySelector<HTMLElement>(
+                `[data-cover-view="${vid}"]`);
+  if (host) {
+    // 1. Dataview API 얻기
+    const dvApi = (this.app as any)
+                    .plugins?.plugins?.dataview?.api;
+    if (dvApi) {
+      // 2. Dataview 인덱스 완료를 보장
+      const mc: any = this.app.metadataCache;
+      if (!mc.resolved) {
+        await new Promise<void>(res => mc.once?.("resolved", res));
+      }
+      // 3. 첫 번째 renderAutoView 실행 → model 등록
+      await this.renderAutoView(
+        dvApi,                 // ← Dataview
+        {},                    // 빈 settings
+        { sourcePath:
+            (host.closest(".markdown-preview-view") as any)?.file?.path ?? ""
+        } as any,              // 최소 ctx
+        host,                  // hostPre
+        true                   // passive=true (상태 보존)
+      );
+      model = this.models.get(vid);   // 방금 생긴 model 회수
+    }
+  }
+}
+/* ──── ★★★ self-heal 끝 ★★★ ──── */
+
+
+
+
+  /* perPage 복원 */
+  if (model) {
+    const pp = gs(model["settings"]._notePath!, model["viewId"], "perPage");
+    if (typeof pp === "number" && pp > 0) model["settings"].perPage = pp;
+  }
+
+  /* ② host 가 살아 있는지 확인 */
+  if (model && !document.body.contains(model["host"])) {
+    /* 동일 viewId 를 가진 새 host 탐색 */
+    const fresh = document.querySelector(
+      `[data-cover-view="${model["viewId"]}"]`,
+    ) as HTMLElement | null;
+
+    if (fresh) {
+      (model as any)["host"] = fresh;          // host 교체
+    } else {
+      this.models.delete(model["viewId"]); // 유령 제거
+      model = undefined;
+    }
+  }
+  if (!model) {
+    Log.d("[CT] rerender – model not found -> abort");
+    return; 
+  }                // 대상 없음 → 종료
+
+    Log.time(`[CT] compute+render ${vid}`);
     await model.compute(passive);
     await this.renderAutoView(
       model["dv"],
@@ -454,10 +555,21 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
       model["host"],
       passive
     );
+    Log.timeEnd(`[CT] compute+render ${vid}`);
     /* models 맵에서 화면에 더 존재하지 않는 Pane 제거 */
-   this.models.forEach((m, id) => {
-     if (!document.body.contains(m.host)) this.models.delete(id);
-   });
+/* ① 지금 갱신 중인 뷰는 절대 지우지 않는다 */
+const keeping = model["viewId"];
+
+/* ② 300 ms 뒤에 한 번 더 확인 후 삭제
+      (탭 전환으로 잠시 떨어졌다 다시 붙는 상황 방지) */
+setTimeout(() => {
+  this.models.forEach((m, id) => {
+    if (id === keeping) return;                    // 현재 모델 보존
+    if (!document.body.contains(m.host)) this.models.delete(id);
+  });
+}, 300);
+
+   
   }
 
   /* ===========================================================
@@ -550,9 +662,9 @@ private isFolderNote(p: any) {
 private makeScopedCb(note: string, vid: string): UITableCallbacks {
   return {
     ...this.cb,                           // 기존 기능 재사용
-    rerender : async () => {              // ← vid 고정
-      await this.rerender(true, vid);
-    },
+rerender : async (_n = note, _v = vid) => {
+  await this.rerender(true, _v);
+},
     sync     : async (_, __, key, val) => {
       ss(note, vid, key, val);            // note/vid 고정
       await this.rerender(true, vid);
@@ -562,7 +674,69 @@ private makeScopedCb(note: string, vid: string): UITableCallbacks {
   };
 }
 
+/* ===========================================================
+ *  Global EventBus → passive rerender (FINAL & STABLE)
+ * ========================================================= */
+private refreshByBus(file?: TFile) {
+  /* ── 0. Debounced render – 중복 호출 방지 ── */
+  const renderDebounced = (() => {
+    let t: number | null = null;
+    return () => {
+      if (t) clearTimeout(t);
+      t = window.setTimeout(() => {
+        this.models.forEach((_, vid) => this.rerender(true, vid));
+      }, 80);
+    };
+  })();
+
+  /* ── 1. 폴더 필터 검사 ─────────────────────── */
+  if (file && this.models.size) {
+    const first = this.models.values().next().value as
+                  InteractiveTableModel | undefined;
+    if (first) {
+      const folder = first["settings"].path ??
+                     first["ctx"].sourcePath.replace(/\/[^/]+$/, "");
+      if (!file.path.startsWith(folder + "/")) return;   // 다른 폴더
+    }
+  }
+
+  /* 1-B. models 가 비어 있는데 host 가 화면에 존재 → 최초 Pane 등록 */
+  if (!this.models.size) {
+    document
+      .querySelectorAll("[data-cover-view]")
+      .forEach((h) => {
+        const vid = (h as HTMLElement).dataset.coverView!;
+        if (!this.models.has(vid)) {
+          /* 첫 렌더는 Controller.renderAutoView 내부에서 자동 등록됨
+             → 여기서는 models.size==0 일 때 만 호출되므로 skip */
+        }
+      });
+  }
+
+  /* ── 2. Dataview cache 확인 & 대기 ──────────── */
+  if (file) {
+    const mc: any = this.app.metadataCache as any;
+    const parsed  = mc.getFileCache(file)?.frontmatter != null;
+
+    if (!parsed) {
+      /* 아직 파싱 전 → resolved 1-shot */
+      const ref = mc.on("resolved", () => {
+        mc.offref(ref);
+        renderDebounced();
+      });
+      return;               // 📌 대기만 하고 종료
+    }
+  }
+
+  /* ── 3. 즉시(또는 debounce) 렌더 ─────────────── */
+  renderDebounced();
 }
+
+}
+
+
+
+
 
 /*──────────────────────────────────────────────────────────────
   📌  참고

@@ -28,8 +28,6 @@ import {
   CoverTableSettingTab,
 } from "../setting";
 
-import BASE_THEME_CSS from "../theme/css/base.css";
-
 /* ── Feature 모듈 ─────────────────────────────────────────────── */
 import { TabManager }           from "../features/tab-manager/TabManager";
 import { InteractiveTableController as InteractiveTable } from "../features/interactive-table/InteractiveTableController";
@@ -43,6 +41,9 @@ import {
   DEFAULT_EMBED_SETTINGS,
 } from "../features/embed/EmbedService";
 import { DesignService } from "./theme/DesignService"; 
+import { EventBus } from "./events/EventBus";
+
+import { Log } from "../features/interactive-table/utils/log";
 
 /* ===============================================================
  *  1. 전역 네임스페이스(window.coverTable)
@@ -139,9 +140,10 @@ applyExplorerHide(): void {
    *  · 플러그인 초기화 & 각 서브-모듈 부트스트랩
    * =========================================================== */
   async onload() {
+    EventBus.init(this.app);
 
 
-    console.log("[Cover-Table] ▶ onload");
+    Log.d("[Cover-Table] ▶ onload");
     /* ▼ ① style.css 강제 주입 (manifest 경로 버그 우회) */
     try {
       /* ‣ getBasePath() 는 FileSystemAdapter 에만 존재 → 타입 캐스팅 */
@@ -161,9 +163,9 @@ applyExplorerHide(): void {
       document.head.appendChild(tag);
       /* 플러그인 언로드 시 자동 제거 */
       this.register(() => tag.remove());
-      console.log("[Cover-Table] fallback style injected ✔");
+      Log.d("[Cover-Table] fallback style injected ✔");
     } catch (e) {
-      console.error("[Cover-Table] fallback style inject FAIL", e);
+      Log.d("[Cover-Table] fallback style inject FAIL", e);
     }
 
 
@@ -180,14 +182,15 @@ applyExplorerHide(): void {
 
     /* (3) Settings */
    await this.loadSettings();
+   Log.setDebug(this.settings.debugLog);
 
     /* ▼▼  예외 가드 ▼▼ */
     try {
       const st = new CoverTableSettingTab(this.app, this);
       this.addSettingTab(st);
-      console.log("🆗 CoverTableSettingTab 등록 완료");
+      Log.d("🆗 CoverTableSettingTab 등록 완료");
     } catch (e) {
-      console.error("❌ SettingTab 생성 실패:", e);
+      Log.e("❌ SettingTab 생성 실패:", e);
       new Notice("Cover-Table 설정 UI 로드 실패 — 콘솔(DevTools)을 확인하세요.");
     }
 
@@ -221,7 +224,7 @@ this.design = new DesignService(this.app, () => this.settings);
           (window as any).DataviewAPI ||
           (window as any).dvAPI;
         if (!dv) {
-          console.warn("[Cover-Table] Dataview API not found");
+          Log.w("[Cover-Table] Dataview API not found");
           return;
         }
         await ct.waitForEngine();
@@ -243,13 +246,37 @@ this.design = new DesignService(this.app, () => this.settings);
             if (ctx)
               await ct.engine.renderAutoView(dv, opts, ctx, container);
           } catch (e) {
-            console.error("[Cover-Table] render error:", e);
+            Log.e("[Cover-Table] render error:", e);
           }
         }
       }
     );
 
-    console.log("[Cover-Table] ▶ onload done");
+    Log.d("[Cover-Table] ▶ onload done");
+
+
+/* === Cover-Table: suppress benign vault-delete console noise ========== */
+window.addEventListener("unhandledrejection", (ev) => {
+  /* 필터링하고 싶은 메시지를 여기에 추가 */
+  const msg = String(ev.reason?.message || ev.reason || "").toLowerCase();
+
+  /* 1) 노트 삭제·휴지통 이동 중 발생하는 children TypeError */
+  if (msg.includes("cannot read properties of null") &&
+      msg.includes("children")) {
+    ev.preventDefault();               // 콘솔 오류 숨김
+    return;
+  }
+  /* 2) 일부 환경에서 노트 이동·삭제 시 뜨는 illegal access */
+  if (msg.includes("illegal access")) {
+    ev.preventDefault();               // 콘솔 오류 숨김
+  }
+});
+/* ===================================================================== */
+
+
+
+
+
   }
 
   /* ===========================================================
@@ -258,7 +285,7 @@ this.design = new DesignService(this.app, () => this.settings);
    *  · 리스너 / 싱글턴 해제
    * =========================================================== */
   onunload() {
-    console.log("[Cover-Table] ▶ onunload");
+    Log.d("[Cover-Table] ▶ onunload");
     this.tabManager.destroy();
     this.embed.destroy();
   }
@@ -275,6 +302,7 @@ this.design = new DesignService(this.app, () => this.settings);
 
   async saveSettings() {
     await this.saveData(this.settings);
+    Log.setDebug(this.settings.debugLog);
     this.applyZeroFolderVisibility();
     this.applyExplorerHide();          // 신규
 
