@@ -45,6 +45,8 @@ import { EventBus } from "./events/EventBus";
 
 import { Log } from "../features/interactive-table/utils/log";
 
+import { cloneRootStyleToLeaves } from "../features/interactive-table/utils/cloneRootStyle";
+
 /* ===============================================================
  *  1. 전역 네임스페이스(window.coverTable)
  *    · InteractiveTable 싱글턴 & 헬퍼 노출
@@ -273,7 +275,12 @@ window.addEventListener("unhandledrejection", (ev) => {
 });
 /* ===================================================================== */
 
-
+/* onload() 마지막에 */
+this.registerEvent(
+  this.app.workspace.on("layout-change", () => {
+    cloneRootStyleToLeaves(this.app);
+  })
+);
 
 
 
@@ -297,6 +304,7 @@ window.addEventListener("unhandledrejection", (ev) => {
     const raw = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, raw);
     /* ↳ Embed 기본값 병합 */
+    
     this.settings.embed = Object.assign({}, DEFAULT_EMBED_SETTINGS, this.settings.embed);
   }
 
@@ -307,6 +315,10 @@ window.addEventListener("unhandledrejection", (ev) => {
     this.applyExplorerHide();          // 신규
 
     this.embed.reload();
+
+    this.applyDesignSettings();
+
+    cloneRootStyleToLeaves(this.app);
   }
 
   /* ===========================================================

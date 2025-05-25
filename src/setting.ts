@@ -85,9 +85,8 @@ export class CoverTableSettingTab extends PluginSettingTab {
 private async commit() {
   await this.plugin.saveSettings();
 
-  const mode: ModeKey =
-    document.body.classList.contains("theme-dark") ? "dark" : "light";
-  injectTokens(mode, this.plugin.settings.tokens);
+  injectTokens("dark",  this.plugin.settings.tokens);
+  injectTokens("light", this.plugin.settings.tokens);
 
   /* ✅ 플러그인 공개 메서드 호출만 남김 */
   this.plugin.rebuildListCallouts();
@@ -106,6 +105,7 @@ private fillMissing(tokens: AppDesignTokens) {
     tgt.base    = { ...def.base,    ...tgt.base    };
     tgt.heading = { ...def.heading, ...tgt.heading };
     tgt.list    = { ...def.list,    ...tgt.list    };
+    tgt.bold  = { ...def.bold, ...tgt.bold };
 
     /* ▲ ① 기본 블록은 전부 OK — 아래 merge 함수만 수정 */
 
@@ -351,7 +351,12 @@ c.createEl("p", {
         v  => S.tokens.light.list[k] = v, v  => S.tokens.dark.list[k]  = v,
       )
     );
-
+/* bold (NEW) */
+this.addDualPicker(
+  c, "Bold text",
+  () => S.tokens.light.bold.bold,  () => S.tokens.dark.bold.bold,
+  v  => S.tokens.light.bold.bold = v, v => S.tokens.dark.bold.bold = v,
+);
     /* 4) Explorer folders – Level 0 */
     c.createEl("h4", { text: "Explorer folders – Level 0" });
     (["_01","_25","_68"] as const).forEach(k =>
