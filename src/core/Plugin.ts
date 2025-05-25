@@ -156,11 +156,11 @@ applyExplorerHide(): void {
 
 
       const pluginDir = this.manifest.dir || "";
-      const absPath = join(base, pluginDir, "style.css");
+      const absPath = join(base, pluginDir, "styles.css");
 
       const cssText = readFileSync(absPath, "utf8");
       const tag = document.createElement("style");
-      tag.id = "ct-style-fallback";
+      tag.id = "ct-styles-fallback";
       tag.textContent = cssText;
       document.head.appendChild(tag);
       /* 플러그인 언로드 시 자동 제거 */
