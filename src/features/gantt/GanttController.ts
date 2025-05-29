@@ -7,8 +7,9 @@
 import {
   App,
   MarkdownPostProcessorContext,
+  TFile
 } from "obsidian";
-
+import { EventBus } from "../../core/events/EventBus";
 import { GanttModel, GanttSettings, GanttDataPack } from "./GanttModel";
 import { GanttUIManager } from "../../ui/gantt/GanttUIManager";
 import { Log } from "../interactive-table/utils/log";
@@ -25,7 +26,10 @@ export class GanttController {
   private readonly ui = new GanttUIManager();
   private _rendering = false;
 
-  constructor(private readonly app: App) {}
+constructor(private readonly app: App) {
+  EventBus.i.on(this.refreshByBus.bind(this));
+  (this as any).__cover_unload__ = () => EventBus.i.off(this.refreshByBus.bind(this));
+}
 
   /*=============================================================
    *  renderView()
@@ -176,6 +180,61 @@ return null;
 
     return `<table class="gantt-table">${thead}${tbody}</table>`;
   }
+
+private refreshByBus(file?: TFile) {
+  if (this._rendering) return;
+
+  const dv = (this.app as any).plugins?.plugins?.dataview?.api;
+  if (!dv) {
+    Log.w("[Gantt] Dataview API not available.");
+    return;
+  }
+
+  const activeFile = this.app.workspace.getActiveFile();
+  if (!activeFile) {
+    Log.w("[Gantt] No active file found.");
+    return;
+  }
+
+  // 변경된 파일과 활성 파일이 다르면 무시
+  if (file && file.path !== activeFile.path) return;
+
+  const settings: GanttSettings = {
+    renderInteractiveBelow: true,
+    showLegend: true
+  };
+
+  const existingGanttView = document.querySelector(".gantt-view") as HTMLElement | null;
+  if (!existingGanttView) {
+    Log.w("[Gantt] Gantt host container not found.");
+    return;
+  }
+
+  const host = existingGanttView.parentElement;
+  if (!host) {
+    Log.w("[Gantt] Gantt host parent element not found.");
+    return;
+  }
+
+  existingGanttView.remove(); // 기존 DOM 제거 (중요)
+
+  // 정상 출력을 위해서 최소한의 ctx 제공 (타입 오류 우회)
+  const ctx = {
+    sourcePath: activeFile.path,
+    frontmatter: this.app.metadataCache.getFileCache(activeFile)?.frontmatter ?? {},
+    getSectionInfo: () => null,
+    docId: "",              // 필수 요소 추가 (빈 문자열 제공으로 해결)
+    addChild: () => null    // 필수 메서드 추가
+  } as unknown as MarkdownPostProcessorContext;  // 타입 문제 안전하게 우회
+
+  this.renderView(dv, settings, ctx, host);
+}
+
+
+
+
+
+
 }
 
 /*───────────────────────────────────────────────────────────────

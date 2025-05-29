@@ -5,11 +5,8 @@ import {
   DEFAULT_TOKENS,
   injectTokens,
   type AppDesignTokens,
-  type TablePalette,
-  type ImagePalette,
 } from "./theme/tokens";
 
-import type { EmbedFileHandlerSettings } from "./features/embed/EmbedService";
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type CoverTablePlugin from "./core/Plugin";   // 플러그인 클래스
 import { Log } from "./features/interactive-table/utils/log";
@@ -28,7 +25,6 @@ export interface CoverTableSettings {
   hideAllNotes         : boolean;
   listCallouts         : ListCallout[];
 
-  embed     : EmbedFileHandlerSettings;
   baseVars  : Record<string,string>;
   tokens    : AppDesignTokens;
   customCss : string;
@@ -41,8 +37,6 @@ export const DEFAULT_SETTINGS: CoverTableSettings = {
   hideAllNotes         : true,
   listCallouts         : [],
 
-  embed : { enableEmbedNoPreview: true,
-            nonPreviewExtensions: [".pdf",".exe",".zip",".rar"] },
 
   tokens   : structuredClone(DEFAULT_TOKENS),
   baseVars : {},

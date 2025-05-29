@@ -36,10 +36,6 @@ import { GanttController        } from "../features/gantt/GanttController";
 /* ── Theme / Service 모듈 ─────────────────────────────────────── */
 import { HeaderNumberingService } from "../features/header-numbering/HeaderNumberingService";
 import { ListCalloutManager    } from "../theme/ListCalloutManager";
-import {
-  EmbedService,
-  DEFAULT_EMBED_SETTINGS,
-} from "../features/embed/EmbedService";
 import { DesignService } from "./theme/DesignService"; 
 import { EventBus } from "./events/EventBus";
 
@@ -84,7 +80,6 @@ export default class CoverTablePlugin extends Plugin {
   private tabManager!: TabManager;
   private headerNumbering: HeaderNumberingService | null = null;
   private listCallouts!: ListCalloutManager;
-  private embed!: EmbedService;
   private design!: DesignService;
   private explorerStyleEl: HTMLStyleElement | null = null;
 
@@ -156,11 +151,11 @@ applyExplorerHide(): void {
 
 
       const pluginDir = this.manifest.dir || "";
-      const absPath = join(base, pluginDir, "styles.css");
+      const absPath = join(base, pluginDir, "style.css");
 
       const cssText = readFileSync(absPath, "utf8");
       const tag = document.createElement("style");
-      tag.id = "ct-styles-fallback";
+      tag.id = "ct-style-fallback";
       tag.textContent = cssText;
       document.head.appendChild(tag);
       /* 플러그인 언로드 시 자동 제거 */
@@ -198,11 +193,6 @@ applyExplorerHide(): void {
 
     this.applyZeroFolderVisibility();
     this.applyExplorerHide();          // ← 신규 토글 초기 상태 적용
-
-
-    /* (4) 📎 Embed (Drag / Paste) */
-    this.embed = new EmbedService(this, () => this.settings.embed);
-    this.embed.enable();
 
     /* (5) List-Callout & Header-Numbering */
     this.listCallouts = new ListCalloutManager(this);
@@ -294,7 +284,8 @@ this.registerEvent(
   onunload() {
     Log.d("[Cover-Table] ▶ onunload");
     this.tabManager.destroy();
-    this.embed.destroy();
+
+    EventBus.i.off(ct.ganttController.refreshByBus.bind(ct.ganttController));
   }
 
   /* ===========================================================
@@ -304,8 +295,6 @@ this.registerEvent(
     const raw = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, raw);
     /* ↳ Embed 기본값 병합 */
-    
-    this.settings.embed = Object.assign({}, DEFAULT_EMBED_SETTINGS, this.settings.embed);
   }
 
   async saveSettings() {
@@ -313,8 +302,6 @@ this.registerEvent(
     Log.setDebug(this.settings.debugLog);
     this.applyZeroFolderVisibility();
     this.applyExplorerHide();          // 신규
-
-    this.embed.reload();
 
     this.applyDesignSettings();
 
@@ -396,6 +383,9 @@ public rebuildListCallouts(): void {
   if (this.listCallouts) {
     this.listCallouts.rebuild();
   }
+}
+
+public reloadEmbed(): void {
 }
 
 }
