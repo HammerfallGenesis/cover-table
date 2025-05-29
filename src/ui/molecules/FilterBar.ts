@@ -25,6 +25,7 @@ import { Spinner } from "../atoms/spinner";
 import type { ColumnDef } from "../../features/interactive-table/types";
 import type { FmCandidate, UITableCallbacks } from "../interactive-table/UIManager"; // relative to ui folder
 import { openInNewLeafAndClose } from "../interactive-table/UIManager";
+import { v4 as uuid } from "uuid";
 
 /*───────────────────────────────────────────────────────────────
   🔧 Safe-cast helper – tag 값이 어떤 형태든 배열로 변환
@@ -43,6 +44,7 @@ function toTagArray(raw: any): string[] {          // ★ PATCH
 export interface FilterBarOptions {
   showOpenFolderButton        : boolean;
   showNewNoteButton           : boolean;
+  showNewCanvasButton         : boolean;   // ★ 추가
   showTagFilterButton         : boolean;
   showFrontmatterFilterButton : boolean;
   showSearchBox               : boolean;
@@ -113,6 +115,45 @@ if (opts.showNewNoteButton) {
 
     /* D. 새 Leaf 로 열고, Interactive-Table Leaf 닫기 */
     await openInNewLeafAndClose(this.app, file.path, host);
+  };
+
+  this.btns.appendChild(btn);
+}
+
+
+/* + New canvas ------------------------------------------------------- */
+if (opts.showNewCanvasButton) {
+  const btn = this.btnFactory.newCanvas();
+
+  btn.onclick = async () => {
+    try {
+      /* ① 대상 폴더 결정 */
+      const folderPath =
+        this.opts.folderPath ??
+        this.note.substring(0, this.note.lastIndexOf("/"));
+
+      /* ② 폴더가 없으면 생성 */
+      let tFolder = this.app.vault.getAbstractFileByPath(folderPath);
+      if (!(tFolder instanceof TFolder)) {
+        await this.app.vault.createFolder(folderPath);
+        tFolder = this.app.vault.getAbstractFileByPath(folderPath);
+      }
+
+      /* ③ 고유 파일명 확보 */
+      const ts   = window.moment().format("YYYY-MM-DD HHmmss");
+      const name = `Untitled ${ts}.canvas`;
+      const full = `${folderPath}/${name}`;
+
+      /* ④ 빈 캔버스 파일 생성 */
+      await this.createBlankCanvas(full);
+
+      /* ⑤ 팝-아웃 Leaf 로 열고, Interactive-Table 창 닫기 */
+      await openInNewLeafAndClose(this.app, full, host);
+
+    } catch (e) {
+      new Notice(`Failed to create canvas: ${(e as Error).message}`);
+      console.error(e);
+    }
   };
 
   this.btns.appendChild(btn);
@@ -204,6 +245,23 @@ if (cur !== "ALL") btn.classList.add("is-active");
 
     this.wrap.appendChild(input);
   }
+  /*───────────────────────────────────────────────────────────────
+    2‑D. Canvas new
+  ───────────────────────────────────────────────────────────────*/
+
+/* 클래스 내부(any 위치) */
+private async createBlankCanvas(path: string): Promise<void> {
+  const blank = JSON.stringify(
+    { nodes: [], edges: [], version: "1.0.0", id: uuid() },
+    null,
+    2,
+  );
+  await this.app.vault.create(path, blank);
+}
+
+
+
+
 }
 
 /*───────────────────────────────────────────────────────────────

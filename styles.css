@@ -729,3 +729,10 @@ td.ct-data-table__td{
   width:100%!important;
 }
 
+
+/* ▸ 2. 상단 바 (Filter-Bar) — + New canvas (노트와 동일 디자인) */
+button.interactive_table-button.interactive_table-button--new-canvas{
+  /* New-note 와 같은 시각적 스타일을 이미 상속받음
+     → gap 균형만 맞추기 (필요 시 값 조정) */
+  margin-left:.25rem;   /* ← New note 바로 옆 간격 */
+}

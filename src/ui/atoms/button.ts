@@ -49,6 +49,19 @@ export interface UIButtonOptions {
 export class ButtonFactory {
   constructor(private readonly app: App) {}
 
+
+    /*───────────────────────────────
+    🔹 ➊  새 캔버스 버튼 preset 추가
+  ───────────────────────────────*/
+  /** ＋ **New canvas** – 공통 스타일만 지정 (onClick 은 FilterBar 쪽에서 재바인딩) */
+  newCanvas(): HTMLButtonElement {
+    return this.create({
+      label : "＋ New canvas",
+      cls   : "interactive_table-button interactive_table-button--new-canvas",
+      onClick: () => {/* noop – FilterBar 에서 덮어씀 */},
+    });
+  }
+
   /*============================================================
     create() – 공통 버튼 생성 헬퍼
   ============================================================*/

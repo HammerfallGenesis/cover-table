@@ -184,6 +184,11 @@ return null;
 private refreshByBus(file?: TFile) {
   if (this._rendering) return;
 
+
+ // ── Canvas 파일은 프론트매터·날짜필드가 없으므로 Gantt 새로고침 대상에서 제외
+ if (file?.extension === "canvas") return;
+
+
   const dv = (this.app as any).plugins?.plugins?.dataview?.api;
   if (!dv) {
     Log.w("[Gantt] Dataview API not available.");
@@ -191,6 +196,7 @@ private refreshByBus(file?: TFile) {
   }
 
   const activeFile = this.app.workspace.getActiveFile();
+  if (!activeFile || activeFile.extension === "canvas") return;
   if (!activeFile) {
     Log.w("[Gantt] No active file found.");
     return;

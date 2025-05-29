@@ -75,12 +75,25 @@ function todayYMD(): string {
 }
 
 function injectCreated(page: any): any {
-  // 이미 값이 있으면 그대로 두고, 없으면 오늘 날짜를 넣어 준다
-  if (!page.created || page.created === "-") {
-    const today = todayYMD();
-    return { ...page, created: today, frontmatter:{ ...page.frontmatter, created: today } };
-  }
-  return page;
+// created 값이 없으면 “파일 생성일(ctime)”로 고정
+if (!page.created || page.created === "-") {
+  const born =
+    /* Dataview 0.5↑: Luxon DateTime 객체 */
+    page.file?.cday?.toISODate?.() ??
+    page.file?.ctime?.toISODate?.() ??
+    /* Dataview 0.4↓: epoch 숫자 */
+    (typeof page.file?.ctime === "number"
+      ? epochToYMD(page.file.ctime)
+      : todayYMD());            // ↙ 최후 fallback
+
+  return {
+    ...page,
+    created: born,
+    frontmatter: { ...page.frontmatter, created: born }
+  };
+}
+return page;
+
 }
 
 /** epoch millis → YYYY-MM-DD (Asia/Seoul) */
@@ -451,10 +464,11 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
         {
           showOpenFolderButton        : settings.showOpenFolderButton        ?? true,
           showNewNoteButton           : settings.showNewNoteButton           ?? true,
+          showNewCanvasButton         : settings.showNewCanvasButton  ?? true,  // ★
           showTagFilterButton         : settings.showTagFilterButton         ?? true,
           showFrontmatterFilterButton : settings.showFrontmatterFilterButton ?? true,
           showSearchBox               : settings.showSearchBox               ?? true,
-          showRefreshButton           : settings.showRefreshButton           ?? true,
+          showRefreshButton           : settings.showRefreshButton           ?? false,
           folderPath                  : settings.path ?? null
         },
         fmCandidates,   // ← ③-B 에서 만든 front-matter 후보

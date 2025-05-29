@@ -158,6 +158,9 @@ export class GanttModel {
 
     const pages = base.filter((p: any) => {
 
+      // Canvas 페이지(.canvas) → Gantt 대상 제외
+      if (p.file?.extension === "canvas") return false;
+
       /* 상태값 필터 */
       if (excl) {
         const stat = (p[sKey] ?? "").toString().toLowerCase();

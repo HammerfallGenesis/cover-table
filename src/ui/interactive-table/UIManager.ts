@@ -128,6 +128,7 @@ export interface UITableCallbacks {
 export interface UIManagerOptions {
   showOpenFolderButton        : boolean;
   showNewNoteButton           : boolean;
+  showNewCanvasButton         : boolean;   // ★
   showTagFilterButton         : boolean;
   showFrontmatterFilterButton : boolean;
   showSearchBox               : boolean;
@@ -179,6 +180,7 @@ export class UIManager {
     const fbOpts: FilterBarOptions = {
       showOpenFolderButton        : opts.showOpenFolderButton,
       showNewNoteButton           : opts.showNewNoteButton,
+      showNewCanvasButton         : opts.showNewCanvasButton, // ★
       showTagFilterButton         : opts.showTagFilterButton,
       showFrontmatterFilterButton : opts.showFrontmatterFilterButton,
       showSearchBox               : opts.showSearchBox,
