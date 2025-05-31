@@ -25,11 +25,13 @@ import { Log } from "../interactive-table/utils/log";
 export class GanttController {
   private readonly ui = new GanttUIManager();
   private _rendering = false;
+  private readonly busCb: (file?: TFile) => void;
 
-constructor(private readonly app: App) {
-  EventBus.i.on(this.refreshByBus.bind(this));
-  (this as any).__cover_unload__ = () => EventBus.i.off(this.refreshByBus.bind(this));
-}
+  constructor(private readonly app: App) {
+    this.busCb = this.refreshByBus.bind(this);
+    EventBus.i.on(this.busCb);
+    (this as any).__cover_unload__ = () => EventBus.i.off(this.busCb);
+  }
 
   /*=============================================================
    *  renderView()
