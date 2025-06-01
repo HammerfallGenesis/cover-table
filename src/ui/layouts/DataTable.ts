@@ -58,7 +58,20 @@ export interface DataTableOptions {
 function pad(n:number){return n.toString().padStart(2,"0");}
 function fmtDate(d:Date){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
 
-function renderByFormat(raw:any, fmt?:string): string {
+function renderTags(raw:any): HTMLElement {
+  const wrap = Dom.el("span", "");
+  const tags = normalizeTags(raw).sort((a,b)=>a.localeCompare(b,"ko"));
+  tags.forEach((t, i) => {
+    const span = Dom.el("span", "ct-tag", t);
+    const prefix = t.split("/")[0];
+    span.classList.add(`ct-tag--${prefix}`);
+    wrap.appendChild(span);
+    if (i < tags.length - 1) wrap.appendChild(document.createTextNode(", "));
+  });
+  return wrap;
+}
+
+function renderByFormat(raw:any, fmt?:string): string | HTMLElement {
   if (raw == null) return "";
 
   switch(fmt){
@@ -72,8 +85,7 @@ function renderByFormat(raw:any, fmt?:string): string {
       return isNaN(d.getTime()) ? String(raw) : fmtDate(d);
     }
     case "tags": {
-  const sorted = normalizeTags(raw).sort((a,b)=>a.localeCompare(b,"ko"));
-  return sorted.join(", ");           // [] 없애고 보기 좋게
+  return renderTags(raw);
     }
     default:     // text
       return String(raw);
