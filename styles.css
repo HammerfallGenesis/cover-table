@@ -763,5 +763,5 @@ button.interactive_table-button.interactive_table-button--new-canvas{
   margin-left:.25rem;   /* ← New note 바로 옆 간격 */
 }
 
-.theme-dark .ct-mode-source{ color:#ff5555 !important; }
-.theme-light .ct-mode-source{ color:#8b0000 !important; }
+.ct-mode-source{color:#ff5555!important;}
+.theme-light .ct-mode-source{color:#8b0000!important;}
