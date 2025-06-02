@@ -115,6 +115,7 @@ export class InteractiveTableController {
   private readonly svc  : TableController;
   private models        : Map<string, InteractiveTableModel> = new Map();
   private _rendering    = false;
+  private refreshTimer : number | null = null;  // debounced refresh
   private skipStateWrite= false;     // rerender(passive) → 상태 재저장 차단
 
   /*──────── ctor ────────*/
@@ -693,15 +694,14 @@ rerender : async (_n = note, _v = vid) => {
  * ========================================================= */
 private refreshByBus(file?: TFile) {
   /* ── 0. Debounced render – 중복 호출 방지 ── */
-  const renderDebounced = (() => {
-    let t: number | null = null;
-    return () => {
-      if (t) clearTimeout(t);
-      t = window.setTimeout(() => {
-        this.models.forEach((_, vid) => this.rerender(true, vid));
-      }, 80);
-    };
-  })();
+  const renderDebounced = () => {
+    if (this.refreshTimer) clearTimeout(this.refreshTimer);
+    this.refreshTimer = window.setTimeout(() => {
+      this.models.forEach((_, vid) => this.rerender(true, vid));
+      this.refreshTimer = null;
+    }, 80);
+  };
+
 
   /* ── 1. 폴더 필터 검사 ─────────────────────── */
   if (file && this.models.size) {

@@ -168,7 +168,7 @@ export class TabManager {
     ws.openLinkText = async (
       link: string,
       src : string,
-      _newLeaf?: boolean,
+      newLeaf?: boolean,
       state?: any,
     ) => {
       const dest = this.app.metadataCache.getFirstLinkpathDest(link, src);
@@ -180,7 +180,7 @@ export class TabManager {
         }
       }
       /* _newLeaf = true → 항상 새 탭 */
-      return original(link, src, true, state);
+      return original(link, src, newLeaf, state);
     };
 
     /* unload 시 복원을 위해 저장 */
