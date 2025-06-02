@@ -77,6 +77,8 @@ export class GanttController {
       let host: HTMLElement;
       if (hostPre) {
         /* 코드펜스일 때 – <pre> 바로 위에 삽입 */
+        hostPre.empty();
+        hostPre.classList.add("ct-it-container");
         host = hostPre;
       } else {
         /* Dataview 블록일 때 – dv.container 사용 */
