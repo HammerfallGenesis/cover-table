@@ -137,7 +137,8 @@ export class TabManager {
       const note = this.findFolderNote(folderPath);
       if (!note) return;                 // 폴더 접힘/펼침 기본 행동 유지
       evt.preventDefault();
-      this.focusOrOpenFile(note);
+      // this.focusOrOpenFile(note);
+      void this.app.workspace.getLeaf(false).openFile(note);
       return;
     }
 
