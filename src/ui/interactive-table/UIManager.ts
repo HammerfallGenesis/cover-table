@@ -139,6 +139,7 @@ export interface UIManagerOptions {
 
 export interface FmCandidate {                    // 새 타입
   prop   : string;
+  name   : string;
   values : string[];
 }
 

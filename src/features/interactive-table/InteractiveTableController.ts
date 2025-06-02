@@ -405,7 +405,7 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
               }
             })
           )].sort((a,b)=>String(a).localeCompare(String(b)));
-          return { prop: c.prop, values:["ALL", ...vals] };
+          return { prop: c.prop, name: c.name, values:["ALL", ...vals] };
         });
 
       const tagCandidates = (() => {                     // 태그 후보
@@ -442,7 +442,7 @@ this.models.set(model["viewId"], model);   // ← 반드시 넣어 주세요!
               }
             })
           )].sort((a,b)=>String(a).localeCompare(String(b)));
-          return { prop: c.prop, values:["ALL", ...vals] };
+           return { prop: c.prop, name: c.name, values:["ALL", ...vals] };
         });
       
       /** ② 태그 후보 목록 */

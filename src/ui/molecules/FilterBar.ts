@@ -196,10 +196,11 @@ if (opts.showNewCanvasButton) {
     2‑B. Front‑matter Filter Buttons
   ───────────────────────────────────────────────────────────────*/
   private buildFrontmatterFilters(): void {
-    this.fmList.forEach(({ prop, values }) => {
+    this.fmList.forEach(({ prop, name, values }) => {
       const key = `filter_${this.vid}_${prop}`;
       const cur = (this.cb.getState as any)(this.note, this.vid, key) || "ALL";
-      const label = cur === "ALL" ? prop : `${prop}: ${cur}`;
+      const base = name || prop;
+      const label = cur === "ALL" ? base : `${base}: ${cur}`;
 
       const btn = this.btnFactory.filter(label, async () => {
         const chosen = await this.cb.suggester(values);

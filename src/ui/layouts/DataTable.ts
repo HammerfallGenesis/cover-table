@@ -224,7 +224,12 @@ tr.onclick = () => {
           content = opts.cellRenderer(row, col);
         } else {
           const raw = getVal(row, col.prop);
-          content = renderByFormat(raw, col.format);
+          if (col.prop === "obsidianUIMode" && String(raw) === "source") {
+            const span = Dom.el("span", "ct-mode-source", "source");
+            content = span;
+          } else {
+            content = renderByFormat(raw, col.format);
+          }
         }
 
         if (content instanceof HTMLElement) td.appendChild(content);
