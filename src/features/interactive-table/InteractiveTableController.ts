@@ -289,6 +289,7 @@ if (!hostPre.dataset.coverVid) {
 }
 settings.__viewId  = hostPre.dataset.coverVid;
 settings._notePath = ctx.sourcePath;
+hostPre.dataset.coverSettings = JSON.stringify(_settings);
 
 /* pull saved page-size from tableState */
 const savedPerPage = gs(notePath, settings.__viewId!, "perPage");
@@ -520,7 +521,9 @@ if (!model && vid) {
       // 3. 첫 번째 renderAutoView 실행 → model 등록
       await this.renderAutoView(
         dvApi,                 // ← Dataview
-        {},                    // 빈 settings
+        host.dataset.coverSettings
+          ? JSON.parse(host.dataset.coverSettings)
+          : {},                // 저장된 설정 복원
         { sourcePath:
             (host.closest(".markdown-preview-view") as any)?.file?.path ?? ""
         } as any,              // 최소 ctx

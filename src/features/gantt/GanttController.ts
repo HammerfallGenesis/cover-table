@@ -101,6 +101,12 @@ export class GanttController {
         settings.renderInteractiveBelow /* divider 표시 여부 */
       );
 
+      /*
+       * 현재 옵션을 DOM 노드에 저장하여 refresh 시 그대로 사용한다.
+       * JSON 깊은 복사로 원본 변형을 방지한다.
+       */
+      (wrap as any).__settings = JSON.parse(JSON.stringify(settings));
+
       /* 6) 셀 색칠 & 오늘 강조 */
       this.ui.colorize(
         (title, d) => model.colorFor(title, d, pack),
@@ -134,10 +140,12 @@ return null;
           //   wrap /* hostPre 대신 wrap 아래에 렌더 */
           // );
           const itMount = wrap.createDiv({ cls: "ct-it-mount" }); /* 💡 전용 컨테이너 */
+          const opts = settings.interactiveOptions ?? {};
+          itMount.dataset.coverSettings = JSON.stringify(opts);
           if (ctx)
             await engine.renderAutoView(
               dv,
-              settings.interactiveOptions ?? {},
+              opts,
               ctx,
               itMount
             );
@@ -209,12 +217,13 @@ private refreshByBus(file?: TFile) {
   // 변경된 파일과 활성 파일이 다르면 무시
   if (file && file.path !== activeFile.path) return;
 
-  const settings: GanttSettings = {
-    renderInteractiveBelow: true,
-    showLegend: true
-  };
 
   const existingGanttView = document.querySelector(".gantt-view") as HTMLElement | null;
+  const prev = (existingGanttView as any)?.__settings as GanttSettings | undefined;
+  const settings: GanttSettings = { ...prev };
+  settings.renderInteractiveBelow ??= true;
+  settings.showLegend ??= true;
+
   if (!existingGanttView) {
     Log.w("[Gantt] Gantt host container not found.");
     return;
