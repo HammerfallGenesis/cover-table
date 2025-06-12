@@ -203,6 +203,81 @@ applyExplorerHide(): void {
 /* (6) 테마 변경 → DesignService 내부에서 자동 처리 */
 this.design = new DesignService(this.app, () => this.settings);
 
+
+    /* Tag prefix colours inside notes */
+    const ctTagColoursDark: Record<string, string> = {
+      region: "#ff5555",
+      topic: "#ff9900",
+      category: "#ffeb3b",
+      purpose: "#55ff55",
+      provider: "#55ffdd",
+      technology: "#55bbff",
+      theory: "#5574ff",
+      effect: "#be55ff",
+      method: "#ff55e5",
+    };
+    const ctTagColoursLight: Record<string, string> = {
+      region: "#8b0000",
+      topic: "#8b4500",
+      category: "#666600",
+      purpose: "#006400",
+      provider: "#006661",
+      technology: "#004882",
+      theory: "#000266",
+      effect: "#380066",
+      method: "#66005c",
+    };
+
+    const ctTagStyleId = "ct-tag-colors";
+    const ctApplyTagStyles = (doc: Document = document) => {
+      const rules: string[] = [];
+      for (const p of Object.keys(ctTagColoursDark)) {
+        const dark = ctTagColoursDark[p];
+        const light = ctTagColoursLight[p];
+        rules.push(
+          `.tag[href^="#${p}"]{color:${dark};}`,
+          `.multi-select-pill[data-value^="#${p}"] .multi-select-pill-content span,` +
+            `.multi-select-pill[data-value^="${p}"] .multi-select-pill-content span,` +
+            `.markdown-source-view.mod-cm6 span.cm-hashtag[data-tag^="#${p}"]{color:${dark};}`,
+          `.theme-light .tag[href^="#${p}"]{color:${light};}`,
+          `.theme-light .multi-select-pill[data-value^="#${p}"] .multi-select-pill-content span,` +
+            `.theme-light .multi-select-pill[data-value^="${p}"] .multi-select-pill-content span,` +
+            `.theme-light .markdown-source-view.mod-cm6 span.cm-hashtag[data-tag^="#${p}"]{color:${light};}`
+        );
+      }
+      let st = doc.getElementById(ctTagStyleId) as HTMLStyleElement | null;
+      if (!st) {
+        st = doc.createElement("style");
+        st.id = ctTagStyleId;
+        doc.head.appendChild(st);
+      }
+      st.textContent = rules.join("\n");
+    };
+
+    const ctApplyTagPillValues = () => {
+      document.querySelectorAll<HTMLElement>(".multi-select-pill").forEach((p) => {
+        const s = p.querySelector<HTMLSpanElement>(".multi-select-pill-content span");
+        if (!s) return;
+        const value = s.textContent || "";
+        p.setAttribute("data-value", value);
+      });
+    };
+
+    ctApplyTagStyles();
+    ctApplyTagPillValues();
+    const ctPillObserver = new MutationObserver(() => {
+      ctApplyTagPillValues();
+      ctApplyTagStyles();
+    });
+    ctPillObserver.observe(document.body, { childList: true, subtree: true });
+    this.register(() => ctPillObserver.disconnect());
+    cloneRootStyleToLeaves(this.app);
+
+
+
+
+
+
     /* (7) Dataview 코드펜스 렌더러 */
     this.registerMarkdownPostProcessor(
       async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
@@ -271,7 +346,12 @@ this.registerEvent(
     cloneRootStyleToLeaves(this.app);
   })
 );
-
+    this.registerEvent(
+      this.app.workspace.on("window-open", (_leaf, win) => {
+        cloneRootStyleToLeaves(this.app);
+        ctApplyTagStyles(win.document);
+      })
+    );
 
 
   }

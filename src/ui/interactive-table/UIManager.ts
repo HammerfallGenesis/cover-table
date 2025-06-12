@@ -35,16 +35,9 @@ import type { PaginationOptions } from "../molecules/Pagination";
 
 
 
-async function openPathInPopout(app: App, path: string): Promise<void> {
+async function openPathInNewLeaf(app: App, path: string): Promise<void> {
   if (!path) return;
-  const file =
-        app.metadataCache.getFirstLinkpathDest(path, "") ??
-        app.vault.getAbstractFileByPath(path);
-  if (!(file instanceof TFile)) return;
-
-  const leaf = app.workspace.openPopoutLeaf();
-  await leaf.openFile(file);
-  app.workspace.revealLeaf(leaf);
+  await app.workspace.openLinkText(path, "", true);
 }
 
 /* ============================================================= */
@@ -55,46 +48,9 @@ export async function openInNewLeafAndClose(
   filePath: string,
   currHost: HTMLElement,
 ) {
-  /* ① pop-out Leaf 직접 생성 (가장 확실) */
-  const popoutLeaf = app.workspace.openPopoutLeaf();   // WorkspaceLeaf
+  await app.workspace.openLinkText(filePath, "", true);
 
-  /* ② 새 파일(또는 canvas) 열기 – 반드시 Leaf 에서! */
-  const af = app.vault.getAbstractFileByPath(filePath);
-  if (af instanceof TFile)
-    await popoutLeaf.openFile(af, { active: true });
-  else
-    await app.workspace.openLinkText(filePath, "", true);   // e.g. canvas
-
-  /* ③ Interactive-Table Pane 닫기 */
   (currHost.closest(".workspace-leaf") as any)?.view?.leaf?.detach?.();
-
-/* 창 닫기 헬퍼 */
-/* ⬇️  팝-아웃 leaf 만 닫는 헬퍼 ------------------------------ */
-const closePopout = () => {
-  /* 이미 닫혔으면 무시 */
-if ((popoutLeaf as any).view == null) return;
-  popoutLeaf.detach();          // ← ★ 핵심 한 줄
-};
-
-/* 삭제 이벤트 */
-const refDelete = app.vault.on("delete", f => {
-  if (f.path === filePath) closePopout();
-});
-
-/* ✨ file-open(null) 이벤트 */
-const refOpen = app.workspace.on("file-open", (file: any) => {
-  if (file == null && app.workspace.activeLeaf === popoutLeaf)
-    closePopout();
-});
-
-/* 창 소멸 시 두 리스너 해제 */
-app.workspace.on("layout-change", () => {
-  if ((popoutLeaf as any).view == null) {
-    app.vault.offref(refDelete);
-    app.workspace.offref(refOpen);
-  }
-});
-
 }
 
 
@@ -236,7 +192,7 @@ table.addEventListener(
     if (!path) return;
 
     e.preventDefault();                            // 기본 탐색 억제
-    await openPathInPopout(this.app, path);        // ★ Pop-out
+    await openPathInNewLeaf(this.app, path);       // open in new tab
   },
   true,   // capture 단계
 );

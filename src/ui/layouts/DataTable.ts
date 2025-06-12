@@ -213,7 +213,7 @@ tr.onclick = () => {
       /* 더블 클릭 → 노트 열기 */
       tr.ondblclick = () => {
         const file = row?.file?.path;
-        if (file) (window as any).app.workspace.openLinkText(file,"",false);
+        if (file) (window as any).app.workspace.openLinkText(file, "", true);
       };
 
       opts.columns.filter(c => c.column).forEach(col => {

@@ -148,7 +148,7 @@ postProcessor(): MarkdownPostProcessor {
         li.addEventListener("dblclick", () => {
           if (!li.closest(".markdown-reading-view")) return;
           firstLink.dispatchEvent(
-            new MouseEvent("click", { bubbles:true, cancelable:true, view:window }),
+            new MouseEvent("click", { bubbles: true, cancelable: true, view: window })
           );
         });
       }

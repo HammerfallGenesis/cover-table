@@ -137,7 +137,6 @@ export class TabManager {
       const note = this.findFolderNote(folderPath);
       if (!note) return;                 // 폴더 접힘/펼침 기본 행동 유지
       evt.preventDefault();
-      // this.focusOrOpenFile(note);
       void this.app.workspace.getLeaf(false).openFile(note);
       return;
     }
@@ -151,7 +150,10 @@ export class TabManager {
       const file =
         this.app.metadataCache.getFirstLinkpathDest(href, "") ??
         this.app.vault.getAbstractFileByPath(href);
-      if (file instanceof TFile) this.focusOrOpenFile(file);
+      if (file instanceof TFile) {
+        const leaf = this.app.workspace.getLeaf("tab");
+        void leaf.openFile(file).then(() => this.app.workspace.revealLeaf(leaf));
+      }
       return;
     }
 
