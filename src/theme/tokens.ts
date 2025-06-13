@@ -9,9 +9,9 @@ export interface HeadingPalette{ h1:string; h2:string; h3:string;
                                  h4:string; h5:string; h6:string; }
 export interface ListPalette   { bullet:string; olMarker:string; }
 export interface BoldPalette { bold: string }
+export interface ItalicPalette { italic: string }
 
-export interface FolderLevel   { _01:string; _25:string; _68:string; }
-export interface FolderPalette { lvl0:FolderLevel; lvl1:FolderLevel; q:string; }
+
 
 export interface TablePalette  { border:string; shadow:string;
                                  rowEven:string; rowHover:string; }
@@ -24,7 +24,7 @@ export interface ModePalette{
   heading:HeadingPalette;
   list   :ListPalette;
   bold   : BoldPalette;       // ★ NEW
-  folder :FolderPalette;
+  italic  : ItalicPalette;
   table  :TablePalette;
   image  :ImagePalette;
 }
@@ -37,11 +37,7 @@ const makeDefault = ():ModePalette => ({
             h4:"#4cd964", h5:"#5ac8fa", h6:"#af52de" },
   list   :{ bullet:"rgb(54,54,190)", olMarker:"red" },
   bold : { bold :"rgb(138,0,119)" },
-  folder :{
-    lvl0:{ _01:"#0076ad", _25:"#989300", _68:"#9b1000" },
-    lvl1:{ _01:"#003d5a", _25:"#453a01", _68:"#461300" },
-    q   :"#848484",
-  },
+  italic : { italic : "rgb(255,130,178)"},
   table  :{ border:"#c0c0c0", shadow:"rgba(0,0,0,.10)",
             rowEven:"rgba(0,0,0,.03)", rowHover:"rgba(0,0,0,.07)" },
   image  :{ border:"#d0d0d0", shadow:"rgba(0,0,0,.10)" },
@@ -53,11 +49,10 @@ export const DEFAULT_TOKENS:AppDesignTokens = {
     const d = makeDefault();
     d.list   ={ bullet:"rgb(89,89,223)", olMarker:"red" };
     d.bold  = { bold:"rgb(255,188,188)" };            // ★
+    d.italic  = { italic:"rgb(255, 234, 234)" };            // ★
     d.table  ={ border:"#444444", shadow:"rgba(0,0,0,.55)",
                 rowEven:"transparent", rowHover:"rgba(255,255,255,.07)" };
     d.image  ={ border:"#555555", shadow:"rgba(0,0,0,.60)" };
-    d.folder.lvl0={ _01:"#91dcff", _25:"#fffcab", _68:"#ffb3ab" };
-    d.folder.lvl1={ _01:"#2ebdff", _25:"#ffdf3e", _68:"#ff7e4f" };
     return d;
   })(),
 };
@@ -69,13 +64,7 @@ export const VAR = {
                      h4:"--ct-h4-dark",  h5:"--ct-h5-dark",  h6:"--ct-h6-dark",
   /* list */         bullet:"--bullet-new-color",   olMarker:"--ct-ol-marker-dark",
   /* bold */         bold: "--ct-bold",
-  /* folders level0*/lvl0_01:"--ct-folder-lvl0-01-dark",
-                     lvl0_25:"--ct-folder-lvl0-25-dark",
-                     lvl0_68:"--ct-folder-lvl0-68-dark",
-  /* folders level1*/lvl1_01:"--ct-folder-lvl1-01-dark",
-                     lvl1_25:"--ct-folder-lvl1-25-dark",
-                     lvl1_68:"--ct-folder-lvl1-68-dark",
-  folderQ:"--ct-folder-q-dark",
+                     italic: "--ct-italic",
   /* table */        tBorder:"--ct-table-border", tShadow:"--ct-table-shadow",
                      tEven:"--ct-table-row-even", tHover:"--ct-table-row-hover",
   /* image */        iBorder:"--ct-image-border",  iShadow:"--ct-image-shadow",
@@ -107,15 +96,7 @@ export function injectTokens(
   /* ---------- bold ---------- */
 el.style.setProperty(`--ct-bold-${suf}`, P.bold.bold);   // ★ NEW
 
-  /* --folder-- */
-  const { lvl0, lvl1, q } = P.folder;
-  el.style.setProperty(`--ct-folder-lvl0-01-${suf}`, lvl0._01);
-  el.style.setProperty(`--ct-folder-lvl0-25-${suf}`, lvl0._25);
-  el.style.setProperty(`--ct-folder-lvl0-68-${suf}`, lvl0._68);
-  el.style.setProperty(`--ct-folder-lvl1-01-${suf}`, lvl1._01);
-  el.style.setProperty(`--ct-folder-lvl1-25-${suf}`, lvl1._25);
-  el.style.setProperty(`--ct-folder-lvl1-68-${suf}`, lvl1._68);
-  el.style.setProperty(`--ct-folder-q-${suf}`,        q);
+el.style.setProperty(`--ct-italic-${suf}`, P.italic.italic);   // ★ NEW
 
   /* --table-- */
   el.style.setProperty(VAR.tBorder, P.table.border );

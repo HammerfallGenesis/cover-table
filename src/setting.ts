@@ -21,7 +21,6 @@ export interface ListCallout {
 /*────────────── 2. 설정 스키마 / 기본값 ──────────*/
 export interface CoverTableSettings {
   hideZeroFolders      : boolean;
-  hideAllNotes         : boolean;
   listCallouts         : ListCallout[];
 
   baseVars  : Record<string,string>;
@@ -32,7 +31,6 @@ export interface CoverTableSettings {
 
 export const DEFAULT_SETTINGS: CoverTableSettings = {
   hideZeroFolders      : true,
-  hideAllNotes         : true,
   listCallouts         : [],
 
 
@@ -52,10 +50,6 @@ const LABEL = {
   h4:"H4 (Green)", h5:"H5 (Blue)", h6:"H6 (Violet)",
   /* List */
   bullet:"List Bullet", olMarker:"Ordered-list Number",
-  /* Explorer – folders */
-  lvl0_01:"Folder L0 - 0~1", lvl0_25:"Folder L0 - 2~5", lvl0_68:"Folder L0 - 6~8",
-  lvl1_01:"Folder L1 - 0~1", lvl1_25:"Folder L1 - 2~5", lvl1_68:"Folder L1 - 6~8",
-  folderQ :"Folder “Q)”",
   /* Table / Image */
   tBorder:"Table Border", tShadow:"Table Shadow",
   tRowEven:"Table Row (even)", tRowHover:"Table Row (hover)",
@@ -98,7 +92,7 @@ private fillMissing(tokens: AppDesignTokens) {
     tgt.heading = { ...def.heading, ...tgt.heading };
     tgt.list    = { ...def.list,    ...tgt.list    };
     tgt.bold  = { ...def.bold, ...tgt.bold };
-
+    tgt.italic  = { ...def.italic, ...tgt.italic };
     /* ▲ ① 기본 블록은 전부 OK — 아래 merge 함수만 수정 */
 
     /** d(기본)에서 존재하는 key 를 t(현재)로 채워 넣는다 */
@@ -107,11 +101,6 @@ private fillMissing(tokens: AppDesignTokens) {
         t[k] ??= d[k];
       });
     };
-
-    /* Folder - L0 · L1 */
-    merge(def.folder.lvl0, tgt.folder.lvl0);
-    merge(def.folder.lvl1, tgt.folder.lvl1);
-    tgt.folder.q ??= def.folder.q;
 
     /* Table / Image */
     tgt.table = { ...def.table, ...tgt.table };
@@ -274,26 +263,13 @@ new Setting(c)
 /* (A) _0  On / Off  → hideZeroFolders 토글 */
 new Setting(c)
   .setName("_0  On / Off")
-  .setDesc('Hide every folder or file whose name starts with "0_" in Explorer')
+  .setDesc('Hide every folder whose name starts with "0_" in Explorer; files inside remain visible')
   .addToggle(t =>
     t.setValue(S.hideZeroFolders)
      .onChange(async v => {
        S.hideZeroFolders = v;
        await this.commit();
        this.plugin.applyZeroFolderVisibility();   // 즉시 반영
-     }),
-  );
-
-/* (B) 모든 노트 숨김 토글 (hideAllNotes) */
-new Setting(c)
-  .setName("Hide all notes in Explorer")
-  .setDesc("Temporarily hide every file (nav-file); folders stay visible.")
-  .addToggle(t =>
-    t.setValue(S.hideAllNotes)
-     .onChange(async v => {
-       S.hideAllNotes = v;
-       await this.commit();
-       this.plugin.applyExplorerHide();
      }),
   );
 
@@ -349,37 +325,14 @@ this.addDualPicker(
   () => S.tokens.light.bold.bold,  () => S.tokens.dark.bold.bold,
   v  => S.tokens.light.bold.bold = v, v => S.tokens.dark.bold.bold = v,
 );
-    /* 4) Explorer folders – Level 0 */
-    c.createEl("h4", { text: "Explorer folders – Level 0" });
-    (["_01","_25","_68"] as const).forEach(k =>
-      this.addDualPicker(
-        c, LABEL[`lvl0_${k.slice(1)}` as keyof typeof LABEL],
-        () => S.tokens.light.folder.lvl0[k],
-        () => S.tokens.dark .folder.lvl0[k],
-        v  => S.tokens.light.folder.lvl0[k] = v,
-        v  => S.tokens.dark .folder.lvl0[k] = v,
-      )
-    );
 
-    /* 5) Explorer folders – Level 1 */
-    c.createEl("h4", { text: "Explorer folders – Level 1" });
-    (["_01","_25","_68"] as const).forEach(k =>
-      this.addDualPicker(
-        c, LABEL[`lvl1_${k.slice(1)}` as keyof typeof LABEL],
-        () => S.tokens.light.folder.lvl1[k],
-        () => S.tokens.dark .folder.lvl1[k],
-        v  => S.tokens.light.folder.lvl1[k] = v,
-        v  => S.tokens.dark .folder.lvl1[k] = v,
-      )
-    );
+/* italic (NEW) */
+this.addDualPicker(
+  c, "Italic text",
+  () => S.tokens.light.italic.italic,  () => S.tokens.dark.italic.italic,
+  v  => S.tokens.light.italic.italic = v, v => S.tokens.dark.italic.italic = v,
+);
 
-    /* Folder “Q)” */
-c.createEl("h4", { text: 'Explorer folder – "Q)"' });    
-    this.addDualPicker(
-      c, LABEL.folderQ,
-      () => S.tokens.light.folder.q, () => S.tokens.dark.folder.q,
-      v  => S.tokens.light.folder.q = v, v  => S.tokens.dark.folder.q = v,
-    );
 
 
 /* 6) 📝 List Callouts --------------------------------------- */

@@ -59,12 +59,6 @@ ct.waitForEngine ??= async (timeout = 4_000) => {
   throw new Error("coverTable.waitForEngine → timeout");
 };
 
-/* ▼ 모든 노트 숨김용 상수 ------------------------------------ */
-const HIDE_NOTES_CLASS = "ct-hide-notes";          // body 클래스
-const HIDE_NOTES_STYLE = `
-/* Cover-Table → hide ALL notes */
-body.${HIDE_NOTES_CLASS} .nav-file{ display:none !important; }
-`;
 
 
 /* ===============================================================
@@ -98,9 +92,9 @@ export default class CoverTablePlugin extends Plugin {
         tag.id = id;
         tag.textContent = `
 /* Cover-Table ► hide 0_ folders */
-.nav-file-title[data-path^="0_"],
+
 .nav-folder-title[data-path^="0_"],
-.nav-file-title[data-path*="/0_"],
+
 .nav-folder-title[data-path*="/0_"]{ display:none!important; }`;
         document.head.appendChild(tag);
       }
@@ -108,25 +102,24 @@ export default class CoverTablePlugin extends Plugin {
       tag?.remove();
     }
   }
-/* -----------------------------------------------------------
- *  applyExplorerHide()
- *  · 모든 파일(nav-file)을 숨기거나 표시
- * ----------------------------------------------------------- */
+/** 
+ * Explorer 노트 숨김 
+ * 단, data-path^="0_" 으로 시작하는 폴더 내부는 제외 
+ */
 applyExplorerHide(): void {
-  /* <style> 최초 1회 삽입 */
   if (!this.explorerStyleEl) {
     this.explorerStyleEl = document.createElement("style");
     this.explorerStyleEl.id = "ct-hide-notes-style";
-    this.explorerStyleEl.textContent = HIDE_NOTES_STYLE;
+    this.explorerStyleEl.textContent = `
+/* hide all files except under "0_" folders */
+.nav-file:not([data-path^="0_"]) {
+  display: none !important;
+}
+`;
     document.head.appendChild(this.explorerStyleEl);
   }
-
-  /* body 클래스 토글 */
-  document.body.classList.toggle(
-    HIDE_NOTES_CLASS,
-    this.settings.hideAllNotes,
-  );
 }
+
 
   /* ===========================================================
    *  onload()
@@ -230,13 +223,13 @@ this.design = new DesignService(this.app, () => this.settings);
         const light = ctTagColoursLight[p];
         rules.push(
           `.tag[href^="#${p}"]{color:${dark};}`,
-          `.multi-select-pill[data-value^="#${p}"] .multi-select-pill-content span,` +
-            `.multi-select-pill[data-value^="${p}"] .multi-select-pill-content span,` +
-            `.markdown-source-view.mod-cm6 span.cm-hashtag[data-tag^="#${p}"]{color:${dark};}`,
+          `.multi-select-pill[data-value^="#${p}"], .multi-select-pill[data-value^="${p}"]{background:${dark};border-color:${dark};color:black;}`,
+          `.multi-select-pill[data-value^="#${p}"] svg.svg-icon.lucide-x, .multi-select-pill[data-value^="${p}"] svg.svg-icon.lucide-x { color:black; }`,
+          `.markdown-source-view.mod-cm6 span.cm-hashtag[data-tag^="#${p}"]{color:${dark};}`,
           `.theme-light .tag[href^="#${p}"]{color:${light};}`,
-          `.theme-light .multi-select-pill[data-value^="#${p}"] .multi-select-pill-content span,` +
-            `.theme-light .multi-select-pill[data-value^="${p}"] .multi-select-pill-content span,` +
-            `.theme-light .markdown-source-view.mod-cm6 span.cm-hashtag[data-tag^="#${p}"]{color:${light};}`
+          `.theme-light .multi-select-pill[data-value^="#${p}"], .theme-light .multi-select-pill[data-value^="${p}"]{background:${light};border-color:${light};color:white;}`,
+          `.theme-light .multi-select-pill[data-value^="#${p}"] svg.svg-icon.lucide-x, .theme-light .multi-select-pill[data-value^="${p}"] svg.svg-icon.lucide-x { color:white; }`,
+          `.theme-light .markdown-source-view.mod-cm6 span.cm-hashtag[data-tag^="#${p}"]{color:${light};}`
         );
       }
       let st = doc.getElementById(ctTagStyleId) as HTMLStyleElement | null;
@@ -335,17 +328,23 @@ window.addEventListener("unhandledrejection", (ev) => {
 /* ===================================================================== */
 
 /* onload() 마지막에 */
-this.registerEvent(
-  this.app.workspace.on("layout-change", () => {
-    cloneRootStyleToLeaves(this.app);
-  })
-);
-    this.registerEvent(
-      this.app.workspace.on("window-open", (_leaf, win) => {
-        cloneRootStyleToLeaves(this.app);
-        ctApplyTagStyles(win.document);
-      })
-    );
+  this.registerEvent(
+    this.app.workspace.on("layout-change", () => {
+      cloneRootStyleToLeaves(this.app);
+    })
+  );
+  this.registerEvent(
+    this.app.workspace.on("css-change", () => {
+      cloneRootStyleToLeaves(this.app);
+      ctApplyTagStyles();
+    })
+  );
+  this.registerEvent(
+    this.app.workspace.on("window-open", (_leaf, win) => {
+      cloneRootStyleToLeaves(this.app);
+      ctApplyTagStyles(win.document);
+    })
+  );
 
 
   }
@@ -375,7 +374,6 @@ this.registerEvent(
     await this.saveData(this.settings);
     Log.setDebug(this.settings.debugLog);
     this.applyZeroFolderVisibility();
-    this.applyExplorerHide();          // 신규
 
     this.applyDesignSettings();
 

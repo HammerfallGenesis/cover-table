@@ -7,12 +7,38 @@
    0. Global Color / UI Tokens  (모든 색상은 여기서만 관리)
    ──────────────────────────────────────────────────────────── */
 :root{
-  /* 공통 베이스(흰색) & 액티브(주황)  */
-  --it-base-color   : #ffffff;   /* 기존 #fff, #ffffff */
-  --it-active-color : #ff9800;   /* 기존 #ff9800       */
+  /* 공통 베이스(어두운 모드 기준 흰색) & 액티브(주황)  */
+  --it-base-color   : #ffffff;   /* 다크 모드 기본 흰색 */
+  --it-active-color : #ff9800;   /* 기본 주황          */
 
   --basic-color     : var(--it-base-color);
   --active-color    : var(--it-active-color);
+
+  --it-contrast-color: #000000; /* unused - reserved */
+
+  /* Tag 색상 기본값 */
+  --it-tag-bg       : #999;
+  --it-tag-bg-hover : #777;
+  --it-tag-text     : #222;
+}
+
+/* 라이트/다크 모드 자동 반영 */
+.theme-dark{
+  --it-base-color:#ffffff;
+  --basic-color     : var(--it-base-color);
+  --it-tag-bg:#444;
+  --it-tag-bg-hover:#666;
+  --it-tag-text:#eee;
+  --it-contrast-color:#000000;
+}
+
+.theme-light{
+  --it-base-color:#000000;
+  --basic-color     : var(--it-base-color);
+  --it-tag-bg:#ccc;
+  --it-tag-bg-hover:#aaa;
+  --it-tag-text:#222;
+  --it-contrast-color:#ffffff;
 }
 
 /*****************************************************************
@@ -84,13 +110,13 @@ th.ct-data-table__th{
   font:600 .8rem/1 var(--font-interface)!important;
   text-align:center;
   vertical-align:middle;
-  color:var(--background-primary);
+  color:var(--it-contrast-color);
   white-space:nowrap!important;
   background:var(--basic-color)!important;
   border-left-color:transparent;
   border-right-color:transparent;
-  border-top-color:var(--basic-color)!important;
-  border-bottom-color:var(--basic-color)!important;
+  border-top-color:var(--it-contrast-color)!important;
+  border-bottom-color:var(--it-contrast-color)!important;
 }
 
 /* 정렬 상태 색상 (기존 값 유지) */
@@ -166,9 +192,9 @@ td.ct-data-table__td span.ct-tag--method  { color:#ff55e5; }
 }
 
 .interactive_table-pagination__btn--arrow{
-  color:var(--background-primary)!important;
+  color:var(--it-contrast-color)!important;
   padding:.15rem .5rem;
-  border:2px solid var(--basic-color);
+  border:2px solid var(--it-contrast-color);
   border-radius:0;
   background:var(--basic-color)!important;
   cursor:pointer;
@@ -183,11 +209,11 @@ td.ct-data-table__td span.ct-tag--method  { color:#ff55e5; }
   border:2px solid var(--basic-color);
 }
 .interactive_table-pagination__btn--arrow:hover{
-  color:var(--background-primary)!important;
+  color:var(--it-contrast-color)!important;
   background:var(--basic-color)!important;
   transition:all .3s ease;
   transform:scale(.9);
-  border:2px solid var(--basic-color);
+  border:2px solid var(--it-contrast-color);
 }
 
 /* Active · Disabled */
@@ -200,7 +226,7 @@ td.ct-data-table__td span.ct-tag--method  { color:#ff55e5; }
 .interactive_table-pagination__btn--arrow.is-active{
   background:var(--active-color)!important;
   border-color:var(--active-color)!important;
-  color:var(--background-primary)!important;
+  color:var(--it-contrast-color)!important;
 }
 .interactive_table-pagination__btn--disabled{
   opacity:.5;
@@ -241,15 +267,15 @@ button.interactive_table-button.interactive_table-button--new-canvas{
 
 /* ====== Fancy Tags ======== */
 .frontmatter-section-tags .tag:not(.token) {
-  background: #999;
-  background-image: -webkit-linear-gradient(top, #999, #777);
+  background: var(--it-tag-bg) !important;
+  background-image: -webkit-linear-gradient(top, var(--it-tag-bg), var(--it-tag-bg-hover)) !important;
   border-radius: 6px;
-  color: #222 !important;
+  color: var(--it-tag-text) !important;
   -webkit-box-shadow: 1px 1px 20px 0 #000000;
    box-shadow: 1px 1px 20px 0 #000000;
   text-decoration: none !important;
-  text-shadow: 1px 1px rgba (0, 0, 0, 0.85);
-  border: solid #909090 1px;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.85) !important;
+  border: solid var(--it-tag-bg-hover) 1px !important;
   display: inline-block;
   cursor: pointer;
   text-align: center;
@@ -257,9 +283,9 @@ button.interactive_table-button.interactive_table-button--new-canvas{
 }
 
 .frontmatter-section-tags .tag:not(.token):hover {
-	border: solid #909090 1px;
-  background: #777;
-  background-image: -webkit-linear-gradient(top, #777, #999);
+  border: solid var(--it-tag-bg-hover) 1px !important;
+  background: var(--it-tag-bg-hover) !important;
+  background-image: -webkit-linear-gradient(top, var(--it-tag-bg-hover), var(--it-tag-bg)) !important;
   border-radius: 6px;
   text-decoration: none;
 }

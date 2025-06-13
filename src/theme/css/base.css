@@ -9,21 +9,13 @@
   --ct-base-white        : #ffffff;
   --ct-base-black        : #000000;
 
-  /* ─────────── 탐색기 폴더 색상 ─────────── */
-  /* 0 단계(최상위) */
-  --ct-folder-lvl0-01-dark  : #91dcff;   --ct-folder-lvl0-01-light  : #0076ad;
-  --ct-folder-lvl0-25-dark  : #fffcab;   --ct-folder-lvl0-25-light  : #989300;
-  --ct-folder-lvl0-68-dark  : #ffb3ab;   --ct-folder-lvl0-68-light  : #9b1000;
-  /* 1 단계(내부) */
-  --ct-folder-lvl1-01-dark  : #2ebdff;   --ct-folder-lvl1-01-light  : #003d5a;
-  --ct-folder-lvl1-25-dark  : #ffdf3e;   --ct-folder-lvl1-25-light  : #453a01;
-  --ct-folder-lvl1-68-dark  : #ff7e4f;   --ct-folder-lvl1-68-light  : #461300;
-  /* ‘Q)’ 폴더노트 */
-  --ct-folder-q-dark        : #848484;   --ct-folder-q-light        : #848484;
+
 
   /* ─────────── 본문 텍스트 스타일 ─────────── */
   --ct-bold-dark            : rgb(255,188,188);
   --ct-bold-light           : rgb(138,0,119);
+  --ct-italic-dark       : #cccccc;
+  --ct-italic-light      : #888888;
 
   /* ─────────── 헤딩(무지개 토큰: 읽기+편집 공통) ─────────── */
   --ct-h1-dark : #ff5555;  --ct-h1-light : #ff5555;   /* red    */
@@ -84,93 +76,6 @@ li              { margin-block:5px; }
 .cm-s-obsidian .cm-line.HyperMD-header { padding:0!important; text-indent:0; }
 .HyperMD-list-line.HyperMD-list-line-1.cm-line { text-indent:-50px!important; padding-inline-start:40px!important; }
 
-/*****************************************************************
- *  탐색기 폴더 색상 (모든 단계·모드 보존)
- *****************************************************************/
-
-/* ──────────────────────────────────────────────────────────────
-   0 단계(최상위)  ────────────────────────────────────────────*/
-/* DARK */
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
-  color:var(--ct-folder-lvl0-01-dark)!important;
-}
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
-  color:var(--ct-folder-lvl0-25-dark)!important;
-}
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
-.theme-dark .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
-  color:var(--ct-folder-lvl0-68-dark)!important;
-}
-
-/* LIGHT */
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
-  color:var(--ct-folder-lvl0-01-light)!important;
-}
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
-  color:var(--ct-folder-lvl0-25-light)!important;
-}
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
-.theme-light .nav-files-container .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
-  color:var(--ct-folder-lvl0-68-light)!important;
-}
-
-/* ──────────────────────────────────────────────────────────────
-   1 단계(내부)  ─────────────────────────────────────────────*/
-/* DARK */
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
-  color:var(--ct-folder-lvl1-01-dark)!important;
-}
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
-  color:var(--ct-folder-lvl1-25-dark)!important;
-}
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
-  color:var(--ct-folder-lvl1-68-dark)!important;
-}
-
-/* LIGHT */
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="0_"],
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="1_"]{
-  color:var(--ct-folder-lvl1-01-light)!important;
-}
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="2_"],
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="3_"],
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="4_"],
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="5_"]{
-  color:var(--ct-folder-lvl1-25-light)!important;
-}
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="6_"],
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="7_"],
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder> .tree-item-self[data-path^="8_"]{
-  color:var(--ct-folder-lvl1-68-light)!important;
-}
-
-/* ──────────────────────────────────────────────────────────────
-   ‘Q)’ 폴더노트 색상  ─────────────────────────────────────────*/
-/* DARK */
-.theme-dark .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item-self.is-clickable.mod-collapsible.has-folder-note[data-path*="Q)"]{
-  color:var(--ct-folder-q-dark)!important;
-}
-/* LIGHT */
-.theme-light .nav-files-container .tree-item.nav-folder .tree-item-children .tree-item-self.is-clickable.mod-collapsible.has-folder-note[data-path*="Q)"]{
-  color:var(--ct-folder-q-light)!important;
-}
-
 
 /*****************************************************************
  *  볼드 컬러 (기존 기능 유지)
@@ -180,15 +85,29 @@ li              { margin-block:5px; }
 .theme-dark .markdown-source-view.mod-cm6 .cm-content strong,
 .theme-dark .markdown-source-view.mod-cm6 .cm-content b,
 .theme-dark .markdown-source-view.mod-cm6 .cm-content .cm-strong{
-  font-weight:normal!important; color:var(--ct-bold-dark)!important;
+  font-weight:bold  !important; color:var(--ct-bold-dark)!important;
 }
 .theme-light .markdown-preview-view strong,
 .theme-light .markdown-preview-view b,
 .theme-light .markdown-source-view.mod-cm6 .cm-content strong,
 .theme-light .markdown-source-view.mod-cm6 .cm-content b,
 .theme-light .markdown-source-view.mod-cm6 .cm-content .cm-strong{
-  font-weight:normal!important; color:var(--ct-bold-light)!important;
+  font-weight:bold !important; color:var(--ct-bold-light)!important;
 }
+
+
+/* ───────────────────────────────────────────────────
+   이텔릭 텍스트 색 적용
+─────────────────────────────────────────────────── */
+
+.theme-dark .cm-em {
+  color: var(--ct-italic-dark) !important;
+}
+.theme-light .cm-em {
+  color: var(--ct-italic-light) !important;
+}
+
+
 
 /*****************************************************************
  *  헤딩 – 무지개 + 밑줄 100% + 아이콘 우측
@@ -340,11 +259,8 @@ li              { margin-block:5px; }
   background: var(--ct-bullet-light) !important;
 }
 
-/*****************************************************************
- *  UI 가독성 – 공통 아이콘 숨김 (기존 유지)
- *****************************************************************/
-.nav-files-container .tree-item.nav-folder .tree-item-children .tree-item.nav-folder>.tree-item-self .collapse-icon,
-.tree-item-self.nav-folder-title.has-folder-note::before{display:none!important;}
+
+
 
 /*****************************************************************
  *  테이블 스타일 – 단일 토큰 기반 / 모드별 자동
@@ -428,3 +344,33 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
   margin: 0 0 0.5em 0;
   color: var(--text-muted);
 }
+
+
+
+/* ────────────────────────────────────────────
+   폴더노트 전용: 사각형 아이콘 + 클릭 비활성화
+───────────────────────────────────────────── */
+.tree-item-self.nav-folder-title.has-folder-note 
+  .tree-item-icon.collapse-icon {
+  /* 1) 실제 사각형 모양 */
+  display: inline-block !important;
+  width: 0.5rem  !important;
+  height: 0.5rem !important;
+  background-color: var(--nav-collapse-icon-color) !important;
+  border-radius: 0            !important;
+
+  /* 2) 위치 미세 조정 */
+  left: 3rem    !important; 
+  top: 0.5rem    !important;  /* 텍스트 중앙에 맞춰 살짝 아래로 */
+
+  /* 3) 클릭 무시 (접기/펼치기 이벤트 차단) */
+  pointer-events: none        !important;
+}
+
+/* 기존 삼각형 SVG 숨기기 */
+.tree-item-self.nav-folder-title.has-folder-note 
+  .tree-item-icon.collapse-icon svg {
+  display: none !important;
+}
+
+

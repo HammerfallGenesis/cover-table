@@ -7,9 +7,18 @@
    0. Global Color Tokens (모든 색상은 여기서만 정의)
    ──────────────────────────────────────────────────────────── */
 :root{
-  /* 공통 베이스 컬러 */
+    /* 공통 베이스 컬러 (다크 모드 기준 흰색) */
   --ct-base-white : #ffffff;
-}
+  }
+
+  /* 라이트/다크 모드 자동 반영 */
+  .theme-dark:root{
+    --ct-base-white:#ffffff;
+  }
+  .theme-light:root{
+    --ct-base-white:#000000;
+  }
+
 
 /* ──────────────────────────────────────────────────────────────
    1. View Wrapper & Animation
