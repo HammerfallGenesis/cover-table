@@ -346,31 +346,12 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
 }
 
 
-
 /* ────────────────────────────────────────────
    폴더노트 전용: 사각형 아이콘 + 클릭 비활성화
 ───────────────────────────────────────────── */
 .tree-item-self.nav-folder-title.has-folder-note 
   .tree-item-icon.collapse-icon {
-  /* 1) 실제 사각형 모양 */
-  display: inline-block !important;
-  width: 0.5rem  !important;
-  height: 0.5rem !important;
-  background-color: var(--nav-collapse-icon-color) !important;
-  border-radius: 0            !important;
-
-  /* 2) 위치 미세 조정 */
-  left: 3rem    !important; 
-  top: 0.5rem    !important;  /* 텍스트 중앙에 맞춰 살짝 아래로 */
-
+  display: none !important;
   /* 3) 클릭 무시 (접기/펼치기 이벤트 차단) */
   pointer-events: none        !important;
 }
-
-/* 기존 삼각형 SVG 숨기기 */
-.tree-item-self.nav-folder-title.has-folder-note 
-  .tree-item-icon.collapse-icon svg {
-  display: none !important;
-}
-
-
