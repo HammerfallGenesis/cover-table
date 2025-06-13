@@ -29,7 +29,6 @@ import {
 } from "../setting";
 
 /* ── Feature 모듈 ─────────────────────────────────────────────── */
-import { TabManager }           from "../features/tab-manager/TabManager";
 import { InteractiveTableController as InteractiveTable } from "../features/interactive-table/InteractiveTableController";
 import { GanttController        } from "../features/gantt/GanttController";
 
@@ -76,7 +75,7 @@ export default class CoverTablePlugin extends Plugin {
   static readonly ZERO_FOLDER_STYLE_ID = "ct-hide-zero-folders";
 
   /** UI / Helper 싱글턴 */
-  private tabManager!: TabManager;
+
   private listCallouts!: ListCalloutManager;
   private design!: DesignService;
   private explorerStyleEl: HTMLStyleElement | null = null;
@@ -166,8 +165,6 @@ applyExplorerHide(): void {
 
 
 
-    /* (1) 탭 관리 – “한 파일 = 한 탭” */
-    this.tabManager = new TabManager(this.app);
 
     /* (2) InteractiveTable / Gantt 싱글턴 확보 */
     if (!ct.engine)              ct.engine = new InteractiveTable(this.app);
@@ -360,7 +357,7 @@ this.registerEvent(
    * =========================================================== */
   onunload() {
     Log.d("[Cover-Table] ▶ onunload");
-    this.tabManager.destroy();
+
 
     EventBus.i.off(ct.ganttController.refreshByBus.bind(ct.ganttController));
   }

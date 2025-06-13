@@ -210,11 +210,7 @@ tr.onclick = () => {
   tr.classList.add("ct-row--active");
 };
 
-      /* 더블 클릭 → 노트 열기 */
-      tr.ondblclick = () => {
-        const file = row?.file?.path;
-        if (file) (window as any).app.workspace.openLinkText(file, "", true);
-      };
+
 
       opts.columns.filter(c => c.column).forEach(col => {
         const td = Dom.el("td", "ct-data-table__td");

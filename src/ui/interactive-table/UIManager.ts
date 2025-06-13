@@ -46,11 +46,9 @@ async function openPathInNewLeaf(app: App, path: string): Promise<void> {
 export async function openInNewLeafAndClose(
   app: App,
   filePath: string,
-  currHost: HTMLElement,
+  _currHost: HTMLElement,
 ) {
-  await app.workspace.openLinkText(filePath, "", true);
-
-  (currHost.closest(".workspace-leaf") as any)?.view?.leaf?.detach?.();
+  await app.workspace.openLinkText(filePath, "", false); // open in same tab
 }
 
 
