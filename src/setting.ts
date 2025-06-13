@@ -20,7 +20,6 @@ export interface ListCallout {
 
 /*────────────── 2. 설정 스키마 / 기본값 ──────────*/
 export interface CoverTableSettings {
-  enableHeaderNumbering: boolean;
   hideZeroFolders      : boolean;
   hideAllNotes         : boolean;
   listCallouts         : ListCallout[];
@@ -32,7 +31,6 @@ export interface CoverTableSettings {
 }
 
 export const DEFAULT_SETTINGS: CoverTableSettings = {
-  enableHeaderNumbering: true,
   hideZeroFolders      : true,
   hideAllNotes         : true,
   listCallouts         : [],

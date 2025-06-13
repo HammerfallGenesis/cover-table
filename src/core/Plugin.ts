@@ -34,7 +34,6 @@ import { InteractiveTableController as InteractiveTable } from "../features/inte
 import { GanttController        } from "../features/gantt/GanttController";
 
 /* ── Theme / Service 모듈 ─────────────────────────────────────── */
-import { HeaderNumberingService } from "../features/header-numbering/HeaderNumberingService";
 import { ListCalloutManager    } from "../theme/ListCalloutManager";
 import { DesignService } from "./theme/DesignService"; 
 import { EventBus } from "./events/EventBus";
@@ -78,7 +77,6 @@ export default class CoverTablePlugin extends Plugin {
 
   /** UI / Helper 싱글턴 */
   private tabManager!: TabManager;
-  private headerNumbering: HeaderNumberingService | null = null;
   private listCallouts!: ListCalloutManager;
   private design!: DesignService;
   private explorerStyleEl: HTMLStyleElement | null = null;
@@ -198,7 +196,6 @@ applyExplorerHide(): void {
     this.listCallouts = new ListCalloutManager(this);
     this.registerEditorExtension(this.listCallouts.editorExtensions());
     this.registerMarkdownPostProcessor(this.listCallouts.postProcessor(), 10_000);
-    this.reloadHeaderNumbering();
 
 /* (6) 테마 변경 → DesignService 내부에서 자동 처리 */
 this.design = new DesignService(this.app, () => this.settings);
@@ -431,30 +428,6 @@ this.registerEvent(
 
 
   /* ===========================================================
-   *  Header Numbering(Toggle)
-   * =========================================================== */
-  reloadHeaderNumbering() {
-    /* (A) 기존 제거 */
-    this.headerNumbering = null;
-
-    /* (B) 토글 OFF → 숨김 CSS 유지 & 종료 */
-    if (!this.settings.enableHeaderNumbering) {
-      if (!document.getElementById("ct-hn-hide")) {
-        const st = document.createElement("style");
-        st.id = "ct-hn-hide";
-        st.textContent = `.ct-hn-label{ display:none!important; }`;
-        document.head.appendChild(st);
-      }
-      return;
-    }
-
-    /* (C) 토글 ON → 서비스 재등록 */
-    document.getElementById("ct-hn-hide")?.remove();
-    this.headerNumbering = new HeaderNumberingService(this);
-    this.headerNumbering.register();
-  }
-
-  /* ===========================================================
  *  List-Callout helpers
  *  · SettingTab → commit() 에서 호출
  * =========================================================== */
@@ -467,7 +440,6 @@ public rebuildListCallouts(): void {
 
 public reloadEmbed(): void {
 }
-
 }
 
 /* ===============================================================

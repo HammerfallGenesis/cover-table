@@ -412,17 +412,7 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
   margin:5px 0!important;
   border-bottom-style:outset;
 }
-/* ② 번호(ct-hn-label) – 맨 앞 */
-.markdown-preview-view h1 .ct-hn-label,
-.markdown-preview-view h2 .ct-hn-label,
-.markdown-preview-view h3 .ct-hn-label,
-.markdown-preview-view h4 .ct-hn-label,
-.markdown-preview-view h5 .ct-hn-label,
-.markdown-preview-view h6 .ct-hn-label{
-  order:0;
-  flex:0 0 auto;
-  margin-right:.35em;
-}
+
 /* ③ 접기 아이콘 – 절대→정적 + 우측 끝 */
 .markdown-preview-view .heading-collapse-indicator.collapse-indicator{
   position:static!important;       /* ← 겹침 원인 제거 */

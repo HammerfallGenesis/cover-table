@@ -9,7 +9,6 @@ export function cloneRootStyleToLeaves(app: App) {
     "ct-base-theme",
     "ct-custom-css",
     "ct-base-vars",
-    "ct-hn-hide",
     "ct-tag-colors",
   ];
 
