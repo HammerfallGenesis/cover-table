@@ -57,6 +57,23 @@ export class GanttController {
       settings.forceInteractiveBelow  ??= false;
       if (settings.forceInteractiveBelow) settings.renderInteractiveBelow = true;
 
+
+      /* ✨ legacy "entries on page" at root level */
+      const legacy =
+        (settings as any)["entries on page"] ??
+        (settings as any).entries_on_page ??
+        (settings as any).entriesOnPage;
+      if (legacy != null) {
+        settings.interactiveOptions ??= {};
+        if ((settings.interactiveOptions as any).perPage == null)
+          (settings.interactiveOptions as any).perPage = Number(legacy) || 0;
+      }
+
+
+
+
+
+
       /* 1) current page 확보(canvas 지원) */                      /* :contentReference[oaicite:2]{index=2}:contentReference[oaicite:3]{index=3} */
       let cur = dv.current?.();
       if ((!cur || !cur.file) && ctx?.sourcePath) cur = dv.page(ctx.sourcePath);
@@ -141,6 +158,16 @@ return null;
           // );
           const itMount = wrap.createDiv({ cls: "ct-it-mount" }); /* 💡 전용 컨테이너 */
           const opts = settings.interactiveOptions ?? {};
+
+          if (opts.perPage == null) {
+            const legacyPer =
+              (opts as any)["entries on page"] ??
+              (opts as any).entries_on_page ??
+              (opts as any).entriesOnPage;
+            if (legacyPer != null) opts.perPage = Number(legacyPer) || 0;
+          }
+
+
           itMount.dataset.coverSettings = JSON.stringify(opts);
           if (ctx)
             await engine.renderAutoView(

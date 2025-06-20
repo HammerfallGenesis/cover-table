@@ -66,18 +66,6 @@
 }
 
 /*****************************************************************
- *  공통 타이포그래피 / 레이아웃
- *****************************************************************/
-p               { text-indent:25px; margin:5px 0!important; text-align:justify; }
-li p            { text-indent:0px !important;}
-li              { margin-block:5px; }
-.hr.cm-line     { text-indent:0!important; }
-.cm-line        { font-size:1em!important; text-align:justify; text-indent:25px; line-height:1.5em; }
-.cm-s-obsidian .cm-line.HyperMD-header { padding:0!important; text-indent:0; }
-.HyperMD-list-line.HyperMD-list-line-1.cm-line { text-indent:-50px!important; padding-inline-start:40px!important; }
-
-
-/*****************************************************************
  *  볼드 컬러 (기존 기능 유지)
  *****************************************************************/
 .theme-dark .markdown-preview-view strong,
@@ -346,6 +334,7 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
 }
 
 
+
 /* ────────────────────────────────────────────
    폴더노트 전용: 사각형 아이콘 + 클릭 비활성화
 ───────────────────────────────────────────── */
@@ -356,6 +345,67 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
   pointer-events: none        !important;
 }
 
+
+
+.tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-folder-note{
+  padding-left:0.25rem!important;
+}
+
+.tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-folder-note{
+  padding-left:0.25rem!important;
+}
+
+
+.theme-dark .canvas-node-content-blocker ol>li::marker,
+.theme-dark .canvas-node-content-blocker ul>li::marker,
+.theme-dark .canvas-node-content ol>li::marker,
+.theme-dark .canvas-node-content ul>li::marker{color:var(--ct-ol-marker-dark);}
+.theme-dark .canvas-node-content-blocker ul>li>.list-bullet:after,
+.theme-dark .canvas-node-content ul>li>.list-bullet:after{height:5px;width:5px;border-radius:50%;background:var(--ct-bullet-dark)!important;}
+.theme-dark .canvas-node-content-blocker ul>li>ul>li>.list-bullet:after,
+.theme-dark .canvas-node-content ul>li>ul>li>.list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--ct-bullet-dark)!important;}
+.theme-dark .canvas-node-content-blocker ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .canvas-node-content ul>li>ul>li>ul>li>.list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--ct-bullet-dark)!important;border-radius:50%;}
+.theme-dark .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .canvas-node-content ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:5px;width:5px;border-radius:0;background:var(--ct-bullet-dark)!important;}
+.theme-dark .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .canvas-node-content ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--ct-bullet-dark)!important;}
+.theme-dark .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .canvas-node-content ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--ct-bullet-dark)!important;}
+.theme-dark .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-dark .canvas-node-content ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:2px;width:2px;border-radius:50%;background:var(--ct-bullet-dark)!important;}
+
+.theme-light .canvas-node-content-blocker ol>li::marker,
+.theme-light .canvas-node-content-blocker ul>li::marker,
+.theme-light .canvas-node-content ol>li::marker,
+.theme-light .canvas-node-content ul>li::marker{color:var(--ct-ol-marker-light);}
+.theme-light .canvas-node-content-blocker ul>li>.list-bullet:after,
+.theme-light .canvas-node-content ul>li>.list-bullet:after{height:5px;width:5px;border-radius:50%;background:var(--ct-bullet-light)!important;}
+.theme-light .canvas-node-content-blocker ul>li>ul>li>.list-bullet:after,
+.theme-light .canvas-node-content ul>li>ul>li>.list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--ct-bullet-light)!important;}
+.theme-light .canvas-node-content-blocker ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .canvas-node-content ul>li>ul>li>ul>li>.list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--ct-bullet-light)!important;border-radius:50%;}
+.theme-light .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .canvas-node-content ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:5px;width:5px;border-radius:0;background:var(--ct-bullet-light)!important;}
+.theme-light .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .canvas-node-content ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:1px;width:7px;border-radius:0;background:var(--ct-bullet-light)!important;}
+.theme-light .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .canvas-node-content ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:4px;width:4px;background:transparent;border:1px solid var(--ct-bullet-light)!important;}
+.theme-light .canvas-node-content-blocker ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after,
+.theme-light .canvas-node-content ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>ul>li>.list-bullet:after{height:2px;width:2px;border-radius:50%;background:var(--ct-bullet-light)!important;}
+
+
+.canvas-node-content.markdown-embed > .markdown-embed-content > .markdown-preview-view {
+  padding: 1rem 0.3rem 1rem 1rem !important;
+}
+
+.markdown-source-view.mod-inside-iframe > .cm-editor > .cm-scroller{
+  padding: 1rem 0.3rem 1rem 1rem !important;
+}
+
+.markdown-source-view.mod-inside-iframe > .cm-editor > .cm-scroller {
+  padding: 1rem 0.3rem 1rem 1rem !important;
+}
 /*****************************************************************
  *  src/theme/css/gantt.css – auto-generated from legacy Cover-Table v2025-05
  *  📊  Gantt-specific Theme Rules   (⚠ 수정 금지 · 기능 보존)

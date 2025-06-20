@@ -139,9 +139,11 @@ if (opts.showNewCanvasButton) {
         tFolder = this.app.vault.getAbstractFileByPath(folderPath);
       }
 
-      /* ③ 고유 파일명 확보 */
+      /* ③ 파일명 입력 */
       const ts   = window.moment().format("YYYY-MM-DD HHmmss");
-      const name = `Untitled ${ts}.canvas`;
+      let name   = await this.promptForName(`Untitled ${ts}`);
+      if (!name) return;
+      if (!name.endsWith(".canvas")) name += ".canvas";
       const full = `${folderPath}/${name}`;
 
       /* ④ 빈 캔버스 파일 생성 */
@@ -260,6 +262,37 @@ private async createBlankCanvas(path: string): Promise<void> {
   await this.app.vault.create(path, blank);
 }
 
+private async promptForName(def: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    const { Modal } = (globalThis as any).coverTable.obsidian;
+    class NameModal extends Modal {
+      result = def;
+      constructor(app: App) {
+        super(app);
+      }
+      onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl("h1", { text: "New canvas name" });
+        const input = contentEl.createEl("input", { value: this.result });
+        input.style.width = "100%";
+        const accept = () => {
+          this.result = input.value.trim();
+          this.close();
+          resolve(this.result);
+        };
+        input.addEventListener("keydown", (ev: KeyboardEvent) => {
+          if (ev.key === "Enter") accept();
+        });
+        const ok = contentEl.createEl("button", { text: "OK" });
+        ok.onclick = accept;
+      }
+      onClose() {
+        this.contentEl.empty();
+      }
+    }
+    new NameModal(this.app).open();
+  });
+}
 
 
 

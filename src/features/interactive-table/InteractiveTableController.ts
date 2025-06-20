@@ -289,7 +289,7 @@ if (!hostPre.dataset.coverVid) {
 }
 settings.__viewId  = hostPre.dataset.coverVid;
 settings._notePath = ctx.sourcePath;
-hostPre.dataset.coverSettings = JSON.stringify(_settings);
+hostPre.dataset.coverSettings = JSON.stringify(settings);
 
 /* pull saved page-size from tableState */
 const savedPerPage = gs(notePath, settings.__viewId!, "perPage");
@@ -343,7 +343,7 @@ const excaliPages = this.app.vault.getFiles()
   });
 
  /* 4) 합치기 */
- const allPages = [...mdPages, ...canvasPages, ...excaliPages];
+ const allPages = [...canvasPages, ...mdPages, ...excaliPages];
 
 
       /*──────── ② 컬럼 정의 ────────*/
