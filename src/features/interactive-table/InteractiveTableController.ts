@@ -323,7 +323,7 @@ const canvasPages = this.app.vault.getFiles()
       file       : { path:f.path, link:dv.fileLink(f.path), folder, basename:f.basename },
       frontmatter: { title: f.basename },
       created    : ctime,          // ← 최초 생성일
-      tags       : "#canvas"
+      tags       : "#category/canvas"
     };
   });
 

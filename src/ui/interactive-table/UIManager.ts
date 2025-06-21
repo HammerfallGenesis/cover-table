@@ -37,7 +37,10 @@ import type { PaginationOptions } from "../molecules/Pagination";
 
 async function openPathInNewLeaf(app: App, path: string): Promise<void> {
   if (!path) return;
-  await app.workspace.openLinkText(path, "", true);
+  const file = app.vault.getAbstractFileByPath(path);
+  if (!(file instanceof TFile)) return;
+  const leaf = app.workspace.getLeaf(true);
+  await leaf.openFile(file);
 }
 
 /* ============================================================= */

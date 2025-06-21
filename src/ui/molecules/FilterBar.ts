@@ -146,8 +146,11 @@ if (opts.showNewCanvasButton) {
       if (!name.endsWith(".canvas")) name += ".canvas";
       const full = `${folderPath}/${name}`;
 
-      /* ④ 빈 캔버스 파일 생성 */
-      await this.createBlankCanvas(full);
+      /* ④ 중복 여부 확인 후 파일 생성 */
+      const exists = this.app.vault.getAbstractFileByPath(full);
+      if (!exists) {
+        await this.createBlankCanvas(full);
+      }
 
       /* ⑤ 팝-아웃 Leaf 로 열고, Interactive-Table 창 닫기 */
       await openInNewLeafAndClose(this.app, full, host);
