@@ -193,26 +193,20 @@ this.design = new DesignService(this.app, () => this.settings);
 
     /* Tag prefix colours inside notes */
     const ctTagColoursDark: Record<string, string> = {
-      region: "#ff5555",
-      topic: "#ff9900",
-      category: "#ffeb3b",
-      purpose: "#55ff55",
-      provider: "#55ffdd",
-      technology: "#55bbff",
-      theory: "#5574ff",
-      effect: "#be55ff",
-      method: "#ff55e5",
+      topic: "#ff5555",
+      method: "#ff9900",
+      project: "#ffeb3b",
+      region: "#55ff55",
+      type: "#55ffdd",
+      person: "#5574ff",
     };
     const ctTagColoursLight: Record<string, string> = {
-      region: "#8b0000",
-      topic: "#8b4500",
-      category: "#666600",
-      purpose: "#006400",
-      provider: "#006661",
-      technology: "#004882",
-      theory: "#000266",
-      effect: "#380066",
-      method: "#66005c",
+      topic: "#8b0000",
+      method: "#8b4500",
+      project: "#666600",
+      region: "#006400",
+      type: "#006661",
+      person: "#000266",
     };
 
     const ctTagStyleId = "ct-tag-colors";

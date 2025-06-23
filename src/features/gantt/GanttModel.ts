@@ -42,6 +42,7 @@ export interface GanttSettings extends PaletteSettings {
   renderInteractiveBelow?: boolean;
   forceInteractiveBelow?: boolean;
   interactiveOptions?: any;
+  props?: any[];
   debugLegend?: boolean;
 }
 

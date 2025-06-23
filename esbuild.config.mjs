@@ -46,8 +46,9 @@ async function buildStyle() {
   for (const file of parts) {
     out += await readFile(file, "utf8") + "\n";
   }
+  await writeFile("style.css", out);
   await writeFile("styles.css", out);
-  console.log("✓ styles.css built");
+  console.log("✓ styles.css, style.css built");
 }
 
 await buildStyle();

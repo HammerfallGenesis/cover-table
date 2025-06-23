@@ -144,25 +144,19 @@ td.ct-data-table__td{
 
 
 /* Tag prefix colours */
-td.ct-data-table__td span.ct-tag--region  { color:#ff5555; }
-td.ct-data-table__td span.ct-tag--topic   { color:#ff9900; }
-td.ct-data-table__td span.ct-tag--category{ color:#ffeb3b; }
-td.ct-data-table__td span.ct-tag--purpose { color:#55ff55; }
-td.ct-data-table__td span.ct-tag--provider{ color:#55ffdd; }
-td.ct-data-table__td span.ct-tag--technology{ color:#55bbff; }
-td.ct-data-table__td span.ct-tag--theory  { color:#5574ff; }
-td.ct-data-table__td span.ct-tag--effect  { color:#be55ff; }
-td.ct-data-table__td span.ct-tag--method  { color:#ff55e5; }
+td.ct-data-table__td span.ct-tag--topic   { color:#ff5555; }
+td.ct-data-table__td span.ct-tag--method  { color:#ff9900; }
+td.ct-data-table__td span.ct-tag--project { color:#ffeb3b; }
+td.ct-data-table__td span.ct-tag--region  { color:#55ff55; }
+td.ct-data-table__td span.ct-tag--type    { color:#55ffdd; }
+td.ct-data-table__td span.ct-tag--person  { color:#5574ff; }
 
-.theme-light td.ct-data-table__td span.ct-tag--region  { color:#8b0000; }
-.theme-light td.ct-data-table__td span.ct-tag--topic   { color:#8b4500; }
-.theme-light td.ct-data-table__td span.ct-tag--category{ color:#666600; }
-.theme-light td.ct-data-table__td span.ct-tag--purpose { color:#006400; }
-.theme-light td.ct-data-table__td span.ct-tag--provider{ color:#006661; }
-.theme-light td.ct-data-table__td span.ct-tag--technology{ color:#004882; }
-.theme-light td.ct-data-table__td span.ct-tag--theory  { color:#000266; }
-.theme-light td.ct-data-table__td span.ct-tag--effect  { color:#380066; }
-.theme-light td.ct-data-table__td span.ct-tag--method  { color:#66005c; }
+.theme-light td.ct-data-table__td span.ct-tag--topic   { color:#8b0000; }
+.theme-light td.ct-data-table__td span.ct-tag--method  { color:#8b4500; }
+.theme-light td.ct-data-table__td span.ct-tag--project { color:#666600; }
+.theme-light td.ct-data-table__td span.ct-tag--region  { color:#006400; }
+.theme-light td.ct-data-table__td span.ct-tag--type    { color:#006661; }
+.theme-light td.ct-data-table__td span.ct-tag--person  { color:#000266; }
 
 
 

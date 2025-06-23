@@ -158,6 +158,8 @@ return null;
           // );
           const itMount = wrap.createDiv({ cls: "ct-it-mount" }); /* 💡 전용 컨테이너 */
           const opts = settings.interactiveOptions ?? {};
+          if (settings.props && opts.props == null)
+            (opts as any).props = settings.props;
 
           if (opts.perPage == null) {
             const legacyPer =
