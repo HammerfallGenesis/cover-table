@@ -144,6 +144,7 @@ td.ct-data-table__td{
 
 
 /* Tag prefix colours */
+td.ct-data-table__td span.ct-tag--status  { color:#ffffff; }
 td.ct-data-table__td span.ct-tag--topic   { color:#ff5555; }
 td.ct-data-table__td span.ct-tag--method  { color:#ff9900; }
 td.ct-data-table__td span.ct-tag--project { color:#ffeb3b; }
@@ -151,6 +152,7 @@ td.ct-data-table__td span.ct-tag--region  { color:#55ff55; }
 td.ct-data-table__td span.ct-tag--type    { color:#55ffdd; }
 td.ct-data-table__td span.ct-tag--person  { color:#5574ff; }
 
+.theme-light td.ct-data-table__td span.ct-tag--status  { color:#7d7d7d; }
 .theme-light td.ct-data-table__td span.ct-tag--topic   { color:#8b0000; }
 .theme-light td.ct-data-table__td span.ct-tag--method  { color:#8b4500; }
 .theme-light td.ct-data-table__td span.ct-tag--project { color:#666600; }

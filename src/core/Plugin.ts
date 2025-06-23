@@ -193,6 +193,7 @@ this.design = new DesignService(this.app, () => this.settings);
 
     /* Tag prefix colours inside notes */
     const ctTagColoursDark: Record<string, string> = {
+      status: "#ffffff",
       topic: "#ff5555",
       method: "#ff9900",
       project: "#ffeb3b",
@@ -201,6 +202,7 @@ this.design = new DesignService(this.app, () => this.settings);
       person: "#5574ff",
     };
     const ctTagColoursLight: Record<string, string> = {
+      status: "#7d7d7d",
       topic: "#8b0000",
       method: "#8b4500",
       project: "#666600",
