@@ -34,8 +34,8 @@ export interface GanttSettings extends PaletteSettings {
   excludeDone?: boolean;    // default: true
 
   /* 날짜 필드 */
-  startField?: string;      // default: "created"
-  endField?: string;        // default: "end"
+  startField?: string;      // default: "dataAdded"
+  endField?: string;        // default: "dataEnded"
 
   /* 표시 옵션 (UI 전용, Model 은 그대로 전달) */
   showLegend?: boolean;
@@ -88,8 +88,8 @@ export class GanttModel {
     settings.statusField     ??= "obsidianUIMode";
     settings.statusDoneValue ??= "preview";
     settings.excludeDone     ??= true;
-    settings.startField      ??= "created";
-    settings.endField        ??= "end";
+    settings.startField      ??= "dataAdded";
+    settings.endField        ??= "dataEnded";
 
     this.app      = app;
     this.dv       = dv;
