@@ -91,11 +91,15 @@ export default class CoverTablePlugin extends Plugin {
         tag = document.createElement("style");
         tag.id = id;
         tag.textContent = `
-/* Cover-Table ► hide 0_ folders */
+/* Cover-Table ► hide 0_ folders and their contents */
 
 .nav-folder-title[data-path^="0_"],
 
-.nav-folder-title[data-path*="/0_"]{ display:none!important; }`;
+.nav-folder-title[data-path*="/0_"],
+.nav-file-title[data-path^="0_"],
+.nav-file-title[data-path*="/0_"] {
+  display: none !important;
+}`;
         document.head.appendChild(tag);
       }
     } else {
@@ -193,6 +197,7 @@ this.design = new DesignService(this.app, () => this.settings);
 
     /* Tag prefix colours inside notes */
     const ctTagColoursDark: Record<string, string> = {
+      status: "#ffffff",
       topic: "#ff5555",
       method: "#ff9900",
       project: "#ffeb3b",
@@ -201,6 +206,7 @@ this.design = new DesignService(this.app, () => this.settings);
       person: "#5574ff",
     };
     const ctTagColoursLight: Record<string, string> = {
+      status: "#989898",
       topic: "#8b0000",
       method: "#8b4500",
       project: "#666600",
