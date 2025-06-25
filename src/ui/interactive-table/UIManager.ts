@@ -51,7 +51,13 @@ export async function openInNewLeafAndClose(
   filePath: string,
   _currHost: HTMLElement,
 ) {
-  await app.workspace.openLinkText(filePath, "", false); // open in same tab
+  const abs = app.metadataCache.getFirstLinkpathDest(filePath, "") ??
+              app.vault.getAbstractFileByPath(filePath);
+  if (!(abs instanceof TFile)) return;
+
+  // open in a new leaf so the original view remains
+  const leaf = app.workspace.getLeaf(true);
+  await leaf.openFile(abs);
 }
 
 
