@@ -58,6 +58,7 @@ export async function openInNewLeafAndClose(
   // open in a new leaf so the original view remains
   const leaf = app.workspace.getLeaf(true);
   await leaf.openFile(abs);
+  app.workspace.setActiveLeaf(leaf);
 }
 
 
@@ -197,6 +198,9 @@ table.addEventListener(
     const row  = el.closest<HTMLTableRowElement>("tr");
     const path = href ?? row?.dataset.path ?? "";
     if (!path) return;
+
+    const ext = path.split(".").pop()?.toLowerCase() || "";
+    if (ext && ext !== "md" && ext !== "pdf") return;
 
     e.preventDefault();                            // 기본 탐색 억제
     await openPathInNewLeaf(this.app, path);       // open in new tab

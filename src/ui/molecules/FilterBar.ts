@@ -269,19 +269,19 @@ private async promptForName(def: string): Promise<string | null> {
   return new Promise((resolve) => {
     const { Modal } = (globalThis as any).coverTable.obsidian;
     class NameModal extends Modal {
-      result = def;
-      constructor(app: App) {
-        super(app);
-      }
+      value = def;
+      accepted = false;
+      constructor(app: App) { super(app); }
       onOpen() {
         const { contentEl } = this;
         contentEl.createEl("h1", { text: "New canvas name" });
-        const input = contentEl.createEl("input", { value: this.result });
+        const input = contentEl.createEl("input", { value: this.value });
         input.style.width = "100%";
+        input.focus();
         const accept = () => {
-          this.result = input.value.trim();
+          this.value = input.value.trim();
+          this.accepted = true;
           this.close();
-          resolve(this.result);
         };
         input.addEventListener("keydown", (ev: KeyboardEvent) => {
           if (ev.key === "Enter") accept();
@@ -291,6 +291,7 @@ private async promptForName(def: string): Promise<string | null> {
       }
       onClose() {
         this.contentEl.empty();
+        resolve(this.accepted ? this.value : null);
       }
     }
     new NameModal(this.app).open();
