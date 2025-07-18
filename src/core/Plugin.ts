@@ -132,7 +132,14 @@ applyExplorerHide(): void {
       document
         .querySelectorAll<HTMLElement>(".nav-folder-title.has-folder-note")
         .forEach(el => {
-          el.style.setProperty("padding-inline-start", "20px", "important");
+          const path = el.dataset.path ?? "";
+          const depth = path === "" ? 0 : path.split("/").length - 1;
+          const padding = 20 + depth * 17;
+          el.style.setProperty(
+            "padding-inline-start",
+            `${padding}px`,
+            "important"
+          );
         });
     };
     apply();

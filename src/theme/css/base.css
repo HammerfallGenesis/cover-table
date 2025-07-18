@@ -348,6 +348,7 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
 
 
 .tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-folder-note{
+  margin-inline-start:0!important;
   padding-inline-start:20px!important;
 }
 
