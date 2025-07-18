@@ -139,7 +139,12 @@ applyExplorerHide(): void {
     const explorer = document.querySelector("#file-explorer");
     if (explorer) {
       const ob = new MutationObserver(apply);
-      ob.observe(explorer, { childList: true, subtree: true });
+      ob.observe(explorer, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["style"],
+      });
       this.register(() => ob.disconnect());
     }
   }
@@ -207,6 +212,9 @@ applyExplorerHide(): void {
     this.applyZeroFolderVisibility();
     this.applyExplorerHide();          // ← 신규 토글 초기 상태 적용
     this.applyFolderNotePadding();
+    this.app.workspace.onLayoutReady(() => {
+      this.applyFolderNotePadding();
+    });
 
     /* (5) List-Callout & Header-Numbering */
     this.listCallouts = new ListCalloutManager(this);
