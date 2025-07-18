@@ -124,6 +124,27 @@ applyExplorerHide(): void {
   }
 }
 
+  /**
+   * Folder note padding fix
+   */
+  applyFolderNotePadding(): void {
+    const apply = () => {
+      document
+        .querySelectorAll<HTMLElement>(".nav-folder-title.has-folder-note")
+        .forEach(el => {
+          el.style.setProperty("padding-inline-start", "20px", "important");
+        });
+    };
+    apply();
+    const explorer = document.querySelector("#file-explorer");
+    if (explorer) {
+      const ob = new MutationObserver(apply);
+      ob.observe(explorer, { childList: true, subtree: true });
+      this.register(() => ob.disconnect());
+    }
+  }
+
+
 
   /* ===========================================================
    *  onload()
@@ -185,6 +206,7 @@ applyExplorerHide(): void {
 
     this.applyZeroFolderVisibility();
     this.applyExplorerHide();          // ← 신규 토글 초기 상태 적용
+    this.applyFolderNotePadding();
 
     /* (5) List-Callout & Header-Numbering */
     this.listCallouts = new ListCalloutManager(this);
