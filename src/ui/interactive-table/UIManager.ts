@@ -41,6 +41,7 @@ async function openPathInNewLeaf(app: App, path: string): Promise<void> {
   if (!(file instanceof TFile)) return;
   const leaf = app.workspace.getLeaf(true);
   await leaf.openFile(file);
+  app.workspace.setActiveLeaf(leaf);
 }
 
 /* ============================================================= */
@@ -199,11 +200,15 @@ table.addEventListener(
     const path = href ?? row?.dataset.path ?? "";
     if (!path) return;
 
-    const ext = path.split(".").pop()?.toLowerCase() || "";
-    if (ext && ext !== "md" && ext !== "pdf") return;
+    const target =
+      this.app.metadataCache.getFirstLinkpathDest(path, "") ??
+      this.app.vault.getAbstractFileByPath(path);
+    if (!(target instanceof TFile)) return;
+    const ext = target.extension.toLowerCase();
+    if (!["md", "pdf", "canvas"].includes(ext)) return;
 
     e.preventDefault();                            // 기본 탐색 억제
-    await openPathInNewLeaf(this.app, path);       // open in new tab
+    await openPathInNewLeaf(this.app, target.path);      // open in new tab
   },
   true,   // capture 단계
 );
