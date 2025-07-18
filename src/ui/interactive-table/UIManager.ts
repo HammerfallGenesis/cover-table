@@ -37,6 +37,18 @@ import type { PaginationOptions } from "../molecules/Pagination";
 
 async function openPathInNewLeaf(app: App, path: string): Promise<void> {
   if (!path) return;
+
+  // decode obsidian URI or percent-encoded paths
+  if (path.startsWith("obsidian://")) {
+    try {
+      const url = new URL(path);
+      const f = url.searchParams.get("file");
+      if (f) path = decodeURIComponent(f);
+    } catch {}
+  } else {
+    path = decodeURI(path);
+  }
+
   const file = app.vault.getAbstractFileByPath(path);
   if (!(file instanceof TFile)) return;
   const leaf = app.workspace.getLeaf(true);
@@ -52,6 +64,18 @@ export async function openInNewLeafAndClose(
   filePath: string,
   _currHost: HTMLElement,
 ) {
+
+  if (filePath.startsWith("obsidian://")) {
+    try {
+      const url = new URL(filePath);
+      const f = url.searchParams.get("file");
+      if (f) filePath = decodeURIComponent(f);
+    } catch {}
+  } else {
+    filePath = decodeURI(filePath);
+  }
+
+
   const abs = app.metadataCache.getFirstLinkpathDest(filePath, "") ??
               app.vault.getAbstractFileByPath(filePath);
   if (!(abs instanceof TFile)) return;
