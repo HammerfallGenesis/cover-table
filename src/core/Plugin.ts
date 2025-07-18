@@ -143,6 +143,8 @@ applyExplorerHide(): void {
         });
     };
     apply();
+    const interval = window.setInterval(apply, 100);
+    window.setTimeout(() => window.clearInterval(interval), 2000);
     const explorer = document.querySelector("#file-explorer");
     if (explorer) {
       const ob = new MutationObserver(apply);
@@ -150,7 +152,7 @@ applyExplorerHide(): void {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ["style"],
+        attributeFilter: ["style", "class"],
       });
       this.register(() => ob.disconnect());
     }
