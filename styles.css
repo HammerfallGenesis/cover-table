@@ -348,11 +348,7 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
 
 
 .tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-folder-note{
-  padding-left:0.25rem!important;
-}
-
-.tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-folder-note{
-  padding-left:0.25rem!important;
+  padding-inline-start:20px!important;
 }
 
 

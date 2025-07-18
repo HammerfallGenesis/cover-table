@@ -200,15 +200,7 @@ table.addEventListener(
     const path = href ?? row?.dataset.path ?? "";
     if (!path) return;
 
-    const target =
-      this.app.metadataCache.getFirstLinkpathDest(path, "") ??
-      this.app.vault.getAbstractFileByPath(path);
-    if (!(target instanceof TFile)) return;
-    const ext = target.extension.toLowerCase();
-    if (!["md", "pdf", "canvas"].includes(ext)) return;
-
-    e.preventDefault();                            // 기본 탐색 억제
-    await openPathInNewLeaf(this.app, target.path);      // open in new tab
+    await openPathInNewLeaf(this.app, path);  
   },
   true,   // capture 단계
 );
