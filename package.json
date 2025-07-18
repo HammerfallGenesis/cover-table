@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-cover-table-plugin",
-	"version": "3.4.4",
+	"version": "3.4.5",
 	"description": "Navigator that displays your vault files as a table on the cover screen, with Dataview filtering & sorting, optimized for mobile.",
 	"main": "dist/main.js",
 	"scripts": {

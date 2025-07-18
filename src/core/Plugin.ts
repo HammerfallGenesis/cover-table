@@ -140,6 +140,9 @@ applyExplorerHide(): void {
             `${padding}px`,
             "important"
           );
+          if (depth === 0) {
+            el.style.setProperty("margin-inline-start", "0", "important");
+          }
         });
     };
     apply();
@@ -152,7 +155,7 @@ applyExplorerHide(): void {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ["style", "class"],
+        attributeFilter: ["style"],
       });
       this.register(() => ob.disconnect());
     }
