@@ -162,8 +162,13 @@
 .markdown-preview-view h4,\r
 .markdown-preview-view h5,\r
 .markdown-preview-view h6{\r
-  display:flex!important; align-items:center; width:100%!important;\r
-  font-size:1.4em; line-height:1em; margin:15px !important; border-bottom-style:outset;\r
+  display:flex !important; \r
+  align-items: center; \r
+  width:100% !important;\r
+  font-size: 1.4em; \r
+  line-height: 1em; \r
+  margin: 20px 0px !important; \r
+  border-bottom-style: outset;\r
 }\r
  /*****************************************************************/\r
 \r
