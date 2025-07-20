@@ -107,7 +107,7 @@
 .markdown-preview-view h5,
 .markdown-preview-view h6{
   display:flex!important; align-items:center; width:100%!important;
-  font-size:1.4em; line-height:1em; margin:15px 0!important; border-bottom-style:outset;
+  font-size:1.4em; line-height:1em; margin:15px !important; border-bottom-style:outset;
 }
  /*****************************************************************/
 
