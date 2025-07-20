@@ -133,12 +133,12 @@
 }
 
 /* ２ 레벨별 들여서기 */
-.markdown-preview-view h1              { padding-left: calc(0 * var(--heading-indent-step)) !important; }
-.markdown-preview-view h2              { padding-left: calc(1 * var(--heading-indent-step)) !important; }
-.markdown-preview-view h3              { padding-left: calc(2 * var(--heading-indent-step)) !important; }
-.markdown-preview-view h4              { padding-left: calc(3 * var(--heading-indent-step)) !important; }
-.markdown-preview-view h5              { padding-left: calc(4 * var(--heading-indent-step)) !important; }
-.markdown-preview-view h6              { padding-left: calc(5 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h1              { padding-left: calc(0 * var(--heading-indent-step)) !important; padding-inline-start: calc(0 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h2              { padding-left: calc(1 * var(--heading-indent-step)) !important; padding-inline-start: calc(1 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h3              { padding-left: calc(2 * var(--heading-indent-step)) !important; padding-inline-start: calc(2 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h4              { padding-left: calc(3 * var(--heading-indent-step)) !important; padding-inline-start: calc(3 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h5              { padding-left: calc(4 * var(--heading-indent-step)) !important; padding-inline-start: calc(4 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h6              { padding-left: calc(5 * var(--heading-indent-step)) !important; padding-inline-start: calc(5 * var(--heading-indent-step)) !important; }
 
 /* ３ 헤딩 바로 다음 블록(단락·리스트 등)도 같은 들여서기를 상속 */
 .markdown-preview-view h1 + *,
