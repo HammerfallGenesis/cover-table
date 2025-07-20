@@ -111,7 +111,7 @@
   width:100% !important;
   font-size: 1.4em; 
   line-height: 1em; 
-  margin: 20px 0px !important; 
+  margin: 15px 0px !important; 
   border-bottom-style: outset;
 }
  /*****************************************************************/
@@ -326,7 +326,7 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}
   display:flex!important;          /* 혹시 inline-flex가 아닌 경우 대비 */
   align-items:center;
   width:100%!important;            /* 밑줄 100 % */
-  margin:5px 0!important;
+  margin:15px 0!important;
   border-bottom-style:outset;
 }
 

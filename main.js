@@ -167,7 +167,7 @@
   width:100% !important;\r
   font-size: 1.4em; \r
   line-height: 1em; \r
-  margin: 20px 0px !important; \r
+  margin: 15px 0px !important; \r
   border-bottom-style: outset;\r
 }\r
  /*****************************************************************/\r
@@ -382,7 +382,7 @@ li img{display:block;max-width:100%;height:auto;margin:.5rem auto;}\r
   display:flex!important;          /* \uD639\uC2DC inline-flex\uAC00 \uC544\uB2CC \uACBD\uC6B0 \uB300\uBE44 */\r
   align-items:center;\r
   width:100%!important;            /* \uBC11\uC904 100 % */\r
-  margin:5px 0!important;\r
+  margin:15px 0!important;\r
   border-bottom-style:outset;\r
 }\r
 \r
