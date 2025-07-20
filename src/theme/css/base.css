@@ -114,46 +114,60 @@
 
 
 /*****************************************************************
- *  Header 1
+ *  Heading indentation — **Reading Mode 전용** (미리보기·읽기 화면)
  *****************************************************************/
-/*---- Reading View ----*/
-.el-h1 ~ div{ padding-left: 0em!important;}
-.el-h1 { padding-left: 0em !important;}
+/* 단계별 들여서기 개값을 한곳에서 조정 */
+:root {
+  --heading-indent-step: 1em;   /* 숫자만 바꿈면 모든 레벨이 자동 조정 */
+}
 
-/*****************************************************************
- *  Header 2
- *****************************************************************/
-/*---- Reading View ----*/
-.el-h1 ~ .el-h2 ~ div { padding-left: 1.0em!important;}
-.el-h1 ~ .el-h2 { padding-left: 1.0em !important;}
+/* １ 기본값 초기화 : 테마가 준 padding/margin 제거 */
+.markdown-preview-view h1,
+.markdown-preview-view h2,
+.markdown-preview-view h3,
+.markdown-preview-view h4,
+.markdown-preview-view h5,
+.markdown-preview-view h6 {
+  padding-left: 0 !important;   /* 충돌 방지용 */
+  margin-left : 0;
+}
 
-/*****************************************************************
- *  Header 3
- *****************************************************************/
-/*---- Reading View ----*/
-.el-h2 ~ .el-h3 ~ div { padding-left: 2.0em!important;}
-.el-h2 ~ .el-h3 { padding-left: 2.0em !important;}
+/* ２ 레벨별 들여서기 */
+.markdown-preview-view h1              { padding-left: calc(0 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h2              { padding-left: calc(1 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h3              { padding-left: calc(2 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h4              { padding-left: calc(3 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h5              { padding-left: calc(4 * var(--heading-indent-step)) !important; }
+.markdown-preview-view h6              { padding-left: calc(5 * var(--heading-indent-step)) !important; }
 
-/*****************************************************************
- *  Header 4
- *****************************************************************/
-/*---- Reading View ----*/
-.el-h3 ~ .el-h4 ~ div { padding-left: 3.0em!important;}
-.el-h3 ~ .el-h4 { padding-left: 3.0em !important;}
+/* ３ 헤딩 바로 다음 블록(단락·리스트 등)도 같은 들여서기를 상속 */
+.markdown-preview-view h1 + *,
+.markdown-preview-view h2 + *,
+.markdown-preview-view h3 + *,
+.markdown-preview-view h4 + *,
+.markdown-preview-view h5 + *,
+.markdown-preview-view h6 + * {
+  margin-left: inherit;
+}
 
-/*****************************************************************
- *  Header 5
- *****************************************************************/
-/*---- Reading View ----*/
-.el-h4 ~ .el-h5 ~ div { padding-left: 4.0em !important;}
-.el-h4 ~ .el-h5 { padding-left: 4.0em !important;}
+/* ４ el‑h* 클래스를 쓰는 플러그인(Enhanced Lists 등) 호환 */
+.markdown-preview-view .el-h1,
+.markdown-preview-view .el-h1 + div { padding-left: calc(0 * var(--heading-indent-step)) !important; }
 
-/*****************************************************************
- *  Header 6
- *****************************************************************/
-/*---- Reading View ----*/
-.el-h5 ~ .el-h6 ~ div { padding-left: 5.0em !important;}
-.el-h5 ~ .el-h6 { padding-left: 5.0em !important;}
+.markdown-preview-view .el-h2,
+.markdown-preview-view .el-h2 + div { padding-left: calc(1 * var(--heading-indent-step)) !important; }
+
+.markdown-preview-view .el-h3,
+.markdown-preview-view .el-h3 + div { padding-left: calc(2 * var(--heading-indent-step)) !important; }
+
+.markdown-preview-view .el-h4,
+.markdown-preview-view .el-h4 + div { padding-left: calc(3 * var(--heading-indent-step)) !important; }
+
+.markdown-preview-view .el-h5,
+.markdown-preview-view .el-h5 + div { padding-left: calc(4 * var(--heading-indent-step)) !important; }
+
+.markdown-preview-view .el-h6,
+.markdown-preview-view .el-h6 + div { padding-left: calc(5 * var(--heading-indent-step)) !important; }
 
 
 
