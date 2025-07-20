@@ -152,22 +152,40 @@
 
 /* ４ el‑h* 클래스를 쓰는 플러그인(Enhanced Lists 등) 호환 */
 .markdown-preview-view .el-h1,
-.markdown-preview-view .el-h1 + div { padding-left: calc(0 * var(--heading-indent-step)) !important; }
+.markdown-preview-view .el-h1 + div {
+  margin-left: 0 !important;
+  padding-left: calc(0 * var(--heading-indent-step)) !important;
+}
 
 .markdown-preview-view .el-h2,
-.markdown-preview-view .el-h2 + div { padding-left: calc(1 * var(--heading-indent-step)) !important; }
+.markdown-preview-view .el-h2 + div {
+  margin-left: 0 !important;
+  padding-left: calc(1 * var(--heading-indent-step)) !important;
+}
 
 .markdown-preview-view .el-h3,
-.markdown-preview-view .el-h3 + div { padding-left: calc(2 * var(--heading-indent-step)) !important; }
+.markdown-preview-view .el-h3 + div {
+  margin-left: 0 !important;
+  padding-left: calc(2 * var(--heading-indent-step)) !important;
+}
 
 .markdown-preview-view .el-h4,
-.markdown-preview-view .el-h4 + div { padding-left: calc(3 * var(--heading-indent-step)) !important; }
+.markdown-preview-view .el-h4 + div {
+  margin-left: 0 !important;
+  padding-left: calc(3 * var(--heading-indent-step)) !important;
+}
 
 .markdown-preview-view .el-h5,
-.markdown-preview-view .el-h5 + div { padding-left: calc(4 * var(--heading-indent-step)) !important; }
+.markdown-preview-view .el-h5 + div {
+  margin-left: 0 !important;
+  padding-left: calc(4 * var(--heading-indent-step)) !important;
+}
 
 .markdown-preview-view .el-h6,
-.markdown-preview-view .el-h6 + div { padding-left: calc(5 * var(--heading-indent-step)) !important; }
+.markdown-preview-view .el-h6 + div {
+  margin-left: 0 !important;
+  padding-left: calc(5 * var(--heading-indent-step)) !important;
+}
 
 
 
